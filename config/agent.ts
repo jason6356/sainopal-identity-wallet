@@ -1,44 +1,35 @@
+import {
+  AnonCredsCredentialFormatService,
+  AnonCredsModule,
+  AnonCredsProofFormatService,
+  LegacyIndyCredentialFormatService,
+  LegacyIndyProofFormatService,
+} from "@aries-framework/anoncreds"
+import { AnonCredsRsModule } from "@aries-framework/anoncreds-rs"
 import type { InitConfig } from "@aries-framework/core"
 import {
   Agent,
-  AutoAcceptProof,
   ConsoleLogger,
   CredentialsModule,
   DidsModule,
+  HttpOutboundTransport,
   LogLevel,
   MediationRecipientModule,
   ProofsModule,
   V2CredentialProtocol,
   V2ProofProtocol,
-} from "@aries-framework/core"
-import { agentDependencies } from "@aries-framework/react-native"
-import {
-  HttpOutboundTransport,
   WsOutboundTransport,
 } from "@aries-framework/core"
 import {
-  IndySdkModule,
-  IndySdkPoolConfig,
-  IndySdkModuleConfig,
   IndySdkAnonCredsRegistry,
   IndySdkIndyDidResolver,
+  IndySdkModule,
+  IndySdkPoolConfig,
 } from "@aries-framework/indy-sdk"
-import indySdk, { openPoolLedger } from "indy-sdk-react-native"
-import genesis from "./genesis"
+import { agentDependencies } from "@aries-framework/react-native"
 import { anoncreds } from "@hyperledger/anoncreds-react-native"
-import { AnonCredsRsModule } from "@aries-framework/anoncreds-rs"
-import type { AnonCredsRsModuleConfigOptions } from "@aries-framework/anoncreds-rs/build/AnonCredsRsModuleConfig"
-import {
-  AnonCredsModule,
-  LegacyIndyCredentialFormat,
-  AnonCredsCredentialFormat,
-  LegacyIndyCredentialFormatService,
-  AnonCredsCredentialFormatService,
-  AnonCredsLinkSecretRepository,
-  V1ProofProtocol,
-  LegacyIndyProofFormatService,
-  AnonCredsProofFormatService,
-} from "@aries-framework/anoncreds"
+import indySdk from "indy-sdk-react-native"
+import { genesis } from "./genesis"
 
 const poolConfig: IndySdkPoolConfig = {
   indyNamespace: "",
@@ -47,7 +38,7 @@ const poolConfig: IndySdkPoolConfig = {
   isProduction: false,
 }
 
-const mediatorInvitationUrl = `https://619c-103-52-192-245.ngrok.io?c_i=eyJAdHlwZSI6ICJodHRwczovL2RpZGNvbW0ub3JnL2Nvbm5lY3Rpb25zLzEuMC9pbnZpdGF0aW9uIiwgIkBpZCI6ICJlOThlZGY2MC0zYzk4LTQ4NTQtYjVmYS04OTkzNDkwZDZmZDAiLCAic2VydmljZUVuZHBvaW50IjogImh0dHBzOi8vNjE5Yy0xMDMtNTItMTkyLTI0NS5uZ3Jvay5pbyIsICJsYWJlbCI6ICJNZWRpYXRvciIsICJyZWNpcGllbnRLZXlzIjogWyJEYlBocG5IaXl5YmY0TGZFdzJrZENjU0d0OVNnZFZ1YUdja1E5d1VZN3hXRSJdfQ==`
+const mediatorInvitationUrl = `https://public.mediator.indiciotech.io?c_i=eyJAdHlwZSI6ICJkaWQ6c292OkJ6Q2JzTlloTXJqSGlxWkRUVUFTSGc7c3BlYy9jb25uZWN0aW9ucy8xLjAvaW52aXRhdGlvbiIsICJAaWQiOiAiMDVlYzM5NDItYTEyOS00YWE3LWEzZDQtYTJmNDgwYzNjZThhIiwgInNlcnZpY2VFbmRwb2ludCI6ICJodHRwczovL3B1YmxpYy5tZWRpYXRvci5pbmRpY2lvdGVjaC5pbyIsICJyZWNpcGllbnRLZXlzIjogWyJDc2dIQVpxSktuWlRmc3h0MmRIR3JjN3U2M3ljeFlEZ25RdEZMeFhpeDIzYiJdLCAibGFiZWwiOiAiSW5kaWNpbyBQdWJsaWMgTWVkaWF0b3IifQ==`
 
 const config: InitConfig = {
   label: "sainopal",
@@ -58,7 +49,6 @@ const config: InitConfig = {
   logger: new ConsoleLogger(LogLevel.trace),
 }
 
-const indyCredentialFormat = new LegacyIndyCredentialFormatService()
 const indyProofFormat = new LegacyIndyProofFormatService()
 
 const agent = new Agent({
@@ -102,4 +92,5 @@ const agent = new Agent({
 agent.registerOutboundTransport(new HttpOutboundTransport())
 agent.registerOutboundTransport(new WsOutboundTransport())
 
+agent.modules.anoncreds
 export { agent }

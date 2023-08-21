@@ -11,9 +11,7 @@
       "resizeMode": "contain",
       "backgroundColor": "#ffffff"
     },
-    "assetBundlePatterns": [
-      "**/*"
-    ],
+    "assetBundlePatterns": ["**/*"],
     "ios": {
       "supportsTablet": true,
       "bitcode": false
@@ -29,7 +27,13 @@
       "favicon": "./assets/favicon.png"
     },
     "plugins": [
-      "@animo-id/indy-sdk-expo-plugin"
+      ["@animo-id/indy-sdk-expo-plugin"],
+      [
+        "expo-barcode-scanner",
+        {
+          "cameraPermission": "Allow $(PRODUCT_NAME) to access camera."
+        }
+      ]
     ]
   }
 }
