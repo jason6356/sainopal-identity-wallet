@@ -1,22 +1,18 @@
-import React, { useState, useEffect } from "react"
-import { Text, View, StyleSheet, Button, Alert } from "react-native"
+import { useAgent } from "@aries-framework/react-hooks"
 import { BarCodeScanner, BarCodeScannerResult } from "expo-barcode-scanner"
-import AgentService from "../../services/AgentService"
-import { Buffer } from "buffer"
-import axios from "axios"
+import React, { useEffect, useState } from "react"
+import { Alert, Button, StyleSheet, Text, View } from "react-native"
 
 export default function Scan() {
   const [hasPermission, setHasPermission] = useState<boolean | null>(null)
   const [scanned, setScanned] = useState(false)
-  const [agent, setAgent] = useState<AgentService | null>(null)
+  const agent = useAgent()
 
   useEffect(() => {
     const getBarCodeScannerPermissions = async () => {
       const { status } = await BarCodeScanner.requestPermissionsAsync()
       if (status === "granted") {
         setHasPermission(true)
-        const initAgent: AgentService = new AgentService(axios)
-        setAgent(initAgent)
       }
     }
 
@@ -39,22 +35,9 @@ export default function Scan() {
         {
           text: "OK",
           onPress: () => {
-            const url = new URL(data)
-            const invitationParam = url.searchParams.get("c_i")
-
-            if (!invitationParam) {
-              console.error("Invalid Invitation Url")
-              return
-            }
-            const decoded = Buffer.from(invitationParam, "base64").toString()
-            console.log(decoded)
-            const payload = JSON.parse(decoded)
-            console.log("Payload: ", payload)
-
-            agent
-              ?.receiveInvitation(payload)
-              .then((e) => console.log(e))
-              .catch((e) => console.error(e))
+            agent.agent.oob
+              .receiveInvitationFromUrl(data)
+              .then((e) => console.log("Nice"))
           },
         },
       ],

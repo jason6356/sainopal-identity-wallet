@@ -1,97 +1,49 @@
-import React, { useState, useEffect } from "react"
-import {
-  SafeAreaView,
-  Text,
-  StyleSheet,
-  View,
-  FlatList,
-  TextInput,
-  ScrollView,
-} from "react-native"
-import AgentService from "../../services/AgentService"
-import axios from "axios"
+import { ConnectionRecord } from "@aries-framework/core"
+import { useAgent, useConnections } from "@aries-framework/react-hooks"
 import { MaterialIcons } from "@expo/vector-icons"
-type Connection = {
-  my_did: string
-  updated_at: string
-  rfc23_state: string
-  accept: string
-  their_did: string
-  created_at: string
-  routing_state: string
-  their_label: string
-  invitation_mode: string
-  connection_protocol: string
-  invitation_key: string
-  their_role: string
-  connection_id: string
-  state: string
-}
+import React, { useEffect, useState } from "react"
+import {
+  FlatList,
+  SafeAreaView,
+  StyleSheet,
+  Text,
+  TextInput,
+  View,
+} from "react-native"
 
 const ConnectionUI = () => {
   const [search, setSearch] = useState("")
-  const [filteredConnections, setFilteredConnections] = useState<Connection[]>(
-    []
-  )
-  const [allConnections, setAllConnections] = useState<Connection[]>([])
-  const [agent, setAgent] = useState<AgentService | null>(null)
+  const [filteredConnections, setFilteredConnections] = useState<
+    ConnectionRecord[]
+  >([])
+  const agent = useAgent()
+  const connections = useConnections()
 
   useEffect(() => {
-    if (!agent) {
-      const initAgent: AgentService = new AgentService(axios)
-      setAgent(initAgent)
-    }
-
-    function fetchConnections() {
-      agent
-        ?.getConnections()
-        .then((e) => {
-          console.log(e.results)
-
-          // Filter out connections with empty their_label
-          const validConnections = e.results.filter(
-            (connection: { their_label: any }) => connection.their_label
-          )
-
-          // Sort connections by creation date in descending order
-          validConnections.sort(
-            (
-              a: { created_at: string | number | Date },
-              b: { created_at: string | number | Date }
-            ) =>
-              new Date(b.created_at).getTime() -
-              new Date(a.created_at).getTime()
-          )
-
-          setAllConnections(validConnections)
-          setFilteredConnections(validConnections)
-        })
-        .catch((error) => console.error(error))
-    }
-
-    fetchConnections()
-  }, [agent])
+    setFilteredConnections(connections.records)
+  }, [])
 
   const searchFilterFunction = (text: string) => {
     if (text === "") {
-      setFilteredConnections(allConnections)
+      setFilteredConnections(connections.records)
     } else {
-      const filteredData = allConnections.filter((connection) => {
-        const myDid = connection.their_label || "" // Handle undefined value
+      const filteredData = connections.records.filter((connection) => {
+        const myDid = connection.theirLabel || "" // Handle undefined value
         return myDid.toLowerCase().includes(text.toLowerCase())
       })
+      console.log(filteredData)
       setFilteredConnections(filteredData)
     }
     setSearch(text)
   }
 
   const clearSearch = () => {
-    setFilteredConnections(allConnections)
+    setFilteredConnections(connections.records)
     setSearch("")
   }
 
-  const renderItem = ({ item }: { item: Connection }) => {
-    const createdAt = new Date(item.created_at)
+  const renderItem = ({ item }: { item: ConnectionRecord }) => {
+    const createdAt = new Date(item.createdAt)
     const now = new Date()
 
     const formattedDate = createdAt.toLocaleDateString()
@@ -117,7 +69,7 @@ const ConnectionUI = () => {
       return (
         <View style={styles.itemContainer}>
           <View style={styles.leftContent}>
-            <Text style={styles.itemText}>{item.their_label}</Text>
+            <Text style={styles.itemText}>{item.theirLabel}</Text>
             <Text style={styles.timeText}>{formattedTime}</Text>
           </View>
           <View style={styles.rightContent}>
@@ -166,7 +118,7 @@ const ConnectionUI = () => {
         <View>
           <FlatList
             data={filteredConnections}
-            keyExtractor={(item) => item.my_did}
+            keyExtractor={(item) => item.id}
             renderItem={renderItem}
           />
         </View>
