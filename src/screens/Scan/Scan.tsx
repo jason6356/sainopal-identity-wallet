@@ -1,9 +1,13 @@
 import { useAgent } from "@aries-framework/react-hooks"
+import { StackScreenProps } from "@react-navigation/stack"
 import { BarCodeScanner, BarCodeScannerResult } from "expo-barcode-scanner"
 import React, { useEffect, useState } from "react"
 import { Alert, Button, StyleSheet, Text, View } from "react-native"
+import { RootStackParamList } from "../../navigators/BottomNavigation"
 
-export default function Scan() {
+type Props = StackScreenProps<RootStackParamList, "Scan">
+
+export default function Scan({ navigation, route }: Props) {
   const [hasPermission, setHasPermission] = useState<boolean | null>(null)
   const [scanned, setScanned] = useState(false)
   const agent = useAgent()
@@ -13,36 +17,51 @@ export default function Scan() {
       const { status } = await BarCodeScanner.requestPermissionsAsync()
       if (status === "granted") {
         setHasPermission(true)
+        setScanned(false)
       }
     }
-
     getBarCodeScannerPermissions()
   }, [])
 
-  const handleBarCodeScanned = ({ type, data }: BarCodeScannerResult) => {
-    // setScanned(true)
-    Alert.alert(
-      "Scanned Data",
-      `Bar code with type ${type} and data ${data} has been scanned!`,
-      [
-        {
-          text: "Cancel",
-          style: "cancel",
-          onPress: () => {
-            setScanned(false)
+  const handleBarCodeScanned = async ({ type, data }: BarCodeScannerResult) => {
+    try {
+      const result = await agent.agent.oob.parseInvitation(data)
+      setScanned(true)
+      Alert.alert(
+        "Scanned Data",
+        `Bar code with type ${type} and data ${data} has been scanned!`,
+        [
+          {
+            text: "Cancel",
+            style: "cancel",
+            onPress: () => {
+              setScanned(false)
+            },
           },
-        },
-        {
-          text: "OK",
-          onPress: () => {
-            agent.agent.oob
-              .receiveInvitationFromUrl(data)
-              .then((e) => console.log("Nice"))
+          {
+            text: "OK",
+            onPress: () => {
+              agent.agent.oob
+                .receiveInvitationFromUrl(data)
+                .then((e) => {
+                  Alert.alert(
+                    `Successfully Connected with the Agent ${e.connectionRecord?.theirLabel}`
+                  )
+
+                  navigation.navigate("ContactsStack")
+                })
+                .catch((e) => console.error(e))
+
+              // setScanned(false)
+            },
           },
-        },
-      ],
-      { cancelable: false }
-    )
+        ],
+        { cancelable: false }
+      )
+    } catch (e) {
+      setScanned(true)
+      Alert.alert("Invalid Url")
+    }
   }
 
   if (hasPermission === null) {
@@ -54,10 +73,12 @@ export default function Scan() {
 
   return (
     <View style={styles.container}>
-      <BarCodeScanner
-        onBarCodeScanned={handleBarCodeScanned}
-        style={StyleSheet.absoluteFillObject}
-      />
+      {!scanned && (
+        <BarCodeScanner
+          onBarCodeScanned={handleBarCodeScanned}
+          style={StyleSheet.absoluteFillObject}
+        />
+      )}
       <View style={styles.borderContainer}></View>
 
       {scanned && (

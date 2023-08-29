@@ -1,22 +1,11 @@
+import { StackScreenProps } from "@react-navigation/stack"
 import React from "react"
 import { StyleSheet, Text, View } from "react-native"
-import { RouteProp } from "@react-navigation/native"
-import { StackNavigationProp } from "@react-navigation/stack"
-import { RootStackParamList } from "../../../CustomNavigation"
+import { SettingStackParamList } from "../../navigators/SettingStack"
 
-// Define the types for the navigation and route props
-type NestedScreen1NavigationProp = StackNavigationProp<
-  RootStackParamList,
-  "BackUpWallet"
->
-type NestedScreen1RouteProp = RouteProp<RootStackParamList, "BackUpWallet">
+type Props = StackScreenProps<SettingStackParamList, "BackUpWallet">
 
-type NestedScreen1Props = {
-  navigation: NestedScreen1NavigationProp
-  route: NestedScreen1RouteProp
-}
-
-const NestedScreen1: React.FC<NestedScreen1Props> = ({ route }) => {
+const NestedScreen1: React.FC<Props> = ({ navigation, route }: Props) => {
   const { msg } = route.params // Access the passed parameter
 
   return (

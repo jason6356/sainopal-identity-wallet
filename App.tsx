@@ -3,6 +3,8 @@ import AgentProvider from "@aries-framework/react-hooks"
 import React, { useEffect, useState } from "react"
 import { agent } from "./config" // Assuming this is where you have your agent configuration
 import BottomNavigation from "./src/navigators/BottomNavigation"
+import { GluestackUIProvider } from "@gluestack-ui/react"
+import { createLinkSecretIfRequired } from "./config/agent"
 
 const App: React.FC = () => {
   const [initializedAgent, setInitializedAgent] = useState<Agent<any> | null>(
@@ -13,6 +15,7 @@ const App: React.FC = () => {
     async function initializeAndSetAgent() {
       try {
         await agent.initialize()
+        await createLinkSecretIfRequired(agent)
         setInitializedAgent(agent)
       } catch (error) {
         console.error("Error initializing agent:", error)

@@ -1,6 +1,6 @@
 import { MaterialIcons } from "@expo/vector-icons"
 import { useNavigation } from "@react-navigation/native"
-import { StackNavigationProp } from "@react-navigation/stack"
+import { StackNavigationProp, StackScreenProps } from "@react-navigation/stack"
 import React from "react"
 import {
   FlatList,
@@ -11,11 +11,12 @@ import {
   TouchableOpacity,
   View,
 } from "react-native"
-import { RootStackParamList } from "../../../CustomNavigation"
-type homeScreenProp = StackNavigationProp<RootStackParamList, "BackUpWallet">
 
-const Settings = () => {
-  const navigation = useNavigation<homeScreenProp>()
+import { SettingStackParamList } from "../../navigators/SettingStack"
+
+type Props = StackScreenProps<SettingStackParamList, "Settings", "BackUpWallet">
+
+const Settings: React.FC<Props> = ({ navigation, route }: Props) => {
   const settingsData = [
     {
       id: 1,
@@ -34,8 +35,11 @@ const Settings = () => {
       // navigation.navigate("Wallet Backup", { msg: "Your message here" })
     } else if (title === "Wallet Backup") {
       // navigation.navigate("WalletBackupScreen")
-      navigation.navigate("BackUpWallet", { msg: "Your message 22here" })
+      navigation.push("BackUpWallet", { msg: "Your message 22here" })
     }
+    /**
+     * @Comment : Use navigation.push to improve tracability
+     */
     // Add more cases for other setting titles
   }
 

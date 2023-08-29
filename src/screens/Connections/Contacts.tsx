@@ -1,27 +1,36 @@
 import { ConnectionRecord } from "@aries-framework/core"
-import { useAgent, useConnections } from "@aries-framework/react-hooks"
+import { useConnections } from "@aries-framework/react-hooks"
 import { MaterialIcons } from "@expo/vector-icons"
+import { StackScreenProps } from "@react-navigation/stack"
 import React, { useEffect, useState } from "react"
 import {
   FlatList,
+  Pressable,
   SafeAreaView,
   StyleSheet,
   Text,
   TextInput,
   View,
 } from "react-native"
+import { ContactStackParamList } from "../../navigators/ContactStack"
 
-const ConnectionUI = () => {
+type Props = StackScreenProps<
+  ContactStackParamList,
+  "Contacts",
+  "ConnectionDetails"
+>
+
+const Contacts = ({ navigation, route }: Props) => {
   const [search, setSearch] = useState("")
   const [filteredConnections, setFilteredConnections] = useState<
     ConnectionRecord[]
   >([])
-  const agent = useAgent()
   const connections = useConnections()
 
   useEffect(() => {
     setFilteredConnections(connections.records)
-  }, [])
+    console.log(connections.records)
+  }, [connections.records])
 
   const searchFilterFunction = (text: string) => {
     if (text === "") {
@@ -31,7 +40,6 @@ const ConnectionUI = () => {
         const myDid = connection.theirLabel || "" // Handle undefined value
         return myDid.toLowerCase().includes(text.toLowerCase())
       })
-      console.log(filteredData)
       setFilteredConnections(filteredData)
     }
     setSearch(text)
@@ -67,16 +75,28 @@ const ConnectionUI = () => {
 
     if (createdAt < now) {
       return (
-        <View style={styles.itemContainer}>
-          <View style={styles.leftContent}>
-            <Text style={styles.itemText}>{item.theirLabel}</Text>
-            <Text style={styles.timeText}>{formattedTime}</Text>
+        <Pressable
+          onPress={() =>
+            navigation.push("ConnectionDetails", {
+              connection_id: item.id,
+            })
+          }
+        >
+          <View style={styles.itemContainer}>
+            <View style={styles.leftContent}>
+              <Text style={styles.itemText}>{item.theirLabel}</Text>
+              <Text style={styles.timeText}>{formattedTime}</Text>
+            </View>
+            <View style={styles.rightContent}>
+              <Text style={styles.dateText}>{dateDisplay}</Text>
+              <MaterialIcons
+                name="keyboard-arrow-right"
+                size={24}
+                color="#555"
+              />
+            </View>
           </View>
-          <View style={styles.rightContent}>
-            <Text style={styles.dateText}>{dateDisplay}</Text>
-            <MaterialIcons name="keyboard-arrow-right" size={24} color="#555" />
-          </View>
-        </View>
+        </Pressable>
       )
     } else {
       return null // Do not render connections with future dates
@@ -88,7 +108,7 @@ const ConnectionUI = () => {
   )
 
   return (
-    <SafeAreaView style={{ flex: 1 }}>
+    <SafeAreaView style={{ flex: 1, backgroundColor: "white" }}>
       <View style={styles.container}>
         <View style={styles.textInputContainer}>
           <View style={styles.searchIcon}>
@@ -213,4 +233,4 @@ const styles = StyleSheet.create({
     backgroundColor: "#C8C8C8",
   },
 })
-export default ConnectionUI
+export default Contacts
