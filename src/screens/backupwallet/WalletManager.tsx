@@ -16,7 +16,7 @@ import DocumentPicker, {
 } from "react-native-document-picker"
 export default function WalletScreen() {
   const [exportConfig, setExportConfig] = useState({
-    path: `${RNFS.DownloadDirectoryPath}/exported_wallet${Date.now}.json`,
+    path: `${RNFS.DownloadDirectoryPath}/exported_wallet${Date.now()}.json`,
     key: "ChaCha20-Poly1305-IETF",
   })
 
