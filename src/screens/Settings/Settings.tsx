@@ -33,6 +33,7 @@ const Settings: React.FC<Props> = ({ navigation, route }: Props) => {
   const handleSettingPress = (title: string) => {
     if (title === "Change Pin") {
       // navigation.navigate("Wallet Backup", { msg: "Your message here" })
+      navigation.push("ChangePin", { msg: "Your message 22here" })
     } else if (title === "Wallet Backup") {
       // navigation.navigate("WalletBackupScreen")
       navigation.push("BackUpWallet", { msg: "Your message 22here" })
