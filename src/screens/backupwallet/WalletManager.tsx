@@ -1,4 +1,4 @@
-import { useCallback, useState } from "react"
+import { useCallback, useLayoutEffect, useState } from "react"
 import {
   View,
   Text,
@@ -6,6 +6,8 @@ import {
   Button,
   ImageProps as DefaultImageProps,
   ImageURISource,
+  StyleSheet,
+  Image,
 } from "react-native"
 import { config } from "../../../config/agent"
 import { WalletConfig } from "indy-sdk-react-native"
@@ -14,7 +16,18 @@ import RNFS from "react-native-fs"
 import DocumentPicker, {
   DocumentPickerResponse,
 } from "react-native-document-picker"
-export default function WalletScreen() {
+import { TouchableOpacity } from "react-native-gesture-handler"
+import { StackScreenProps } from "@react-navigation/stack"
+import { WalletStackParamList } from "../../navigators/WalletStack"
+
+type Props = StackScreenProps<WalletStackParamList, "SelfCredential">
+
+const WalletManager = ({ navigation }: Props) => {
+  useLayoutEffect(() => {
+    navigation.setOptions({
+      title: "Backup Wallet",
+    })
+  })
   const [exportConfig, setExportConfig] = useState({
     path: `${RNFS.DownloadDirectoryPath}/exported_wallet${Date.now()}.json`,
     key: "ChaCha20-Poly1305-IETF",
@@ -63,12 +76,10 @@ export default function WalletScreen() {
           walletCredentials
         )
 
-        // Export the wallet data
         await IndySdk.exportWallet(walletHandle, exportConfig)
         await IndySdk.closeWallet(walletHandle)
         console.log("Exported Wallet Successfully")
       } else {
-        // Handle case where walletConfig or walletCredentials is undefined
         console.log("CANNOT SIA")
       }
     } catch (error) {
@@ -96,17 +107,10 @@ export default function WalletScreen() {
             walletCredentials
           )
           await IndySdk.closeWallet(existingWalletHandle)
-          await IndySdk.deleteWallet(
-            walletConfig,
-            walletCredentials,
-            walletName
-          )
+
           console.log("Deleted existing wallet:", walletName)
         } catch (deleteError) {
           // Ignore errors if the wallet doesn't exist
-          if (deleteError.indyCode !== 212) {
-            console.error("Error deleting wallet:", deleteError)
-          }
         }
 
         // Now, you can access the selected file using fileResponse.uri
@@ -144,14 +148,84 @@ export default function WalletScreen() {
   }
 
   return (
-    <View>
-      <Text>Export Wallet</Text>
+    <View style={[styles.container]}>
+      <View style={[styles.containerImage]}>
+        <Image
+          source={require("../../assets/backupIcon.png")}
+          style={styles.image}
+        />
+      </View>
+      <View>
+        <Text style={[styles.title]}>Your Wallet is backed up</Text>
+      </View>
+      <View>
+        <Text style={[styles.subtitle]}>
+          In case you lose access to your wallet, you will be able to recover
+          your data with your recovery phrase and your exported file.
+        </Text>
+      </View>
       {/* Input fields and export button */}
-      <Button title="Export" onPress={handleExport} />
-
-      <Text>Import Wallet</Text>
+      {/* <Button
+        title="Create a new backup file"
+        onPress={handleExport}
+      /> */}
+      <View style={[styles.containerBtn]}>
+        <TouchableOpacity style={styles.button} onPress={handleExport}>
+          <Text style={styles.buttonText}> Create new backup file </Text>
+        </TouchableOpacity>
+      </View>
+      {/* <Text>Import Wallet</Text> */}
       {/* Input fields and import button */}
-      <Button title="Import" onPress={handleImport} />
+      {/* <Button title="Import" onPress={handleImport} /> */}
     </View>
   )
 }
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    padding: 20,
+    backgroundColor: "#fff",
+  },
+  containerImage: {
+    alignItems: "center",
+    marginBottom: 30,
+    marginTop: 30,
+  },
+  containerBtn: {
+    flex: 1,
+    justifyContent: "flex-end",
+    marginBottom: 100,
+  },
+  image: {
+    width: 150,
+    height: 150,
+  },
+  buttonText: {
+    color: "#fff",
+    fontWeight: "bold",
+    lineHeight: 20,
+  },
+  button: {
+    alignItems: "center",
+    backgroundColor: "#90b4fc",
+    color: "#fff",
+    padding: 15,
+    borderRadius: 10,
+  },
+  title: {
+    fontSize: 22,
+    lineHeight: 35,
+    fontWeight: "bold",
+    color: "#243853",
+  },
+  subtitle: {
+    marginTop: 10,
+    lineHeight: 25,
+    fontSize: 16,
+    fontWeight: "bold",
+    color: "#aaafb8",
+  },
+})
+
+export default WalletManager
