@@ -1,14 +1,20 @@
 import { createStackNavigator } from "@react-navigation/stack";
 import React from "react";
 import Scan from "../screens/Scan/Scan";
-import { ConnectionRecord } from "@aries-framework/core";
+import { ConnectionRecord, OutOfBandInvitation } from "@aries-framework/core";
 import ConnectionRequest from "../screens/Connection/ConnectionRequest";
 
 type ScanStackProps = {};
 
+type ConnectionRequestScreenProps = {
+  inviteObj: OutOfBandInvitation;
+  url: string;
+};
+
 export type ScanStackParamList = {
   Scan: undefined;
-  ConnectionRequest: ConnectionRecord | undefined;
+  ConnectionRequest: ConnectionRequestScreenProps | undefined;
+  ContactStack: undefined;
 };
 
 const ScanStack = createStackNavigator<ScanStackParamList>();

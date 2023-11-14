@@ -1,8 +1,15 @@
 import { useAgent } from "@aries-framework/react-hooks";
+import { AntDesign } from "@expo/vector-icons";
 import { StackScreenProps } from "@react-navigation/stack";
 import { BarCodeScanner, BarCodeScannerResult } from "expo-barcode-scanner";
 import React, { useEffect, useState } from "react";
-import { Alert, Button, StyleSheet, Text, View } from "react-native";
+import {
+  Button,
+  StyleSheet,
+  Text,
+  View,
+  TouchableHighlight,
+} from "react-native";
 import { ScanStackParamList } from "../../navigators/ScanStack";
 
 type Props = StackScreenProps<ScanStackParamList, "Scan">;
@@ -23,45 +30,25 @@ export default function Scan({ navigation, route }: Props) {
     getBarCodeScannerPermissions();
   }, []);
 
+  const handleBack = () => {
+    navigation.goBack();
+  };
+
   const handleBarCodeScanned = async ({ type, data }: BarCodeScannerResult) => {
+    setScanned(true);
     try {
       const result = await agent.agent.oob.parseInvitation(data);
-      setScanned(true);
-      Alert.alert(
-        "Scanned Data",
-        `Bar code with type ${type} and data ${data} has been scanned!`,
-        [
-          {
-            text: "Cancel",
-            style: "cancel",
-            onPress: () => {
-              setScanned(false);
-            },
-          },
-          {
-            text: "OK",
-            onPress: () => {
-              agent.agent.oob
-                .receiveInvitationFromUrl(data, { autoAcceptConnection: false })
-                .then((e) => {
-                  Alert.alert(
-                    `Successfully Connected with the Agent ${e.connectionRecord?.theirLabel}`
-                  );
-                  console.log(e.outOfBandRecord);
-                  navigation.navigate("ConnectionRequest", e.connectionRecord);
-                })
-                .catch((e) => console.error(e));
-
-              // setScanned(false)
-            },
-          },
-        ],
-        { cancelable: false }
-      );
+      console.log("Connection Request Received!");
+      navigation.navigate("ConnectionRequest", {
+        inviteObj: result,
+        url: data,
+      });
     } catch (e) {
-      setScanned(true);
-      Alert.alert("Invalid Url");
+      console.log("Invalid QR Code");
     }
+    setTimeout(() => {
+      setScanned(false);
+    }, 5000);
   };
 
   if (hasPermission === null) {
@@ -79,6 +66,11 @@ export default function Scan({ navigation, route }: Props) {
           style={StyleSheet.absoluteFillObject}
         />
       )}
+      <View style={styles.backIcon}>
+        <TouchableHighlight onPress={handleBack}>
+          <AntDesign name="back" size={30} color="#fff" />
+        </TouchableHighlight>
+      </View>
       <View style={styles.borderContainer}></View>
 
       {scanned && (
@@ -102,5 +94,11 @@ const styles = StyleSheet.create({
     borderColor: "white",
     justifyContent: "center",
     alignItems: "center",
+  },
+  backIcon: {
+    position: "absolute",
+    top: 50,
+    left: 10,
+    zIndex: 1,
   },
 });
