@@ -1,72 +1,88 @@
-import React, { useState, useEffect, useLayoutEffect } from "react"
-import { Text, View, StyleSheet, Image } from "react-native"
+import React, { useState, useEffect, useLayoutEffect } from "react";
+import { Text, View, StyleSheet, Image, ScrollView } from "react-native";
 import {
   useConnectionById,
   useCredentialById,
-} from "@aries-framework/react-hooks"
-import { StackScreenProps } from "@react-navigation/stack"
-import { WalletStackParamList } from "../../navigators/WalletStack"
+} from "@aries-framework/react-hooks";
+import { StackScreenProps } from "@react-navigation/stack";
+import { WalletStackParamList } from "../../navigators/WalletStack";
 
 const schemaIdToImageMapping = {
   "NypRCRGykSwKUuRBQx2b9o:2:degree:1.0": require("../../assets/degree.png"),
-}
+};
 
 const schemaIdToCredentialName = {
   "NypRCRGykSwKUuRBQx2b9o:2:degree:1.0": "Degree Certificate",
-}
+};
 
-type Props = StackScreenProps<WalletStackParamList, "Credential">
+type Props = StackScreenProps<WalletStackParamList, "Credential">;
 
 const Credential = ({ navigation, route }: Props) => {
-  const { credential_offer_id, credential_name, schema_id } = route.params
-  const credentialOffer = useCredentialById(credential_offer_id)
+  const { credential_offer_id, credential_name, schema_id } = route.params;
+  const credentialOffer = useCredentialById(credential_offer_id);
   const connectionDetails = useConnectionById(
     credentialOffer?.connectionId ? credentialOffer.connectionId : ""
-  )
-  const [imageSource, setImageSource] = useState(null)
+  );
+  const [imageSource, setImageSource] = useState(null);
 
   useLayoutEffect(() => {
     navigation.setOptions({
       title: credential_name,
-    })
-  })
+    });
+  });
 
   useEffect(() => {
-    console.log(JSON.stringify(credentialOffer))
-    setImageSource(schemaIdToImageMapping[schema_id])
-  })
+    console.log(JSON.stringify(credentialOffer));
+    setImageSource(
+      schemaIdToImageMapping["NypRCRGykSwKUuRBQx2b9o:2:degree:1.0"]
+    );
+  });
 
   return (
     <View style={styles.container}>
-      <View style={styles.card}>
-        {/* 
+      <ScrollView>
+        <View style={styles.card}>
+          {/* 
         @Todo : Null Check for Image Source if we don have the image for specific schema id
         */}
-        <Image source={imageSource} style={styles.image} />
-      </View>
+          <Image source={imageSource} style={styles.image} />
+        </View>
 
-      <View style={styles.card}>
-        <Text style={styles.cardTitle}>Credential Info</Text>
-        {credentialOffer && (
-          <View style={styles.cardContent}>
-            <Text style={styles.schemaId}>
-              Issued By: {connectionDetails?.theirLabel}
-            </Text>
-            <Text style={styles.schemaId}>
-              Issued On: {connectionDetails?.createdAt.toLocaleString()}
-            </Text>
-            <Text style={styles.schemaId}>Info</Text>
-            {credentialOffer.credentialAttributes?.map((attribute, index) => (
-              <Text key={index} style={styles.attribute}>
-                {attribute.name}: {attribute.value}
+        <View style={styles.card}>
+          <Text style={styles.cardTitle}>Credential Info</Text>
+          {credentialOffer && (
+            <View style={styles.cardContent}>
+              <Text style={styles.schemaId}>
+                Issued By: {connectionDetails?.theirLabel}
               </Text>
-            ))}
-          </View>
-        )}
-      </View>
+              <Text style={styles.schemaId}>
+                Issued On: {connectionDetails?.createdAt.toLocaleString()}
+              </Text>
+              <Text style={styles.schemaId}>Info</Text>
+              {credentialOffer.credentialAttributes?.map((attribute, index) => (
+                <React.Fragment key={index}>
+                  {attribute.name === "picture" ? (
+                    <View>
+                      <Text>{attribute.name}</Text>
+                      <Image
+                        source={{ uri: attribute.value }} // Assuming attribute.value is a valid image URL
+                        style={{ width: 300, height: 300 }}
+                      />
+                    </View>
+                  ) : (
+                    <Text style={styles.attribute}>
+                      {attribute.name}: {attribute.value}
+                    </Text>
+                  )}
+                </React.Fragment>
+              ))}
+            </View>
+          )}
+        </View>
+      </ScrollView>
     </View>
-  )
-}
+  );
+};
 
 const styles = StyleSheet.create({
   container: {
@@ -105,6 +121,6 @@ const styles = StyleSheet.create({
     width: 200,
     height: 200,
   },
-})
+});
 
-export default Credential
+export default Credential;

@@ -1,8 +1,8 @@
-import { ConnectionRecord } from "@aries-framework/core"
-import { useConnections } from "@aries-framework/react-hooks"
-import { MaterialIcons } from "@expo/vector-icons"
-import { StackScreenProps } from "@react-navigation/stack"
-import React, { useEffect, useState } from "react"
+import { ConnectionRecord } from "@aries-framework/core";
+import { useConnections } from "@aries-framework/react-hooks";
+import { MaterialIcons } from "@expo/vector-icons";
+import { StackScreenProps } from "@react-navigation/stack";
+import React, { useEffect, useState } from "react";
 import {
   FlatList,
   Pressable,
@@ -11,66 +11,68 @@ import {
   Text,
   TextInput,
   View,
-} from "react-native"
-import { ContactStackParamList } from "../../navigators/ContactStack"
+  Image,
+  ScrollView,
+} from "react-native";
+import { ContactStackParamList } from "../../navigators/ContactStack";
 
 type Props = StackScreenProps<
   ContactStackParamList,
   "Contacts",
   "ConnectionDetails"
->
+>;
 
 const Contacts = ({ navigation, route }: Props) => {
-  const [search, setSearch] = useState("")
+  const [search, setSearch] = useState("");
   const [filteredConnections, setFilteredConnections] = useState<
     ConnectionRecord[]
-  >([])
-  const connections = useConnections()
+  >([]);
+  const connections = useConnections();
 
   useEffect(() => {
-    setFilteredConnections(connections.records)
-    console.log(connections.records)
-  }, [connections.records])
+    setFilteredConnections(connections.records);
+    console.log(connections.records);
+  }, [connections.records]);
 
   const searchFilterFunction = (text: string) => {
     if (text === "") {
-      setFilteredConnections(connections.records)
+      setFilteredConnections(connections.records);
     } else {
       const filteredData = connections.records.filter((connection) => {
-        const myDid = connection.theirLabel || "" // Handle undefined value
-        return myDid.toLowerCase().includes(text.toLowerCase())
-      })
-      setFilteredConnections(filteredData)
+        const myDid = connection.theirLabel || ""; // Handle undefined value
+        return myDid.toLowerCase().includes(text.toLowerCase());
+      });
+      setFilteredConnections(filteredData);
     }
-    setSearch(text)
-  }
+    setSearch(text);
+  };
 
   const clearSearch = () => {
-    setFilteredConnections(connections.records)
-    setSearch("")
-  }
+    setFilteredConnections(connections.records);
+    setSearch("");
+  };
 
   const renderItem = ({ item }: { item: ConnectionRecord }) => {
-    const createdAt = new Date(item.createdAt)
-    const now = new Date()
+    const createdAt = new Date(item.createdAt);
+    const now = new Date();
 
-    const formattedDate = createdAt.toLocaleDateString()
-    const formattedTime = createdAt.toLocaleTimeString()
+    const formattedDate = createdAt.toLocaleDateString();
+    const formattedTime = createdAt.toLocaleTimeString();
 
-    let dateDisplay = formattedDate
+    let dateDisplay = formattedDate;
 
     if (
       createdAt.getDate() === now.getDate() &&
       createdAt.getMonth() === now.getMonth() &&
       createdAt.getFullYear() === now.getFullYear()
     ) {
-      dateDisplay = "Today"
+      dateDisplay = "Today";
     } else if (
       createdAt.getDate() === now.getDate() - 1 &&
       createdAt.getMonth() === now.getMonth() &&
       createdAt.getFullYear() === now.getFullYear()
     ) {
-      dateDisplay = "Yesterday"
+      dateDisplay = "Yesterday";
     }
 
     if (createdAt < now) {
@@ -84,8 +86,16 @@ const Contacts = ({ navigation, route }: Props) => {
         >
           <View style={styles.itemContainer}>
             <View style={styles.leftContent}>
-              <Text style={styles.itemText}>{item.theirLabel}</Text>
-              <Text style={styles.timeText}>{formattedTime}</Text>
+              <View>
+                <Image
+                  style={{ width: 40, height: 40 }}
+                  source={{ uri: item.imageUrl }}
+                />
+              </View>
+              <View style={{ marginLeft: 10 }}>
+                <Text style={styles.itemText}>{item.theirLabel}</Text>
+                <Text style={styles.timeText}>{formattedTime}</Text>
+              </View>
             </View>
             <View style={styles.rightContent}>
               <Text style={styles.dateText}>{dateDisplay}</Text>
@@ -97,15 +107,15 @@ const Contacts = ({ navigation, route }: Props) => {
             </View>
           </View>
         </Pressable>
-      )
+      );
     } else {
-      return null // Do not render connections with future dates
+      return null; // Do not render connections with future dates
     }
-  }
+  };
 
   const ItemSeparatorView = () => (
     <View style={{ height: 0.5, width: "100%", backgroundColor: "#C8C8C8" }} />
-  )
+  );
 
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: "white" }}>
@@ -144,8 +154,8 @@ const Contacts = ({ navigation, route }: Props) => {
         </View>
       </View>
     </SafeAreaView>
-  )
-}
+  );
+};
 
 const styles = StyleSheet.create({
   container: {
@@ -173,11 +183,10 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
     alignItems: "center",
     paddingVertical: 10,
-    paddingHorizontal: 20,
   },
 
   leftContent: {
-    flexDirection: "column", // Display vertically
+    flexDirection: "row", // Display vertically
   },
 
   rightContent: {
@@ -232,5 +241,5 @@ const styles = StyleSheet.create({
     width: "100%",
     backgroundColor: "#C8C8C8",
   },
-})
-export default Contacts
+});
+export default Contacts;

@@ -1,38 +1,39 @@
-import React, { useState, useEffect, useLayoutEffect } from "react"
-import { View, Text, StyleSheet, Button } from "react-native"
-import { useCredentialById, useAgent } from "@aries-framework/react-hooks"
-import { CredentialState } from "@aries-framework/core"
+import React, { useState, useEffect, useLayoutEffect } from "react";
+import { View, Text, StyleSheet, Button } from "react-native";
+import { useCredentialById, useAgent } from "@aries-framework/react-hooks";
+import { AutoAcceptCredential, CredentialState } from "@aries-framework/core";
 
 const CredentialOffer = ({ navigation, route }) => {
-  const { credential_offer_id } = route.params
-  const credentialOffer = useCredentialById(credential_offer_id)
-  const [credentialState, setCredentialState] = useState(credentialOffer.state)
-  const agent = useAgent()
+  const { credential_offer_id } = route.params;
+  const credentialOffer = useCredentialById(credential_offer_id);
+  const [credentialState, setCredentialState] = useState(credentialOffer.state);
+  const agent = useAgent();
 
   useLayoutEffect(() => {
     navigation.setOptions({
       title: credentialOffer?.state,
-    })
-  })
+    });
+  });
 
   useEffect(() => {
-    console.log("hello world")
-    console.log(JSON.stringify(credentialOffer))
-  }, [])
+    console.log("hello world");
+    console.log(JSON.stringify(credentialOffer));
+  }, []);
 
   async function acceptOffer(id: any) {
     await agent.agent.credentials.acceptOffer({
       credentialRecordId: id,
-    })
+      autoAcceptCredential: AutoAcceptCredential.Always,
+    });
   }
   async function declineOffer(id: any) {
-    await agent.agent.credentials.declineOffer(id)
+    await agent.agent.credentials.declineOffer(id);
   }
 
   async function storeToWallet(id: any) {
     agent.agent.credentials.acceptCredential({
       credentialRecordId: id,
-    })
+    });
   }
 
   return (
@@ -59,15 +60,15 @@ const CredentialOffer = ({ navigation, route }) => {
           <Button
             title="Accept Offer"
             onPress={async () => {
-              await acceptOffer(credential_offer_id)
-              navigation.goBack()
+              await acceptOffer(credential_offer_id);
+              navigation.goBack();
             }}
           />
           <Button
             title="Decline Offer"
             onPress={async () => {
-              await declineOffer(credential_offer_id)
-              navigation.goBack()
+              await declineOffer(credential_offer_id);
+              navigation.goBack();
             }}
           />
         </View>
@@ -75,14 +76,14 @@ const CredentialOffer = ({ navigation, route }) => {
         <Button
           title="Accept Credentials"
           onPress={async () => {
-            await storeToWallet(credential_offer_id)
-            navigation.goBack()
+            await storeToWallet(credential_offer_id);
+            navigation.goBack();
           }}
         />
       )}
     </View>
-  )
-}
+  );
+};
 
 const styles = StyleSheet.create({
   container: {
@@ -116,6 +117,6 @@ const styles = StyleSheet.create({
     fontSize: 14,
     marginBottom: 4,
   },
-})
+});
 
-export default CredentialOffer
+export default CredentialOffer;

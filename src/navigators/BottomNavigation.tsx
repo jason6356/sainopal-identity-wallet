@@ -1,37 +1,38 @@
-import React from "react"
-import { Platform, Text, View, ViewStyle } from "react-native"
+import React from "react";
+import { Platform, Text, View, ViewStyle } from "react-native";
 
-import { Entypo, FontAwesome, Ionicons } from "@expo/vector-icons"
-import { createBottomTabNavigator } from "@react-navigation/bottom-tabs"
-import { NavigationContainer } from "@react-navigation/native"
-import Scan from "../screens/Scan/Scan"
-import ContactScreenStack from "./ContactStack"
-import SettingStackScreen from "./SettingStack"
-import WalletScreenStack from "./WalletStack"
+import { Entypo, FontAwesome, Ionicons } from "@expo/vector-icons";
+import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
+import { NavigationContainer } from "@react-navigation/native";
+import Scan from "../screens/Scan/Scan";
+import ContactScreenStack from "./ContactStack";
+import SettingStackScreen from "./SettingStack";
+import WalletScreenStack from "./WalletStack";
+import ScanScreenStack from "./ScanStack";
 
 export type RootStackParamList = {
-  WalletStack: undefined
-  ContactsStack: undefined
-  SettingsStack: undefined
-  Scan: undefined
-}
+  WalletStack: undefined;
+  ContactsStack: undefined;
+  SettingsStack: undefined;
+  ScanStack: undefined;
+};
 
-const Tab = createBottomTabNavigator<RootStackParamList>()
+const Tab = createBottomTabNavigator<RootStackParamList>();
 
 interface ScreenOptions {
-  tabBarShowLabel: boolean
-  headerShown: boolean
+  tabBarShowLabel: boolean;
+  headerShown: boolean;
   tabBarStyle: {
-    position: "absolute"
-    bottom: 0
-    right: 0
-    left: 0
-    elevation: number
-    height: number
-    backgroundColor: string
-    paddingBottom: number
-    paddingTop: number
-  }
+    position: "absolute";
+    bottom: 0;
+    right: 0;
+    left: 0;
+    elevation: number;
+    height: number;
+    backgroundColor: string;
+    paddingBottom: number;
+    paddingTop: number;
+  };
 }
 
 const screenOptions: ScreenOptions = {
@@ -48,7 +49,7 @@ const screenOptions: ScreenOptions = {
     paddingBottom: 20,
     paddingTop: 20,
   },
-}
+};
 
 const notificationAlert: ViewStyle = {
   position: "absolute",
@@ -60,7 +61,7 @@ const notificationAlert: ViewStyle = {
   height: 15,
   justifyContent: "center",
   alignItems: "center",
-}
+};
 
 const BottomNavigation: React.FC = () => {
   return (
@@ -128,8 +129,8 @@ const BottomNavigation: React.FC = () => {
         />
 
         <Tab.Screen
-          name="Scan"
-          component={Scan}
+          name="ScanStack"
+          component={ScanScreenStack}
           options={{
             tabBarIcon: ({ color }) => (
               <View
@@ -157,11 +158,14 @@ const BottomNavigation: React.FC = () => {
                 </Text>
               </View>
             ),
+            tabBarStyle: {
+              display: "none",
+            },
           }}
         />
       </Tab.Navigator>
     </NavigationContainer>
-  )
-}
+  );
+};
 
-export default BottomNavigation
+export default BottomNavigation;

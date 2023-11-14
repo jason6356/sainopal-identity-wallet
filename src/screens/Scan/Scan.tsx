@@ -1,32 +1,32 @@
-import { useAgent } from "@aries-framework/react-hooks"
-import { StackScreenProps } from "@react-navigation/stack"
-import { BarCodeScanner, BarCodeScannerResult } from "expo-barcode-scanner"
-import React, { useEffect, useState } from "react"
-import { Alert, Button, StyleSheet, Text, View } from "react-native"
-import { RootStackParamList } from "../../navigators/BottomNavigation"
+import { useAgent } from "@aries-framework/react-hooks";
+import { StackScreenProps } from "@react-navigation/stack";
+import { BarCodeScanner, BarCodeScannerResult } from "expo-barcode-scanner";
+import React, { useEffect, useState } from "react";
+import { Alert, Button, StyleSheet, Text, View } from "react-native";
+import { ScanStackParamList } from "../../navigators/ScanStack";
 
-type Props = StackScreenProps<RootStackParamList, "Scan">
+type Props = StackScreenProps<ScanStackParamList, "Scan">;
 
 export default function Scan({ navigation, route }: Props) {
-  const [hasPermission, setHasPermission] = useState<boolean | null>(null)
-  const [scanned, setScanned] = useState(false)
-  const agent = useAgent()
+  const [hasPermission, setHasPermission] = useState<boolean | null>(null);
+  const [scanned, setScanned] = useState(false);
+  const agent = useAgent();
 
   useEffect(() => {
     const getBarCodeScannerPermissions = async () => {
-      const { status } = await BarCodeScanner.requestPermissionsAsync()
+      const { status } = await BarCodeScanner.requestPermissionsAsync();
       if (status === "granted") {
-        setHasPermission(true)
-        setScanned(false)
+        setHasPermission(true);
+        setScanned(false);
       }
-    }
-    getBarCodeScannerPermissions()
-  }, [])
+    };
+    getBarCodeScannerPermissions();
+  }, []);
 
   const handleBarCodeScanned = async ({ type, data }: BarCodeScannerResult) => {
     try {
-      const result = await agent.agent.oob.parseInvitation(data)
-      setScanned(true)
+      const result = await agent.agent.oob.parseInvitation(data);
+      setScanned(true);
       Alert.alert(
         "Scanned Data",
         `Bar code with type ${type} and data ${data} has been scanned!`,
@@ -35,40 +35,40 @@ export default function Scan({ navigation, route }: Props) {
             text: "Cancel",
             style: "cancel",
             onPress: () => {
-              setScanned(false)
+              setScanned(false);
             },
           },
           {
             text: "OK",
             onPress: () => {
               agent.agent.oob
-                .receiveInvitationFromUrl(data)
+                .receiveInvitationFromUrl(data, { autoAcceptConnection: false })
                 .then((e) => {
                   Alert.alert(
                     `Successfully Connected with the Agent ${e.connectionRecord?.theirLabel}`
-                  )
-
-                  navigation.navigate("ContactsStack")
+                  );
+                  console.log(e.outOfBandRecord);
+                  navigation.navigate("ConnectionRequest", e.connectionRecord);
                 })
-                .catch((e) => console.error(e))
+                .catch((e) => console.error(e));
 
               // setScanned(false)
             },
           },
         ],
         { cancelable: false }
-      )
+      );
     } catch (e) {
-      setScanned(true)
-      Alert.alert("Invalid Url")
+      setScanned(true);
+      Alert.alert("Invalid Url");
     }
-  }
+  };
 
   if (hasPermission === null) {
-    return <Text>Requesting for camera permission</Text>
+    return <Text>Requesting for camera permission</Text>;
   }
   if (hasPermission === false) {
-    return <Text>No access to camera</Text>
+    return <Text>No access to camera</Text>;
   }
 
   return (
@@ -85,7 +85,7 @@ export default function Scan({ navigation, route }: Props) {
         <Button title={"Tap to Scan Again"} onPress={() => setScanned(false)} />
       )}
     </View>
-  )
+  );
 }
 
 const styles = StyleSheet.create({
@@ -103,4 +103,4 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
   },
-})
+});

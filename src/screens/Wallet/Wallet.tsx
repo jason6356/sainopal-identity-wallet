@@ -1,4 +1,4 @@
-import React, { useLayoutEffect } from "react"
+import React, { useLayoutEffect } from "react";
 import {
   View,
   Text,
@@ -6,28 +6,28 @@ import {
   Image,
   ScrollView,
   Pressable,
-} from "react-native"
-import { useCredentialByState } from "@aries-framework/react-hooks"
-import { CredentialState } from "@aries-framework/core"
-import { StackScreenProps } from "@react-navigation/stack"
-import { WalletStackParamList } from "../../navigators/WalletStack"
+} from "react-native";
+import { useCredentialByState } from "@aries-framework/react-hooks";
+import { CredentialState } from "@aries-framework/core";
+import { StackScreenProps } from "@react-navigation/stack";
+import { WalletStackParamList } from "../../navigators/WalletStack";
 
 const schemaIdToImageMapping = {
   "NypRCRGykSwKUuRBQx2b9o:2:degree:1.0": require("../../assets/degree.png"),
-}
+};
 
 const schemaIdToCredentialName = {
   "NypRCRGykSwKUuRBQx2b9o:2:degree:1.0": "Degree Certificate",
-}
+};
 
-type Props = StackScreenProps<WalletStackParamList, "Wallet", "Credential">
+type Props = StackScreenProps<WalletStackParamList, "Wallet", "Credential">;
 
 const Wallet = ({ navigation, route }: Props) => {
-  const credentials = useCredentialByState(CredentialState.Done)
+  const credentials = useCredentialByState(CredentialState.Done);
 
   useLayoutEffect(() => {
-    console.log(JSON.stringify(credentials))
-  }, [])
+    console.log(JSON.stringify(credentials));
+  }, []);
 
   return (
     <View style={styles.container}>
@@ -36,9 +36,10 @@ const Wallet = ({ navigation, route }: Props) => {
           {credentials.map((credential, index) => {
             const schemaId = credential.metadata.get(
               "_anoncreds/credential"
-            )?.schemaId
-            const imageSource = schemaIdToImageMapping[schemaId]
-            const credentialName = schemaIdToCredentialName[schemaId]
+            )?.schemaId;
+            const imageSource =
+              schemaIdToImageMapping["NypRCRGykSwKUuRBQx2b9o:2:degree:1.0"];
+            const credentialName = "Animo ID";
 
             return (
               <Pressable
@@ -56,15 +57,15 @@ const Wallet = ({ navigation, route }: Props) => {
                   <Text style={styles.credentialName}>{credentialName}</Text>
                 </View>
               </Pressable>
-            )
+            );
           })}
         </ScrollView>
       ) : (
         <Text>There is no credentials yet</Text>
       )}
     </View>
-  )
-}
+  );
+};
 
 const styles = StyleSheet.create({
   container: {
@@ -92,6 +93,6 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
   },
   emptyCredential: {},
-})
+});
 
-export default Wallet
+export default Wallet;
