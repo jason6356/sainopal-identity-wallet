@@ -31,8 +31,8 @@ import {
 import { agentDependencies } from "@aries-framework/react-native";
 import { anoncreds } from "@hyperledger/anoncreds-react-native";
 import indySdk from "indy-sdk-react-native";
-import { genesis, indyGenesis } from "./genesis";
 import _ledger from "./ledger.json";
+import { genesis } from "./genesis";
 
 const ledgers: IndySdkPoolConfig[] = _ledger;
 
@@ -55,12 +55,12 @@ const localMediatorUrl = `https://b3ca-103-52-192-245.ngrok.io/?c_i=eyJAdHlwZSI6
 //   indyNamespace: "indicio:test",
 // }
 
-//ledgers.push(indyPoolConfig)
+//ledgers.push(poolConfig);
 
 const config: InitConfig = {
   label: "SainoPal Mobile Wallet",
   walletConfig: {
-    id: "sainpopal123",
+    id: "sainpopal983",
     key: "testkey0040020000000000000000000",
   },
   logger: new ConsoleLogger(LogLevel.trace),

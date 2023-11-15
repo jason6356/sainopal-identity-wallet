@@ -1,4 +1,10 @@
-import { CredentialState, ProofState } from "@aries-framework/core";
+import {
+  CredentialState,
+  ProofState,
+  CredentialExchangeRecord,
+  GetCredentialFormatDataReturn,
+  CredentialFormat,
+} from "@aries-framework/core";
 import {
   useAgent,
   useConnectionById,
@@ -6,7 +12,16 @@ import {
   useProofsByConnectionId,
 } from "@aries-framework/react-hooks";
 import React, { useEffect, useLayoutEffect, useState } from "react";
-import { Pressable, ScrollView, View } from "react-native";
+import {
+  Pressable,
+  ScrollView,
+  View,
+  StyleSheet,
+  Image,
+  Text,
+  TouchableHighlight,
+} from "react-native";
+import { parseSchemaFromId } from "../../utils/schema";
 import Card from "../../components/Card";
 
 const schemaIdToImageMapping = {
@@ -16,72 +31,91 @@ const schemaIdToImageMapping = {
 const ConnectionDetails = ({ navigation, route }) => {
   const { connection_id } = route.params;
   const connection = useConnectionById(connection_id);
-  const credentialsOffer = useCredentialsByConnectionId(connection_id);
+  const credentialsOffer: CredentialExchangeRecord[] =
+    useCredentialsByConnectionId(connection_id);
   const presentationOffer = useProofsByConnectionId(connection_id);
   const agent = useAgent();
   const [credentialMap, setCredentialMap] = useState(new Map());
 
+  //Write a useEffect which iterate each of the credentialOffer and get the schema_id
+  //Then get the schema name from the schema_id and store it in a map with the id
+  //Then use the map to render the credentialOffer
+  const mapCredentials = async () => {
+    const newCredentialMap = new Map();
+
+    for (const e of credentialsOffer) {
+      const name = await getSchemaNameFromOfferID(e.id);
+      newCredentialMap.set(e.id, name);
+    }
+
+    setCredentialMap(newCredentialMap);
+  };
+
+  useEffect(() => {
+    mapCredentials();
+  }, [credentialsOffer, connection_id]);
+
   useLayoutEffect(() => {
     navigation.setOptions({
       title: connection?.theirLabel,
-      tabBarVisible: false,
     });
   }, [navigation, connection_id]);
 
-  useEffect(() => {
-    const fetchCredentialData = async () => {
-      const newDataMap = new Map();
-      for (const credential of credentialsOffer) {
-        const data = await getFormData(credential.id);
-        newDataMap.set(credential.id, data);
+  async function getSchemaID(offerID: string) {
+    try {
+      const formatData: GetCredentialFormatDataReturn<CredentialFormat[]> =
+        await agent.agent.credentials.getFormatData(offerID);
+
+      if (formatData.offer) {
+        const { schema_id } = formatData.offer?.indy;
+        return schema_id;
       }
-      setCredentialMap(newDataMap);
-    };
-    fetchCredentialData();
-  }, [connection_id]);
+    } catch (e) {
+      console.error("Invalid Credential Offer ID!");
+    }
+  }
 
-  async function getFormData(id: any) {
-    const formatData = await agent.agent.credentials.getFormatData(id);
-    const { offer, offerAttributes } = formatData;
-    const offerData = offer?.indy;
-    const { cred_def_id, schema_id } = offerData;
-
-    console.log(`Credential Definiton : ${cred_def_id}`);
-    console.log(`Schema ID : ${schema_id}`);
-    console.log(offerAttributes);
-    //console.log(offerData)
-    return { schema_id, cred_def_id, offerAttributes };
+  async function getSchemaNameFromOfferID(offerID: string) {
+    const schemaID = await getSchemaID(offerID);
+    const schema = parseSchemaFromId(schemaID);
+    return schema.name;
   }
 
   return (
-    <View>
+    <View style={styles.container}>
       <ScrollView>
         {credentialsOffer
-          .filter((e) => e.state !== CredentialState.Done)
+          .filter(
+            (e) =>
+              e.state !== CredentialState.Done &&
+              e.state !== CredentialState.Declined
+          )
           .map((e, index) => {
-            const formData = credentialMap.get(e.id);
-            const schemaId = formData ? formData.schema_id : "";
+            const name = credentialMap.get(e.id);
             const imageSource =
               schemaIdToImageMapping["NypRCRGykSwKUuRBQx2b9o:2:degree:1.0"];
             return (
-              <Pressable
-                key={e.id}
-                onPress={
-                  () =>
-                    navigation.navigate("CredentialOffer", {
-                      credential_offer_id: e.id,
-                    })
-                  //await acceptOffer(e.id)
-                  //await storeToWallet(e.id)
-                }
-              >
-                <Card
-                  key={index}
-                  title={e.state}
-                  content={`Credential Offer\n`}
-                  imageSource={imageSource} // Pass the image source as a prop
-                />
-              </Pressable>
+              <View style={styles.card} key={e.id}>
+                <Image source={imageSource} style={styles.imageOverlay} />
+                <View style={styles.contentContainer}>
+                  <Text style={styles.title}>Credential Offer</Text>
+                  <Text style={styles.offerContent}>{name}</Text>
+                </View>
+                <TouchableHighlight
+                  onPress={
+                    () =>
+                      navigation.push("CredentialOffer", {
+                        credential_offer_id: e.id,
+                      })
+                    //await acceptOffer(e.id)
+                    //await storeToWallet(e.id)
+                  }
+                >
+                  <View style={styles.openButton}>
+                    <Text style={styles.openText}>Open</Text>
+                  </View>
+                </TouchableHighlight>
+              </View>
             );
           })}
         {presentationOffer
@@ -117,4 +151,53 @@ const ConnectionDetails = ({ navigation, route }) => {
   );
 };
 
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    padding: 15,
+  },
+  card: {
+    backgroundColor: "#fff",
+    borderRadius: 8,
+    padding: 16,
+    margin: 8,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 3,
+    position: "relative", // Required for positioning the overlay
+  },
+  contentContainer: {
+    zIndex: 1, // Ensure content is above the overlay
+  },
+  title: {
+    fontSize: 18,
+    color: "#808080",
+  },
+  offerContent: {
+    fontSize: 16,
+    marginBottom: 8,
+    fontWeight: "bold",
+  },
+  imageOverlay: {
+    alignSelf: "center",
+    position: "relative",
+    marginBottom: 20,
+    width: 300,
+    height: 250,
+  },
+  openButton: {
+    backgroundColor: "#8CB1FF",
+    justifyContent: "center",
+    borderRadius: 8,
+    height: 50,
+    marginVertical: 5,
+  },
+  openText: {
+    textAlign: "center",
+    color: "#fff",
+    fontSize: 18,
+  },
+});
 export default ConnectionDetails;
