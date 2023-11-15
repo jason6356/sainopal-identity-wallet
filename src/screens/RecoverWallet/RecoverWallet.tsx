@@ -1,5 +1,5 @@
 import React, { useLayoutEffect, useState } from "react"
-import { View, Text, Button, StyleSheet, TouchableOpacity } from "react-native"
+import { View, Text, StyleSheet, TouchableOpacity, Alert } from "react-native"
 import DocumentPicker, {
   DocumentPickerResponse,
 } from "react-native-document-picker"
@@ -9,6 +9,7 @@ import { config } from "../../../config/agent"
 
 import { StackScreenProps } from "@react-navigation/stack"
 import { WalletStackParamList } from "../../navigators/WalletStack"
+import { ConsoleLogger, InitConfig, LogLevel } from "@aries-framework/core"
 
 type Props = StackScreenProps<WalletStackParamList, "SelfCredential">
 
@@ -17,42 +18,84 @@ const RecoverWallet = ({ navigation }: Props) => {
     navigation.setOptions({
       title: "Recover Wallet",
     })
-  })
-  const [fileResponse, setFileResponse] =
-    useState<DocumentPickerResponse | null>()
+  }, [navigation])
+
   const [importedFileName, setImportedFileName] = useState<string | null>(null)
 
   const pickDocument = async () => {
     try {
       const response = await DocumentPicker.pick({
-        presentationStyle: "fullScreen",
+        type: [DocumentPicker.types.allFiles],
+        copyTo: "documentDirectory", // Save the selected file to the app's document directory
       })
-      const fileResponse = response.map((item) => {
-        return item
-      })[0]
-      setFileResponse(fileResponse)
-      console.log(fileResponse?.uri + " Test")
-      handleImport(fileResponse) // Call handleImport after successfully picking the document
+
+      const selectedFile = response[0] // Assume the user picked only one file
+      setImportedFileName(selectedFile.name)
+      console.log(`${selectedFile.name} file picked`)
+      handleImport(selectedFile)
     } catch (err) {
-      if (DocumentPicker.isCancel(err)) {
-        // User cancelled the file picker
-      } else {
-        // Handle any other errors
+      if (!DocumentPicker.isCancel(err)) {
         console.error("Error picking document:", err)
+        Alert.alert("Error", "An error occurred while picking the document.")
       }
     }
   }
 
-  const handleImport = async (fileResponse: DocumentPickerResponse | null) => {
+  const handleImport = async (selectedFile: DocumentPickerResponse | null) => {
     try {
-      if (fileResponse?.name) {
-        setImportedFileName(fileResponse.name)
-        // Rest of your import logic here
-      } else {
+      if (!selectedFile) {
         console.log("No file selected")
+        return
       }
+
+      const uniqueIdentifier = `${Date.now()}_${Math.floor(
+        Math.random() * 1000
+      )}`
+      const walletName = `imported_wallet_${uniqueIdentifier}`
+      const localFilePath = `${RNFS.DocumentDirectoryPath}/${selectedFile.name}`
+
+      await RNFS.moveFile(selectedFile.uri, localFilePath)
+
+      const configNew: InitConfig = {
+        label: "SainoPal Mobile Wallet",
+        walletConfig: {
+          id: "wa",
+          key: "testkey0090000000000000000000001",
+        },
+        logger: new ConsoleLogger(LogLevel.trace),
+      }
+
+      const walletConfig: WalletConfig = configNew.walletConfig || {}
+      const walletCredentials = { key: walletConfig.key || "" }
+
+      // Check if the wallet already exists
+      const existingWalletPath = `${RNFS.DocumentDirectoryPath}/.indy_client/wallet/${walletName}`
+      const walletExists = await RNFS.exists(existingWalletPath)
+
+      console.log("localFilePath  ", localFilePath)
+
+      // Delete existing wallet if it exists
+      if (walletExists) {
+        await RNFS.unlink(existingWalletPath)
+        console.log("Deleted existing wallet:", walletName)
+      }
+
+      // Import the wallet
+      // await IndySdk.importWallet(walletConfig, walletCredentials, {
+      //   path: localFilePath,
+      //   key: "123456",
+      // })
+
+      await IndySdk.importWallet(walletConfig, walletCredentials, {
+        path: localFilePath,
+        key: "123456",
+      })
+
+      console.log("Imported Wallet Successfully")
+      Alert.alert("Success", "Wallet imported successfully!")
     } catch (error) {
       console.error("Error during import:", error)
+      Alert.alert("Error", "An error occurred during wallet import.")
     }
   }
 
@@ -109,7 +152,7 @@ const styles = StyleSheet.create({
     color: "#aaafb8",
   },
   selectedFileText: {
-    marginTop: 150,
+    marginTop: 15,
     fontSize: 16,
     color: "#243853",
   },
@@ -128,7 +171,7 @@ const styles = StyleSheet.create({
   containerButton: {
     flex: 1,
     justifyContent: "flex-end",
-    marginBottom: 100,
+    marginBottom: 20,
   },
 })
 

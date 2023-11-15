@@ -44,8 +44,8 @@ const mediatorInvitationUrl = `https://public.mediator.indiciotech.io?c_i=eyJAdH
 const config: InitConfig = {
   label: "SainoPal Mobile Wallet",
   walletConfig: {
-    id: "sainopal-wallet",
-    key: "testkey0030000000000000000000000",
+    id: "wa",
+    key: "testkey0090000000000000000000001",
   },
   logger: new ConsoleLogger(LogLevel.trace),
 }

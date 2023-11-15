@@ -30,7 +30,7 @@ const WalletManager = ({ navigation }: Props) => {
   })
   const [exportConfig, setExportConfig] = useState({
     path: `${RNFS.DownloadDirectoryPath}/exported_wallet${Date.now()}.json`,
-    key: "ChaCha20-Poly1305-IETF",
+    key: "123456",
   })
 
   const [fileResponse, setFileResponse] =

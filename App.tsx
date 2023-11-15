@@ -1,7 +1,8 @@
+import Login from "./src/screens/Auth/Login"
 import { Agent } from "@aries-framework/core"
 import AgentProvider from "@aries-framework/react-hooks"
 import React, { useEffect, useState } from "react"
-import { agent } from "./config" // Assuming this is where you have your agent configuration
+import { agent } from "./config"
 import BottomNavigation from "./src/navigators/BottomNavigation"
 import { GluestackUIProvider } from "@gluestack-ui/react"
 import { createLinkSecretIfRequired } from "./config/agent"
@@ -10,9 +11,10 @@ const App: React.FC = () => {
   const [initializedAgent, setInitializedAgent] = useState<Agent<any> | null>(
     null
   )
+  const [loggedIn, setLoggedIn] = useState(false)
 
   useEffect(() => {
-    async function initializeAndSetAgent() {
+    async function initializeAgent() {
       try {
         await agent.initialize()
         await createLinkSecretIfRequired(agent)
@@ -22,15 +24,29 @@ const App: React.FC = () => {
       }
     }
 
-    initializeAndSetAgent()
-  }, [])
+    if (loggedIn) {
+      initializeAgent()
+    }
+  }, [loggedIn])
+
+  const handleLogin = async (password: string) => {
+    if (password === "a") {
+      setLoggedIn(true)
+    } else {
+      alert("Invalid password. Please try again.")
+    }
+  }
 
   return (
     <>
-      {initializedAgent && (
-        <AgentProvider agent={initializedAgent as Agent<any>}>
-          <BottomNavigation />
-        </AgentProvider>
+      {!loggedIn ? (
+        <Login onLogin={handleLogin} />
+      ) : (
+        initializedAgent && (
+          <AgentProvider agent={initializedAgent}>
+            <BottomNavigation />
+          </AgentProvider>
+        )
       )}
     </>
   )
