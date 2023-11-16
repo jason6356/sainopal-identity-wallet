@@ -9,7 +9,9 @@ import {
   Text,
   View,
   TouchableHighlight,
+  Dimensions,
 } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
 import { ScanStackParamList } from "../../navigators/ScanStack";
 
 type Props = StackScreenProps<ScanStackParamList, "Scan">;
@@ -63,13 +65,27 @@ export default function Scan({ navigation, route }: Props) {
       {!scanned && (
         <BarCodeScanner
           onBarCodeScanned={handleBarCodeScanned}
-          style={StyleSheet.absoluteFillObject}
+          style={{
+            width: 500,
+            height: 910,
+          }}
         />
       )}
       <View style={styles.backIcon}>
         <TouchableHighlight onPress={handleBack}>
           <AntDesign name="back" size={30} color="#fff" />
         </TouchableHighlight>
+        <Text
+          style={{
+            color: "white",
+            fontSize: 18,
+            textAlignVertical: "center",
+            paddingLeft: 30,
+            fontWeight: "bold",
+          }}
+        >
+          Back To Wallet
+        </Text>
       </View>
       <View style={styles.borderContainer}></View>
 
@@ -97,6 +113,7 @@ const styles = StyleSheet.create({
   },
   backIcon: {
     position: "absolute",
+    flexDirection: "row",
     top: 50,
     left: 10,
     zIndex: 1,

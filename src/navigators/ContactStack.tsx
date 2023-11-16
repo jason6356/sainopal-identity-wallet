@@ -13,6 +13,7 @@ export type ContactStackParamList = {
   };
   CredentialOffer: {
     credential_offer_id: string;
+    connection_id: string | undefined;
   };
   CredentialProof: {
     presentation_id: string;

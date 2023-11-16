@@ -23,12 +23,17 @@ import {
 } from "react-native";
 import { parseSchemaFromId } from "../../utils/schema";
 import Card from "../../components/Card";
+import { ContactStackParamList } from "../../navigators/ContactStack";
+import { StackScreenProps } from "@react-navigation/stack";
+import useHideBottomTabBar from "../../hooks/useHideBottomTabBar";
 
 const schemaIdToImageMapping = {
   "NypRCRGykSwKUuRBQx2b9o:2:degree:1.0": require("../../assets/degree.png"),
 };
 
-const ConnectionDetails = ({ navigation, route }) => {
+type Props = StackScreenProps<ContactStackParamList, "ConnectionDetails">;
+
+const ConnectionDetails = ({ navigation, route }: Props) => {
   const { connection_id } = route.params;
   const connection = useConnectionById(connection_id);
   const credentialsOffer: CredentialExchangeRecord[] =
@@ -36,6 +41,7 @@ const ConnectionDetails = ({ navigation, route }) => {
   const presentationOffer = useProofsByConnectionId(connection_id);
   const agent = useAgent();
   const [credentialMap, setCredentialMap] = useState(new Map());
+  const hidden = useHideBottomTabBar();
 
   //Write a useEffect which iterate each of the credentialOffer and get the schema_id
   //Then get the schema name from the schema_id and store it in a map with the id
@@ -53,13 +59,10 @@ const ConnectionDetails = ({ navigation, route }) => {
 
   useEffect(() => {
     mapCredentials();
-  }, [credentialsOffer, connection_id]);
-
-  useLayoutEffect(() => {
     navigation.setOptions({
       title: connection?.theirLabel,
     });
-  }, [navigation, connection_id]);
+  }, [credentialsOffer, connection_id]);
 
   async function getSchemaID(offerID: string) {
     try {
@@ -106,6 +109,7 @@ const ConnectionDetails = ({ navigation, route }) => {
                     () =>
                       navigation.push("CredentialOffer", {
                         credential_offer_id: e.id,
+                        connection_id: e.connectionId,
                       })
                     //await acceptOffer(e.id)
                     //await storeToWallet(e.id)
@@ -132,6 +136,7 @@ const ConnectionDetails = ({ navigation, route }) => {
                   () =>
                     navigation.navigate("CredentialProof", {
                       presentation_id: e.id,
+                      connection_id: e.connectionId,
                     })
                   //await acceptOffer(e.id)
                   //await storeToWallet(e.id)
