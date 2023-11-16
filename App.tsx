@@ -6,6 +6,8 @@ import { agent } from "./config"
 import BottomNavigation from "./src/navigators/BottomNavigation"
 import { GluestackUIProvider } from "@gluestack-ui/react"
 import { createLinkSecretIfRequired } from "./config/agent"
+import LoginNav from "./src/screens/Auth/LoginNav"
+import { NavigationContainer } from "@react-navigation/native"
 
 const App: React.FC = () => {
   const [initializedAgent, setInitializedAgent] = useState<Agent<any> | null>(
@@ -40,8 +42,11 @@ const App: React.FC = () => {
   return (
     <>
       {!loggedIn ? (
-        <Login onLogin={handleLogin} />
+        <NavigationContainer>
+          <LoginNav onLogin={handleLogin} />
+        </NavigationContainer>
       ) : (
+        // <Login onLogin={handleLogin} />
         initializedAgent && (
           <AgentProvider agent={initializedAgent}>
             <BottomNavigation />

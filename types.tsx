@@ -1,5 +1,10 @@
 // types.ts
 
+export type LoginScreenNavigatorProps = {
+  // Define the props specific to your LoginScreenNavigator here
+  // For example, you can define navigation options, route params, etc.
+}
+
 export type FirstScreenNavigatorProps = {
   // Define the props specific to your FirstScreenNavigator here
   // For example, you can define navigation options, route params, etc.

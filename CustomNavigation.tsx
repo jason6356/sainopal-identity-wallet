@@ -1,6 +1,7 @@
 import React from "react"
 import { createStackNavigator } from "@react-navigation/stack"
 import {
+  // LoginScreenNavigatorProps,
   FirstScreenNavigatorProps,
   SecondScreenNavigatorProps,
   ThirdScreenNavigatorProps,
@@ -10,10 +11,14 @@ import {
 // import Screen1 from "./screens/Screen1";
 // import Screen2 from "./screens/Screen2";
 import Settings from "./src/screens/Settings/Settings"
-import Connection from "./src/screens/Connections/ConnectionsUI"
+import Connection from "./src/screens/Connections/Contacts"
 import Screen1 from "./src/screens/Settings/Screen1"
+// import Login from "./src/screens/Auth/Login"
+// import SignUp from "./src/screens/Auth/SignUp"
 
 export type RootStackParamList = {
+  // Login: undefined
+  // SignUp: undefined
   Settings: undefined
   BackUpWallet: { msg: string }
   Connections: undefined
@@ -21,6 +26,15 @@ export type RootStackParamList = {
 }
 
 const Stack = createStackNavigator<RootStackParamList>()
+
+// const LoginScreenNavigator: React.FC<FirstScreenNavigatorProps> = () => {
+//   return (
+//     <Stack.Navigator>
+//       <Stack.Screen name="Login" component={Login} />
+//       <Stack.Screen name="SignUp" component={SignUp} />
+//     </Stack.Navigator>
+//   )
+// }
 
 const FirstScreenNavigator: React.FC<FirstScreenNavigatorProps> = () => {
   return (
