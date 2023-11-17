@@ -3,8 +3,8 @@ import { useState, useEffect } from "react"
 import AgentService from "../../services/AgentService"
 import { Buffer } from "buffer"
 import axios from "axios"
-import "react-native-url-polyfill/auto"
 import { useNavigation } from "@react-navigation/native"
+import React from "react"
 
 interface AlertBox {
   msg: string

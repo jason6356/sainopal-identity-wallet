@@ -1,22 +1,16 @@
 // LoginNav.tsx
 import React from "react"
 import { createNativeStackNavigator } from "@react-navigation/native-stack"
-import Login from "./Login"
-import SignUp from "./SignUp"
+import Login from "../screens/Auth/Login"
+import SignUp from "../screens/Auth/SignUp"
 
 const Stack = createNativeStackNavigator()
 
-const LoginNav = ({ onLogin, onDataFromLogin }: LoginNavProps) => {
+const LoginNav = ({ onLogin }: LoginNavProps) => {
   return (
     <Stack.Navigator>
       <Stack.Screen name="Login" options={{ headerShown: false }}>
-        {(props) => (
-          <Login
-            {...props}
-            onLogin={onLogin}
-            onDataFromLogin={onDataFromLogin}
-          />
-        )}
+        {(props) => <Login {...props} onLogin={onLogin} />}
       </Stack.Screen>
       <Stack.Screen
         name="SignUp"
@@ -30,6 +24,5 @@ const LoginNav = ({ onLogin, onDataFromLogin }: LoginNavProps) => {
 export default LoginNav
 
 interface LoginNavProps {
-  onLogin: (password: string) => void
-  //   onDataFromLogin: (data: any) => void // Define the type according to the data you want to pass
+  onLogin: (isLoggedIn: boolean) => void
 }

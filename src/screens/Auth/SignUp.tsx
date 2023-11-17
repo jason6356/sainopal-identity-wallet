@@ -1,45 +1,117 @@
-import React, { useState } from "react"
+import React, { useEffect, useState } from "react"
 import { View, Text, StyleSheet, Image, TouchableOpacity } from "react-native"
 import { useNavigation } from "@react-navigation/native"
 import SmoothPinCodeInput from "react-native-smooth-pincode-input"
 import NumberPad from "./components/NumberPad"
 import { RouteProp, NavigationProp } from "@react-navigation/native"
+import * as SQLite from "expo-sqlite"
 
 type RootStackParamList = {
   SignUp: undefined
   Login: undefined
 }
 
-type LoginScreenNavigationProp = NavigationProp<RootStackParamList, "Login">
+type SignUpScreenNavigationProp = NavigationProp<RootStackParamList, "SignUp">
 
-type LoginScreenRouteProp = RouteProp<RootStackParamList, "Login">
+type SignUpScreenRouteProp = RouteProp<RootStackParamList, "SignUp">
 
-const SingUp: React.FC<{
-  navigation: LoginScreenNavigationProp
-  route: LoginScreenRouteProp
+const db = SQLite.openDatabase("db.db")
+
+const SignUp: React.FC<{
+  navigation: SignUpScreenNavigationProp
+  route: SignUpScreenRouteProp
 }> = ({ navigation, route }) => {
   const passwordLength = 6
-  const [code, setCode] = useState<string>("")
+  const [firstCode, setFirstCode] = useState<string>("")
+  const [secondCode, setSecondCode] = useState<string>("")
+  const [step, setStep] = useState<number>(1)
   const pinInputRef = React.createRef<SmoothPinCodeInput>()
 
-  const handleLogin = () => {
-    // Validate password length
-    if (code.length === passwordLength) {
-      // Perform login logic with the entered password
-      console.log("Logging in with password:", code)
-    } else {
-      alert(`Password must be ${passwordLength} digits long.`)
+  const logUserData = () => {
+    db.transaction((tx) => {
+      tx.executeSql("select * from user;", [], (_, { rows }) => {
+        console.log("User Data:", rows._array)
+      })
+    })
+  }
+
+  useEffect(() => {
+    const unsubscribe = navigation.addListener("focus", () => {
+      logUserData()
+    })
+    return unsubscribe
+  }, [navigation])
+
+  const checkPinAndNavigate = () => {
+    if (step === 1 && firstCode.length === passwordLength) {
+      setStep(2)
+    } else if (step === 2 && secondCode.length === passwordLength) {
+      if (firstCode === secondCode) {
+        storeUserData(secondCode)
+        navigation.navigate("Login")
+      } else {
+        setFirstCode("")
+        setSecondCode("")
+        setStep(1)
+        alert("PIN entries do not match. Please try again.")
+      }
     }
   }
 
+  useEffect(() => {
+    console.log("First Code:", firstCode)
+    console.log("Second Code:", secondCode)
+    checkPinAndNavigate()
+  }, [firstCode, secondCode])
+
   const onKeyPress = (value: number) => {
-    setCode((prevCode) =>
-      prevCode.length < passwordLength ? prevCode + value.toString() : prevCode
-    )
+    if (step === 1) {
+      setFirstCode((prevCode) =>
+        prevCode.length < passwordLength
+          ? prevCode + value.toString()
+          : prevCode
+      )
+    } else {
+      setSecondCode((prevCode) =>
+        prevCode.length < passwordLength
+          ? prevCode + value.toString()
+          : prevCode
+      )
+    }
+
+    console.log(firstCode.toString(), "==", secondCode)
   }
 
   const onDelete = () => {
-    setCode((prevCode) => prevCode.slice(0, -1))
+    if (step === 1) {
+      setFirstCode((prevCode) => prevCode.slice(0, -1))
+    } else {
+      setSecondCode((prevCode) => prevCode.slice(0, -1))
+    }
+  }
+
+  const storeUserData = (encryptedPassword: string) => {
+    db.transaction((tx) => {
+      tx.executeSql(
+        "create table if not exists user (id integer primary key not null, password text);"
+      )
+      tx.executeSql(
+        "select * from user limit 1;",
+        [],
+        (_, { rows: { _array } }) => {
+          if (_array.length > 0) {
+            tx.executeSql("update user set password = ? where id = ?;", [
+              encryptedPassword,
+              _array[0].id,
+            ])
+          } else {
+            tx.executeSql("insert into user (password) values (?);", [
+              encryptedPassword,
+            ])
+          }
+        }
+      )
+    })
   }
 
   return (
@@ -49,9 +121,11 @@ const SingUp: React.FC<{
         style={styles.forgotPin}
         onPress={() => navigation.navigate("Login")}
       >
-        <Text style={styles.forgotPinText}></Text>
+        <Text style={styles.forgotPinText}>Back to Login</Text>
       </TouchableOpacity>
-      <Text style={styles.title}>Enter New PIN</Text>
+      <Text style={styles.title}>
+        {step === 1 ? "Enter New PIN" : "Confirm New PIN"}
+      </Text>
       <View style={styles.formContainer}>
         <View style={styles.passCon}>
           <SmoothPinCodeInput
@@ -63,8 +137,10 @@ const SingUp: React.FC<{
             cellStyle={null}
             cellStyleFocused={null}
             codeLength={6}
-            value={code}
-            onTextChange={(code: React.SetStateAction<string>) => setCode(code)}
+            value={step === 1 ? firstCode : secondCode}
+            onTextChange={(code: React.SetStateAction<string>) =>
+              step === 1 ? setFirstCode(code) : setSecondCode(code)
+            }
             autoFocus={false}
           />
         </View>
@@ -73,7 +149,6 @@ const SingUp: React.FC<{
     </View>
   )
 }
-
 const styles = StyleSheet.create({
   container: {
     flex: 1,
@@ -125,6 +200,18 @@ const styles = StyleSheet.create({
     color: "#12283b",
     fontWeight: "bold",
   },
+  button: {
+    backgroundColor: "#0c263e",
+    padding: 10,
+    borderRadius: 5,
+    marginTop: 20,
+  },
+  buttonText: {
+    color: "white",
+    textAlign: "center",
+    fontWeight: "bold",
+    fontSize: 18,
+  },
 })
 
-export default SingUp
+export default SignUp

@@ -6,7 +6,7 @@ import { agent } from "./config"
 import BottomNavigation from "./src/navigators/BottomNavigation"
 import { GluestackUIProvider } from "@gluestack-ui/react"
 import { createLinkSecretIfRequired } from "./config/agent"
-import LoginNav from "./src/screens/Auth/LoginNav"
+import LoginNav from "./src/navigators/LoginNav"
 import { NavigationContainer } from "@react-navigation/native"
 
 const App: React.FC = () => {
@@ -31,11 +31,9 @@ const App: React.FC = () => {
     }
   }, [loggedIn])
 
-  const handleLogin = async (password: string) => {
-    if (password === "a") {
+  const handleLogin = async (isLoggedIn: boolean) => {
+    if (isLoggedIn) {
       setLoggedIn(true)
-    } else {
-      alert("Invalid password. Please try again.")
     }
   }
 
@@ -46,7 +44,6 @@ const App: React.FC = () => {
           <LoginNav onLogin={handleLogin} />
         </NavigationContainer>
       ) : (
-        // <Login onLogin={handleLogin} />
         initializedAgent && (
           <AgentProvider agent={initializedAgent}>
             <BottomNavigation />

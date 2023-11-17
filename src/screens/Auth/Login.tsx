@@ -3,6 +3,7 @@ import { View, Text, StyleSheet, Image, TouchableOpacity } from "react-native"
 import SmoothPinCodeInput from "react-native-smooth-pincode-input"
 import NumberPad from "./components/NumberPad"
 import { RouteProp, NavigationProp } from "@react-navigation/native"
+import * as SQLite from "expo-sqlite"
 
 type RootStackParamList = {
   SignUp: undefined
@@ -13,13 +14,54 @@ type LoginScreenNavigationProp = NavigationProp<RootStackParamList, "Login">
 
 type LoginScreenRouteProp = RouteProp<RootStackParamList, "Login">
 
+const db = SQLite.openDatabase("db.db")
+
 const Login: React.FC<{
   navigation: LoginScreenNavigationProp
   route: LoginScreenRouteProp
-}> = ({ navigation, route }) => {
+  onLogin: (isLoggedIn: boolean) => void
+}> = ({ navigation, route, onLogin }) => {
   const passwordLength = 6
   const [code, setCode] = useState<string>("")
   const pinInputRef = React.createRef<SmoothPinCodeInput>()
+
+  useEffect(() => {
+    db.transaction((tx) => {
+      tx.executeSql(
+        "SELECT name FROM sqlite_master WHERE type='table' AND name='user';",
+        [],
+        (_, { rows }) => {
+          const tableExists = rows.length > 0
+
+          if (!tableExists) {
+            console.log("User table does not exist in sqlite")
+            navigation.navigate("SignUp")
+          } else {
+            tx.executeSql("SELECT * FROM user;", [], (_, { rows }) => {
+              const userData = rows._array
+              console.log(userData)
+
+              if (userData.length === 0) {
+                console.log("User table has no data")
+                navigation.navigate("SignUp")
+              }
+            })
+          }
+        }
+      )
+    })
+  }, [navigation])
+
+  const checkPinAndNavigate = () => {
+    if (code.length === passwordLength) {
+      onLogin(true)
+    }
+  }
+
+  useEffect(() => {
+    console.log("Code:", code)
+    checkPinAndNavigate()
+  }, [code])
 
   const onKeyPress = (value: number) => {
     setCode((prevCode) =>
@@ -32,7 +74,6 @@ const Login: React.FC<{
   }
 
   const handleForgotPin = () => {
-    // Navigate to the screen where users can reset their PIN
     navigation.navigate("SignUp")
   }
 
@@ -60,9 +101,6 @@ const Login: React.FC<{
           />
         </View>
         <NumberPad onKeyPress={onKeyPress} onDelete={onDelete} />
-        <TouchableOpacity style={styles.button}>
-          <Text style={styles.buttonText}>Login</Text>
-        </TouchableOpacity>
       </View>
     </View>
   )
