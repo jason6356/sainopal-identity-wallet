@@ -38,7 +38,7 @@ const ledgers: IndySdkPoolConfig[] = _ledger;
 
 const poolConfig: IndySdkPoolConfig = {
   indyNamespace: "",
-  id: "YourSovrin", // <----<<< as shown here
+  id: "HisSovrin", // <----<<< as shown here
   genesisTransactions: genesis,
   connectOnStartup: true,
   isProduction: false,

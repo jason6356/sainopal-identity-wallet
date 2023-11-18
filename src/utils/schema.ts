@@ -1,5 +1,10 @@
 import { CredentialExchangeRecord as CredentialRecord } from "@aries-framework/core";
 import { AnonCredsCredentialMetadataKey } from "@aries-framework/anoncreds/build/utils/metadata";
+import {
+  Agent,
+  GetCredentialFormatDataReturn,
+  CredentialFormat,
+} from "@aries-framework/core";
 
 export type Schema = {
   name: string;
@@ -38,4 +43,25 @@ export function parsedSchema(credential: CredentialRecord): {
   version: string;
 } {
   return parseSchemaFromId(credentialSchema(credential));
+}
+
+export async function getSchemaID(agent: Agent, offerID: string) {
+  try {
+    const formatData: GetCredentialFormatDataReturn<CredentialFormat[]> =
+      await agent.credentials.getFormatData(offerID);
+
+    //Avoid Null Condition
+    if (formatData.offer) {
+      const { schema_id } = formatData.offer?.indy;
+      return schema_id;
+    }
+  } catch (e) {
+    console.error("Invalid Credential Offer ID!");
+  }
+}
+
+export async function getSchemaNameFromOfferID(agent: Agent, offerID: string) {
+  const schemaID = await getSchemaID(agent, offerID);
+  const schema = parseSchemaFromId(schemaID);
+  return schema.name;
 }

@@ -1,9 +1,7 @@
 import {
+  CredentialExchangeRecord,
   CredentialState,
   ProofState,
-  CredentialExchangeRecord,
-  GetCredentialFormatDataReturn,
-  CredentialFormat,
 } from "@aries-framework/core";
 import {
   useAgent,
@@ -11,21 +9,21 @@ import {
   useCredentialsByConnectionId,
   useProofsByConnectionId,
 } from "@aries-framework/react-hooks";
-import React, { useEffect, useLayoutEffect, useState } from "react";
+import { StackScreenProps } from "@react-navigation/stack";
+import React, { useEffect, useState } from "react";
 import {
+  Image,
   Pressable,
   ScrollView,
-  View,
   StyleSheet,
-  Image,
   Text,
   TouchableHighlight,
+  View,
 } from "react-native";
-import { parseSchemaFromId } from "../../utils/schema";
 import Card from "../../components/Card";
-import { ContactStackParamList } from "../../navigators/ContactStack";
-import { StackScreenProps } from "@react-navigation/stack";
 import useHideBottomTabBar from "../../hooks/useHideBottomTabBar";
+import { ContactStackParamList } from "../../navigators/ContactStack";
+import { getSchemaNameFromOfferID } from "../../utils/schema";
 
 const schemaIdToImageMapping = {
   "NypRCRGykSwKUuRBQx2b9o:2:degree:1.0": require("../../assets/degree.png"),
@@ -50,7 +48,7 @@ const ConnectionDetails = ({ navigation, route }: Props) => {
     const newCredentialMap = new Map();
 
     for (const e of credentialsOffer) {
-      const name = await getSchemaNameFromOfferID(e.id);
+      const name = await getSchemaNameFromOfferID(agent.agent, e.id);
       newCredentialMap.set(e.id, name);
     }
 
@@ -63,26 +61,6 @@ const ConnectionDetails = ({ navigation, route }: Props) => {
       title: connection?.theirLabel,
     });
   }, [credentialsOffer, connection_id]);
-
-  async function getSchemaID(offerID: string) {
-    try {
-      const formatData: GetCredentialFormatDataReturn<CredentialFormat[]> =
-        await agent.agent.credentials.getFormatData(offerID);
-
-      if (formatData.offer) {
-        const { schema_id } = formatData.offer?.indy;
-        return schema_id;
-      }
-    } catch (e) {
-      console.error("Invalid Credential Offer ID!");
-    }
-  }
-
-  async function getSchemaNameFromOfferID(offerID: string) {
-    const schemaID = await getSchemaID(offerID);
-    const schema = parseSchemaFromId(schemaID);
-    return schema.name;
-  }
 
   return (
     <View style={styles.container}>
