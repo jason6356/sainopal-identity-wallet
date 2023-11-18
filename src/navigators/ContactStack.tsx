@@ -1,10 +1,10 @@
-import React from "react";
 import { createStackNavigator } from "@react-navigation/stack";
-import ConnectionUI from "../screens/Connections/Contacts";
-import Contacts from "../screens/Connections/Contacts";
+import React from "react";
 import ConnectionDetails from "../screens/Connections/ConnectionDetails";
+import Contacts from "../screens/Connections/Contacts";
 import CredentialOffer from "../screens/Offer/CredentialOffer";
 import CredentialProof from "../screens/Proof/CredentialProof";
+import Credential from "../screens/Wallet/Credential";
 
 export type ContactStackParamList = {
   Contacts: undefined;
@@ -17,6 +17,9 @@ export type ContactStackParamList = {
   };
   CredentialProof: {
     presentation_id: string;
+  };
+  Credential: {
+    credential_offer_id: string;
   };
 };
 
@@ -32,6 +35,7 @@ const ContactScreenStack: React.FC = () => {
       />
       <ContactStack.Screen name="CredentialOffer" component={CredentialOffer} />
       <ContactStack.Screen name="CredentialProof" component={CredentialProof} />
+      <ContactStack.Screen name="Credential" component={Credential} />
     </ContactStack.Navigator>
   );
 };

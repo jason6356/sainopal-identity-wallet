@@ -1,34 +1,43 @@
-import React, { useLayoutEffect } from "react";
-import {
-  View,
-  Text,
-  StyleSheet,
-  Image,
-  ScrollView,
-  Pressable,
-} from "react-native";
-import { useCredentialByState } from "@aries-framework/react-hooks";
 import { CredentialState } from "@aries-framework/core";
+import { useCredentialByState, useAgent } from "@aries-framework/react-hooks";
 import { StackScreenProps } from "@react-navigation/stack";
+import React, { useEffect, useState } from "react";
+import {
+  Image,
+  Pressable,
+  ScrollView,
+  StyleSheet,
+  Text,
+  View,
+} from "react-native";
 import { WalletStackParamList } from "../../navigators/WalletStack";
+import { getSchemaNameFromOfferID } from "../../utils/schema";
 
 const schemaIdToImageMapping = {
   "NypRCRGykSwKUuRBQx2b9o:2:degree:1.0": require("../../assets/degree.png"),
-};
-
-const schemaIdToCredentialName = {
-  "NypRCRGykSwKUuRBQx2b9o:2:degree:1.0": "Degree Certificate",
 };
 
 type Props = StackScreenProps<WalletStackParamList, "Wallet", "Credential">;
 
 const Wallet = ({ navigation, route }: Props) => {
   const credentials = useCredentialByState(CredentialState.Done);
+  const agent = useAgent();
+  const [credentialMap, setCredentialMap] = useState(new Map());
 
-  useLayoutEffect(() => {
-    console.log(JSON.stringify(credentials));
-  }, []);
+  const mapCredentials = async () => {
+    const newCredentialMap = new Map();
 
+    for (const e of credentials) {
+      const name = await getSchemaNameFromOfferID(agent.agent, e.id);
+      newCredentialMap.set(e.id, name);
+    }
+
+    setCredentialMap(newCredentialMap);
+  };
+
+  useEffect(() => {
+    mapCredentials();
+  }, [credentials]);
   return (
     <View style={styles.container}>
       {credentials.length > 0 ? (
@@ -37,9 +46,10 @@ const Wallet = ({ navigation, route }: Props) => {
             const schemaId = credential.metadata.get(
               "_anoncreds/credential"
             )?.schemaId;
+            const credentialName = credentialMap.get(credential.id);
             const imageSource =
               schemaIdToImageMapping["NypRCRGykSwKUuRBQx2b9o:2:degree:1.0"];
-            const credentialName = "Animo ID";
+            console.log(credential.id);
 
             return (
               <Pressable
@@ -47,8 +57,7 @@ const Wallet = ({ navigation, route }: Props) => {
                 onPress={() =>
                   navigation.navigate("Credential", {
                     credential_offer_id: credential.id,
-                    credential_name: credentialName,
-                    schema_id: schemaId,
+                    parentRoute: "Wallet",
                   })
                 }
               >

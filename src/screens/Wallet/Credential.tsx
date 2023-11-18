@@ -1,83 +1,127 @@
-import React, { useState, useEffect, useLayoutEffect } from "react";
-import { Text, View, StyleSheet, Image, ScrollView } from "react-native";
 import {
+  useAgent,
   useConnectionById,
   useCredentialById,
 } from "@aries-framework/react-hooks";
 import { StackScreenProps } from "@react-navigation/stack";
+import React, { useEffect, useLayoutEffect, useState } from "react";
+import { Image, ScrollView, StyleSheet, Text, View } from "react-native";
 import { WalletStackParamList } from "../../navigators/WalletStack";
 
-const schemaIdToImageMapping = {
-  "NypRCRGykSwKUuRBQx2b9o:2:degree:1.0": require("../../assets/degree.png"),
-};
+import {
+  getCredentialFormat,
+  getCredentialName,
+} from "../../utils/credentials";
 
-const schemaIdToCredentialName = {
-  "NypRCRGykSwKUuRBQx2b9o:2:degree:1.0": "Degree Certificate",
+type CredentialFormatData = {
+  name: string;
+  value: string;
 };
 
 type Props = StackScreenProps<WalletStackParamList, "Credential">;
 
+const credentialImage = require("../../assets/degree.png");
+
+const tabBarStyle = {
+  position: "absolute",
+  bottom: 0,
+  right: 0,
+  left: 0,
+  elevation: 0,
+  height: 70,
+  backgroundColor: "#fff",
+  paddingBottom: 20,
+  paddingTop: 20,
+};
+
 const Credential = ({ navigation, route }: Props) => {
-  const { credential_offer_id, credential_name, schema_id } = route.params;
+  const { credential_offer_id, parentRoute } = route.params;
   const credentialOffer = useCredentialById(credential_offer_id);
+  const agent = useAgent();
   const connectionDetails = useConnectionById(
     credentialOffer?.connectionId ? credentialOffer.connectionId : ""
   );
-  const [imageSource, setImageSource] = useState(null);
+
+  const [credentialFormatData, setCredentialFormatData] = useState<
+    CredentialFormatData[]
+  >([]);
+
+  const [credentialName, setCredentialName] = useState<string>("");
 
   useLayoutEffect(() => {
     navigation.setOptions({
-      title: credential_name,
+      title: "",
     });
   });
 
   useEffect(() => {
-    console.log(JSON.stringify(credentialOffer));
-    setImageSource(
-      schemaIdToImageMapping["NypRCRGykSwKUuRBQx2b9o:2:degree:1.0"]
-    );
-  });
+    navigation.getParent()?.setOptions({
+      tabBarStyle: {
+        display: "none",
+      },
+    });
+    updateNameAndFormat(credential_offer_id);
+
+    if (parentRoute === "Wallet") {
+      return () =>
+        navigation.getParent()?.setOptions({ tabBarStyle: tabBarStyle });
+    }
+  }, [navigation]);
+
+  async function updateNameAndFormat(id: string) {
+    setCredentialName(await getCredentialName(agent.agent, id));
+    setCredentialFormatData(await getCredentialFormat(agent.agent, id));
+  }
 
   return (
     <View style={styles.container}>
       <ScrollView>
+        {/*  Credential Card Section */}
         <View style={styles.card}>
           {/* 
         @Todo : Null Check for Image Source if we don have the image for specific schema id
         */}
-          <Image source={imageSource} style={styles.image} />
+          <Image source={credentialImage} style={{ width: 70, height: 70 }} />
         </View>
 
+        {/*  Credential Info Section */}
+
         <View style={styles.card}>
-          <Text style={styles.cardTitle}>Credential Info</Text>
-          {credentialOffer && (
-            <View style={styles.cardContent}>
-              <Text style={styles.schemaId}>
-                Issued By: {connectionDetails?.theirLabel}
-              </Text>
-              <Text style={styles.schemaId}>
-                Issued On: {connectionDetails?.createdAt.toLocaleString()}
-              </Text>
-              <Text style={styles.schemaId}>Info</Text>
-              {credentialOffer.credentialAttributes?.map((attribute, index) => (
-                <React.Fragment key={index}>
-                  {attribute.name === "picture" ? (
-                    <View>
-                      <Text>{attribute.name}</Text>
-                      <Image
-                        source={{ uri: attribute.value }} // Assuming attribute.value is a valid image URL
-                        style={{ width: 300, height: 300 }}
-                      />
-                    </View>
-                  ) : (
-                    <Text style={styles.attribute}>
-                      {attribute.name}: {attribute.value}
-                    </Text>
-                  )}
-                </React.Fragment>
-              ))}
+          <View style={{ padding: 10 }}>
+            <Text style={styles.cardTitle}>Info</Text>
+          </View>
+          <View style={styles.credentialHeader}>
+            <View style={{ flexDirection: "row" }}>
+              <View style={{ width: "50%", paddingVertical: 5 }}>
+                <Text style={styles.credentialAttribute}>Credential</Text>
+              </View>
+              <View style={{ width: "50%", paddingVertical: 5 }}>
+                <Text style={styles.credentialValue}>{credentialName}</Text>
+              </View>
             </View>
-          )}
+            <View style={{ flexDirection: "row" }}>
+              <View style={{ width: "50%", paddingVertical: 5 }}>
+                <Text style={styles.credentialAttribute}>Issuer</Text>
+              </View>
+              <View style={{ width: "50%", paddingVertical: 5 }}>
+                <Text style={styles.credentialValue}>
+                  {connectionDetails?.theirLabel}
+                </Text>
+              </View>
+            </View>
+          </View>
+          <View style={styles.credentialFormData}>
+            {credentialFormatData.map((e, index) => (
+              <View key={index} style={{ flexDirection: "row" }}>
+                <View style={{ width: "50%", paddingVertical: 5 }}>
+                  <Text style={styles.credentialAttribute}>{e.name}</Text>
+                </View>
+                <View style={{ width: "50%", paddingVertical: 5 }}>
+                  <Text style={styles.credentialValue}>{e.value}</Text>
+                </View>
+              </View>
+            ))}
+          </View>
         </View>
       </ScrollView>
     </View>
@@ -87,39 +131,46 @@ const Credential = ({ navigation, route }: Props) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    padding: 16,
-    justifyContent: "center",
+    alignItems: "center",
+    backgroundColor: "#fff",
+    padding: 20,
   },
   card: {
     backgroundColor: "#fff",
     borderRadius: 8,
     padding: 16,
+    margin: 8,
     shadowColor: "#000",
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.1,
     shadowRadius: 4,
     elevation: 3,
-    marginBottom: 10,
+    position: "relative", // Required for positioning the overlay
   },
   cardTitle: {
     fontSize: 20,
     fontWeight: "bold",
     marginBottom: 8,
   },
-  cardContent: {
-    marginTop: 8,
+  credentialHeader: {
+    flexDirection: "column",
+    paddingHorizontal: 10,
+    paddingBottom: 10,
+    borderBottomWidth: 1,
+    borderStyle: "solid",
+    borderColor: "#d3d3d3",
   },
-  schemaId: {
-    fontSize: 14,
-    marginBottom: 8,
+  credentialFormData: {
+    flexDirection: "column",
+    width: "100%",
+    padding: 10,
   },
-  attribute: {
-    fontSize: 14,
-    marginBottom: 4,
+  credentialAttribute: {
+    fontSize: 15,
+    color: "#808080",
   },
-  image: {
-    width: 200,
-    height: 200,
+  credentialValue: {
+    fontSize: 15,
   },
 });
 

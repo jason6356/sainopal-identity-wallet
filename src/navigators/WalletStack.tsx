@@ -1,21 +1,20 @@
-import { createStackNavigator } from "@react-navigation/stack"
-import Wallet from "../screens/Wallet/Wallet"
+import { createStackNavigator } from "@react-navigation/stack";
+import Wallet from "../screens/Wallet/Wallet";
 
-import React from "react"
-import Credential from "../screens/Wallet/Credential"
+import React from "react";
+import Credential from "../screens/Wallet/Credential";
 
-type WalletStackProps = {}
+type WalletStackProps = {};
 
 export type WalletStackParamList = {
-  Wallet: undefined
+  Wallet: undefined;
   Credential: {
-    credential_offer_id: string
-    credential_name: string
-    schema_id: string
-  }
-}
+    credential_offer_id: string;
+    parentRoute: string;
+  };
+};
 
-const WalletStack = createStackNavigator<WalletStackParamList>()
+const WalletStack = createStackNavigator<WalletStackParamList>();
 
 const WalletScreenStack: React.FC = () => {
   return (
@@ -23,7 +22,7 @@ const WalletScreenStack: React.FC = () => {
       <WalletStack.Screen name="Wallet" component={Wallet} />
       <WalletStack.Screen name="Credential" component={Credential} />
     </WalletStack.Navigator>
-  )
-}
+  );
+};
 
-export default WalletScreenStack
+export default WalletScreenStack;
