@@ -35,3 +35,5 @@ android
 
 # typescript
 *.tsbuildinfo
+
+config/agent.ts
