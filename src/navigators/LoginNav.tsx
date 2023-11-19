@@ -12,11 +12,9 @@ const LoginNav = ({ onLogin }: LoginNavProps) => {
       <Stack.Screen name="Login" options={{ headerShown: false }}>
         {(props) => <Login {...props} onLogin={onLogin} />}
       </Stack.Screen>
-      <Stack.Screen
-        name="RecoveryPhrases"
-        options={{ headerShown: false }}
-        component={RecoveryPhrases}
-      />
+      <Stack.Screen name="RecoveryPhrases">
+        {(props) => <RecoveryPhrases {...props} onLogin={onLogin} />}
+      </Stack.Screen>
     </Stack.Navigator>
   )
 }

@@ -284,16 +284,19 @@ const styles = StyleSheet.create({
     fontSize: 24,
     fontWeight: "bold",
     marginBottom: 20,
+    color: "#0c2c44",
   },
   label: {
     fontSize: 16,
     fontWeight: "bold",
+    color: "#0c2c44",
   },
   labelTitle: {
     fontSize: 16,
     fontWeight: "bold",
     marginBottom: 20,
     marginTop: 20,
+    color: "#0c2c44",
   },
   input: {
     width: "100%",
@@ -304,6 +307,7 @@ const styles = StyleSheet.create({
   },
   text: {
     fontSize: 16,
+    color: "#0c2c44",
   },
   buttonContainer: {
     marginBottom: 500,

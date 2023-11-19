@@ -4,6 +4,7 @@ import SmoothPinCodeInput from "react-native-smooth-pincode-input"
 import NumberPad from "./components/NumberPad"
 import { RouteProp, NavigationProp } from "@react-navigation/native"
 import * as SQLite from "expo-sqlite"
+import wordsList from "../../../en.json"
 
 type RootStackParamList = {
   RecoveryPhrases: undefined
@@ -50,12 +51,92 @@ const Login: React.FC<{
         }
       )
     })
+
+    db.transaction((tx) => {
+      tx.executeSql(
+        "SELECT name FROM sqlite_master WHERE type='table' AND name='recoveryPhrase';",
+        [],
+        (_, { rows }) => {
+          const tableExists = rows.length > 0
+
+          if (!tableExists) {
+            tx.executeSql(
+              "CREATE TABLE IF NOT EXISTS recoveryPhrase (id INTEGER PRIMARY KEY AUTOINCREMENT, word TEXT);",
+              [],
+              () => {
+                console.log("recoveryPhrase table created successfully!")
+
+                // Insert data into the recoveryPhrase table
+                const randomWords = generateRandomWords(12)
+                randomWords.forEach((word) => {
+                  tx.executeSql(
+                    "INSERT INTO recoveryPhrase (word) VALUES (?);",
+                    [word],
+                    () => {
+                      console.log(`Inserted word: ${word}`)
+                    },
+                    (error) => {
+                      console.log("Error inserting word:", error.message)
+                    }
+                  )
+                })
+              },
+              (error) => {
+                console.log(
+                  "Error creating recoveryPhrase table: " + error.message
+                )
+              }
+            )
+          } else {
+            // Table exists, check if it has data
+            tx.executeSql(
+              "SELECT * FROM recoveryPhrase;",
+              [],
+              (_, { rows }) => {
+                const recoveryPhraseData = rows._array
+                const wordsOnly = recoveryPhraseData.map((item) => item.word)
+                const wordsString = wordsOnly.join(" ")
+                console.log(wordsString)
+                if (recoveryPhraseData.length === 0) {
+                  console.log("recoveryPhrase table has no data")
+
+                  const randomWords = generateRandomWords(12)
+                  randomWords.forEach((word) => {
+                    tx.executeSql(
+                      "INSERT INTO recoveryPhrase (word) VALUES (?);",
+                      [word],
+                      () => {
+                        console.log(`Inserted word: ${word}`)
+                      },
+                      (error) => {
+                        console.log("Error inserting word:", error.message)
+                      }
+                    )
+                  })
+                }
+              }
+            )
+          }
+        }
+      )
+    })
   }, [navigation])
 
   const checkPinAndNavigate = () => {
     if (code.length === passwordLength) {
       onLogin(true)
     }
+  }
+
+  function generateRandomWords(count: number) {
+    const selectedWords = []
+
+    const shuffledWords = wordsList.sort(() => Math.random() - 0.5)
+
+    for (let i = 0; i < count; i++) {
+      selectedWords.push(shuffledWords[i])
+    }
+    return selectedWords
   }
 
   useEffect(() => {
