@@ -47,7 +47,11 @@ const SignUp: React.FC<{
       setStep(2)
     } else if (step === 2 && secondCode.length === passwordLength) {
       if (firstCode === secondCode) {
-        storeUserData(secondCode)
+        const uniqueIdentifier = `${Date.now()}_${Math.floor(
+          Math.random() * 1000
+        )}`
+        const walletName = `imported_wallet_${uniqueIdentifier}`
+        storeUserData(secondCode, walletName)
         navigation.navigate("Login")
       } else {
         setFirstCode("")
@@ -90,24 +94,25 @@ const SignUp: React.FC<{
     }
   }
 
-  const storeUserData = (encryptedPassword: string) => {
+  const storeUserData = (encryptedPassword: string, wallet: string) => {
     db.transaction((tx) => {
       tx.executeSql(
-        "create table if not exists user (id integer primary key not null, password text);"
+        "create table if not exists user (id integer primary key not null, password text, wallet text);"
       )
       tx.executeSql(
         "select * from user limit 1;",
         [],
         (_, { rows: { _array } }) => {
           if (_array.length > 0) {
-            tx.executeSql("update user set password = ? where id = ?;", [
-              encryptedPassword,
-              _array[0].id,
-            ])
+            tx.executeSql(
+              "update user set password = ?, wallet = ? where id = ?;",
+              [encryptedPassword, wallet, _array[0].id]
+            )
           } else {
-            tx.executeSql("insert into user (password) values (?);", [
-              encryptedPassword,
-            ])
+            tx.executeSql(
+              "insert into user (password, wallet) values (?, ?);",
+              [encryptedPassword, wallet]
+            )
           }
         }
       )

@@ -6,7 +6,7 @@ import { RouteProp, NavigationProp } from "@react-navigation/native"
 import * as SQLite from "expo-sqlite"
 
 type RootStackParamList = {
-  SignUp: undefined
+  RecoveryPhrases: undefined
   Login: undefined
 }
 
@@ -74,7 +74,7 @@ const Login: React.FC<{
   }
 
   const handleForgotPin = () => {
-    navigation.navigate("SignUp")
+    navigation.navigate("RecoveryPhrases")
   }
 
   return (

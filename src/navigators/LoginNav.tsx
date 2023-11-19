@@ -2,8 +2,8 @@
 import React from "react"
 import { createNativeStackNavigator } from "@react-navigation/native-stack"
 import Login from "../screens/Auth/Login"
-import SignUp from "../screens/Auth/SignUp"
-
+// import SignUp from "../screens/Auth/SignUp"
+import RecoveryPhrases from "../screens/Auth/RecoveryPhrase"
 const Stack = createNativeStackNavigator()
 
 const LoginNav = ({ onLogin }: LoginNavProps) => {
@@ -13,9 +13,9 @@ const LoginNav = ({ onLogin }: LoginNavProps) => {
         {(props) => <Login {...props} onLogin={onLogin} />}
       </Stack.Screen>
       <Stack.Screen
-        name="SignUp"
+        name="RecoveryPhrases"
         options={{ headerShown: false }}
-        component={SignUp}
+        component={RecoveryPhrases}
       />
     </Stack.Navigator>
   )

@@ -17,7 +17,8 @@ import { ContactStackParamList } from "../../navigators/ContactStack"
 type Props = StackScreenProps<
   ContactStackParamList,
   "Contacts",
-  "ConnectionDetails"
+  "Communication"
+  // "ConnectionDetails"
 >
 
 const Contacts = ({ navigation, route }: Props) => {
@@ -77,8 +78,9 @@ const Contacts = ({ navigation, route }: Props) => {
       return (
         <Pressable
           onPress={() =>
-            navigation.push("ConnectionDetails", {
+            navigation.push("Communication", {
               connection_id: item.id,
+              connection_name: item.theirLabel,
             })
           }
         >
@@ -99,7 +101,7 @@ const Contacts = ({ navigation, route }: Props) => {
         </Pressable>
       )
     } else {
-      return null // Do not render connections with future dates
+      return null 
     }
   }
 
