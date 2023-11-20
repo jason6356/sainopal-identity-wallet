@@ -149,8 +149,8 @@ const BottomNavigation: React.FC = () => {
                   style={{
                     fontSize: 14,
                     color: "#0e2b45",
-                    position: "absolute", // Add this line
-                    top: 62, // Adjust this value as needed
+                    position: "absolute",
+                    top: 62,
                   }}
                 >
                   Scan

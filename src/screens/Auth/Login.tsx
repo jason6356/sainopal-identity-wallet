@@ -25,7 +25,7 @@ const Login: React.FC<{
   const passwordLength = 6
   const [code, setCode] = useState<string>("")
   const pinInputRef = React.createRef<SmoothPinCodeInput>()
-
+  const [password, setPassword] = useState<string>("")
   useEffect(() => {
     db.transaction((tx) => {
       tx.executeSql(
@@ -41,7 +41,10 @@ const Login: React.FC<{
             tx.executeSql("SELECT * FROM user;", [], (_, { rows }) => {
               const userData = rows._array
               console.log(userData)
-
+              const wordsOnly = userData.map((item) => item.password)
+              const wordsString = wordsOnly.join(" ")
+              setPassword(wordsString)
+              console.log(wordsString)
               if (userData.length === 0) {
                 console.log("User table has no data")
                 navigation.navigate("SignUp")
@@ -123,8 +126,11 @@ const Login: React.FC<{
   }, [navigation])
 
   const checkPinAndNavigate = () => {
+    console.log(password)
     if (code.length === passwordLength) {
-      onLogin(true)
+      if (code === password) {
+        onLogin(true)
+      }
     }
   }
 

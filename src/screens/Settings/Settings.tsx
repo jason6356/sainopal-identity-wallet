@@ -33,6 +33,11 @@ const Settings: React.FC<Props> = ({ navigation, route }: Props) => {
       title: "Recover Wallet",
       icon: require("../../assets/recover.png"),
     },
+    {
+      id: 4,
+      title: "Recover Phrase",
+      icon: require("../../assets/recoveryPhrase.png"),
+    },
   ]
 
   const handleSettingPress = (title: string) => {
@@ -42,6 +47,8 @@ const Settings: React.FC<Props> = ({ navigation, route }: Props) => {
       navigation.push("BackUpWallet", { msg: "Your message here" })
     } else if (title === "Recover Wallet") {
       navigation.push("RecoverWallet", { msg: "Your message here" })
+    } else if (title === "Recover Phrase") {
+      navigation.push("RecoveryPhrase", { msg: "Your message here" })
     }
   }
 
