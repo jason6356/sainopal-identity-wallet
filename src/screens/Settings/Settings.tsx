@@ -44,7 +44,7 @@ const Settings: React.FC<Props> = ({ navigation, route }: Props) => {
     if (title === "Change Pin") {
       navigation.push("ChangePin", { msg: "Your message here" })
     } else if (title === "Backup Wallet") {
-      navigation.push("BackUpWallet", { msg: "Your message here" })
+      navigation.push("WalletManager", { msg: "Your message here" })
     } else if (title === "Recover Wallet") {
       navigation.push("RecoverWallet", { msg: "Your message here" })
     } else if (title === "Recover Phrase") {

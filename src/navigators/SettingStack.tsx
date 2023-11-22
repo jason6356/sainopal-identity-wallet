@@ -1,16 +1,22 @@
 import { createStackNavigator } from "@react-navigation/stack"
 import React from "react"
 import Settings from "../screens/Settings/Settings"
-import BackupWallet from "../screens/Backupwallet/WalletManager"
+import WalletManager from "../screens/Backupwallet/WalletManager"
 import RecoverWallet from "../screens/RecoverWallet/RecoverWallet"
 import Home from "../screens/Home/Home"
 import RecoveryPhrase from "../screens/RecoverWallet/RecoveryPhrase"
+import Login from "../../App"
+import RecoverWalletKey from "../screens/RecoverWallet/RecoverWalletKey"
+import { DocumentPickerResponse } from "react-native-document-picker"
+
 export type SettingStackParamList = {
   Settings: undefined
   ChangePin: { msg: string }
-  BackUpWallet: { msg: string }
+  WalletManager: { msg: string }
   RecoverWallet: { msg: string }
   RecoveryPhrase: { msg: string }
+  RecoverWalletKey: { path: DocumentPickerResponse }
+  Login: undefined
 }
 
 const SettingStack = createStackNavigator<SettingStackParamList>()
@@ -20,9 +26,13 @@ const SettingStackScreen: React.FC = () => {
     <SettingStack.Navigator>
       <SettingStack.Screen name="Settings" component={Settings} />
       <SettingStack.Screen name="ChangePin" component={Home} />
-      <SettingStack.Screen name="BackUpWallet" component={BackupWallet} />
+      <SettingStack.Screen name="WalletManager" component={WalletManager} />
       <SettingStack.Screen name="RecoverWallet" component={RecoverWallet} />
       <SettingStack.Screen name="RecoveryPhrase" component={RecoveryPhrase} />
+      <SettingStack.Screen
+        name="RecoverWalletKey"
+        component={RecoverWalletKey}
+      />
     </SettingStack.Navigator>
   )
 }

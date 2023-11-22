@@ -12,6 +12,7 @@ import { useNavigation } from "@react-navigation/native"
 import NumberPad from "./components/NumberPad"
 import { RouteProp, NavigationProp } from "@react-navigation/native"
 import * as SQLite from "expo-sqlite"
+
 type RootStackParamList = {
   RecoveryPhrases: undefined
   Login: undefined

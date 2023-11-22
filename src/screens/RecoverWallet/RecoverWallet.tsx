@@ -5,13 +5,14 @@ import DocumentPicker, {
 } from "react-native-document-picker"
 import RNFS from "react-native-fs"
 import IndySdk, { WalletConfig } from "indy-sdk-react-native"
-import { config } from "../../../config/agent"
+import { config, recoveryPhraseLocal } from "../../../config/agent"
 
 import { StackScreenProps } from "@react-navigation/stack"
-import { WalletStackParamList } from "../../navigators/WalletStack"
 import { ConsoleLogger, InitConfig, LogLevel } from "@aries-framework/core"
 
-type Props = StackScreenProps<WalletStackParamList, "SelfCredential">
+import { SettingStackParamList } from "../../navigators/SettingStack"
+
+type Props = StackScreenProps<SettingStackParamList, "RecoverWallet">
 
 const RecoverWallet = ({ navigation }: Props) => {
   useLayoutEffect(() => {
@@ -26,13 +27,17 @@ const RecoverWallet = ({ navigation }: Props) => {
     try {
       const response = await DocumentPicker.pick({
         type: [DocumentPicker.types.allFiles],
-        copyTo: "documentDirectory", // Save the selected file to the app's document directory
+        copyTo: "documentDirectory",
       })
 
-      const selectedFile = response[0] // Assume the user picked only one file
+      const selectedFile = response[0]
       setImportedFileName(selectedFile.name)
       console.log(`${selectedFile.name} file picked`)
-      handleImport(selectedFile)
+      // handleImport(selectedFile)
+      // navigation.navigate("RecoverWalletKey", "sohai")
+      navigation.push("RecoverWalletKey", {
+        path: selectedFile,
+      })
     } catch (err) {
       if (!DocumentPicker.isCancel(err)) {
         console.error("Error picking document:", err)
@@ -55,18 +60,18 @@ const RecoverWallet = ({ navigation }: Props) => {
       const localFilePath = `${RNFS.DocumentDirectoryPath}/${selectedFile.name}`
 
       await RNFS.moveFile(selectedFile.uri, localFilePath)
-
+      const recovertWallet: string = await recoveryPhraseLocal()
       const configNew: InitConfig = {
         label: "SainoPal Mobile Wallet",
         walletConfig: {
-          id: "wa",
-          key: "testkey0090000000000000000000001",
+          id: walletName,
+          key: recovertWallet,
         },
         logger: new ConsoleLogger(LogLevel.trace),
       }
 
       const walletConfig: WalletConfig = configNew.walletConfig || {}
-      const walletCredentials = { key: walletConfig.key || "" }
+      const walletCredentials = { key: configNew.walletConfig?.key || "" }
 
       // Check if the wallet already exists
       const existingWalletPath = `${RNFS.DocumentDirectoryPath}/.indy_client/wallet/${walletName}`
@@ -88,7 +93,7 @@ const RecoverWallet = ({ navigation }: Props) => {
 
       await IndySdk.importWallet(walletConfig, walletCredentials, {
         path: localFilePath,
-        key: "123456",
+        key: recovertWallet,
       })
 
       console.log("Imported Wallet Successfully")

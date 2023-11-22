@@ -1,27 +1,33 @@
-import React, { useEffect, useLayoutEffect, useState } from "react"
-import { View, Text, StyleSheet, TouchableOpacity, Alert } from "react-native"
-import DocumentPicker, {
-  DocumentPickerResponse,
-} from "react-native-document-picker"
-import RNFS from "react-native-fs"
-import IndySdk, { WalletConfig } from "indy-sdk-react-native"
-import { config } from "../../../config/agent"
-
+import React, { useEffect, useLayoutEffect, useRef, useState } from "react"
+import {
+  View,
+  Text,
+  StyleSheet,
+  TouchableOpacity,
+  Alert,
+  Clipboard,
+} from "react-native"
 import { StackScreenProps } from "@react-navigation/stack"
-import { WalletStackParamList } from "../../navigators/WalletStack"
-import { ConsoleLogger, InitConfig, LogLevel } from "@aries-framework/core"
 import * as SQLite from "expo-sqlite"
+import Toast from "react-native-toast-message"
+import { Animated } from "react-native"
+import { SettingStackParamList } from "../../navigators/SettingStack"
 
-type Props = StackScreenProps<WalletStackParamList, "SelfCredential">
+type Props = StackScreenProps<SettingStackParamList, "RecoveryPhrase">
 const db = SQLite.openDatabase("db.db")
 
 const RecoveryPhrase = ({ navigation }: Props) => {
   useLayoutEffect(() => {
     navigation.setOptions({
       title: "Recover Wallet",
+      headerStyle: {
+        borderBottomWidth: 1,
+        borderBottomColor: "#ccc",
+      },
     })
   }, [navigation])
-  const [storedRecoveryPhrase, setStoredRecoveryPhrase] = useState([])
+
+  const [storedRecoveryPhrase, setStoredRecoveryPhrase] = useState<string[]>([])
 
   useEffect(() => {
     db.transaction(
@@ -34,7 +40,7 @@ const RecoveryPhrase = ({ navigation }: Props) => {
           const wordsString = wordsOnly.join(" ")
           console.log(wordsString)
           if (recoveryPhraseData.length > 0) {
-            setStoredRecoveryPhrase(recoveryPhraseData)
+            setStoredRecoveryPhrase(wordsOnly)
           }
         })
       },
@@ -44,31 +50,88 @@ const RecoveryPhrase = ({ navigation }: Props) => {
     )
   }, [])
 
+  const shakeAnimation = useRef(new Animated.Value(0)).current
+
+  const startShakeAnimation = () => {
+    Animated.sequence([
+      Animated.timing(shakeAnimation, {
+        toValue: 5,
+        duration: 50,
+        useNativeDriver: false,
+      }),
+      Animated.timing(shakeAnimation, {
+        toValue: -5,
+        duration: 50,
+        useNativeDriver: false,
+      }),
+      Animated.timing(shakeAnimation, {
+        toValue: 5,
+        duration: 50,
+        useNativeDriver: false,
+      }),
+      Animated.timing(shakeAnimation, {
+        toValue: 0,
+        duration: 50,
+        useNativeDriver: false,
+      }),
+    ]).start()
+  }
+
+  const handleCopyToClipboard = async () => {
+    const recoveryPhraseText = storedRecoveryPhrase.join(" ")
+    Clipboard.setString(recoveryPhraseText)
+    startShakeAnimation()
+  }
+
+  const textColorInterpolation = shakeAnimation.interpolate({
+    inputRange: [-10, 0, 10],
+    outputRange: ["#465360", "#465360", "lightgreen"],
+  })
+
   return (
     <View style={styles.container}>
+      <Toast position="bottom" bottomOffset={20} />
+
       <View>
         <Text style={styles.title}>Please secure your recovery phrase</Text>
       </View>
       <View>
         <Text style={styles.subtitle}>
-          You should store there 12 secret words in the right order in safe
-          place
+          You should store these 12 secret words in the right order in a safe
+          place.
         </Text>
       </View>
 
-      <View>
-        <Text style={styles.subtitle}>{storedRecoveryPhrase}</Text>
-      </View>
+      <Animated.View
+        style={[
+          styles.subtitleContainer,
+          {
+            borderColor: textColorInterpolation,
+          },
+        ]}
+      >
+        {storedRecoveryPhrase.map((word, index) => (
+          <Animated.Text
+            key={index}
+            style={[styles.subtitleText, { color: textColorInterpolation }]}
+          >
+            {index > 0 ? " " : ""}
+            {word}
+          </Animated.Text>
+        ))}
+      </Animated.View>
 
       <View style={styles.containerButton}>
-        <TouchableOpacity style={styles.importButton}>
+        <TouchableOpacity
+          style={styles.importButton}
+          onPress={handleCopyToClipboard}
+        >
           <Text style={styles.importButtonText}>Copy to clipboard</Text>
         </TouchableOpacity>
       </View>
     </View>
   )
 }
-
 const styles = StyleSheet.create({
   container: {
     padding: 20,
@@ -110,6 +173,28 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: "flex-end",
     marginBottom: 90,
+  },
+
+  subtitleContainer: {
+    borderTopWidth: 1,
+    borderBottomWidth: 1,
+    borderColor: "#d0cccc",
+    padding: 20,
+    flexDirection: "row",
+    flexWrap: "wrap",
+    alignItems: "center",
+    justifyContent: "center",
+    paddingHorizontal: 20,
+    marginTop: 40,
+  },
+  subtitleText: {
+    fontSize: 16,
+    fontWeight: "bold",
+    color: "#475361",
+    textAlign: "center",
+    marginHorizontal: 5,
+    marginBottom: 5,
+    paddingTop: 10,
   },
 })
 

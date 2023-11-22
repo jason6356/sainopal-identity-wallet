@@ -1,7 +1,13 @@
 import React, { useEffect, useState } from "react"
 import { ActivityIndicator, View, Image, StyleSheet } from "react-native"
 import { Agent } from "@aries-framework/core"
-import { agent, createLinkSecretIfRequired } from "./config/agent"
+import {
+  createLinkSecretIfRequired,
+  getAgent,
+  getAgentConfig,
+  recoveryPhraseLocal,
+  walletLocal,
+} from "./config"
 import AgentProvider from "@aries-framework/react-hooks"
 import BottomNavigation from "./src/navigators/BottomNavigation"
 import LoginNav from "./src/navigators/LoginNav"
@@ -17,7 +23,10 @@ const App: React.FC = () => {
   useEffect(() => {
     async function initializeAgent() {
       try {
-        // Set loading to false when initialization is complete
+        const id = await walletLocal()
+        const recoveryPhrase = await recoveryPhraseLocal()
+        const config = getAgentConfig(id, recoveryPhrase)
+        const agent = getAgent(config)
         await agent.initialize()
         await createLinkSecretIfRequired(agent)
         setInitializedAgent(agent)

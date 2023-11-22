@@ -66,6 +66,7 @@ const Communication: React.FC<CommunicationProps> = ({ navigation, route }) => {
 
   useEffect(() => {
     setReceivedMessages((prevMessages) => [...basicMessages].reverse())
+    console.log("Received messages:", receivedMessages)
   }, [basicMessages, isFocused])
 
   const isSentMessage = (role: BasicMessageRole) =>
@@ -73,7 +74,8 @@ const Communication: React.FC<CommunicationProps> = ({ navigation, route }) => {
 
   const handleSendMessage = async () => {
     try {
-      await agent.basicMessages.sendMessage(connection_id, message)
+      await agent?.basicMessages.sendMessage(connection_id, message)
+      console.log(agent?.config)
       setMessage("")
     } catch (error) {
       console.error("Error sending message:", error)
@@ -106,7 +108,6 @@ const Communication: React.FC<CommunicationProps> = ({ navigation, route }) => {
 
     return (
       <View>
-        {/* Display the date separator only once for each date */}
         {!isDateDisplayed && (index === 0 || currentDate !== previousDate) && (
           <Text style={styles.dateSeparator}></Text>
         )}
@@ -210,7 +211,7 @@ const Communication: React.FC<CommunicationProps> = ({ navigation, route }) => {
     console.log("Combined data:", message)
 
     // Send the message after both transactions have completed
-    await agent.basicMessages.sendMessage(connection_id, message)
+    await agent?.basicMessages.sendMessage(connection_id, message)
   }
 
   return (

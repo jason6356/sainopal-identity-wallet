@@ -2,10 +2,12 @@ import React, { useEffect, useState } from "react"
 import { View, Text, StyleSheet, Image, TouchableOpacity } from "react-native"
 import SmoothPinCodeInput from "react-native-smooth-pincode-input"
 import NumberPad from "./components/NumberPad"
-import { RouteProp, NavigationProp } from "@react-navigation/native"
+import { RouteProp, NavigationProp, useFocusEffect } from "@react-navigation/native"
 import * as SQLite from "expo-sqlite"
 import wordsList from "../../../en.json"
-
+import Toast from "react-native-toast-message"
+import { Alert } from "react-native"
+import { Animated } from "react-native"
 type RootStackParamList = {
   RecoveryPhrases: undefined
   Login: undefined
@@ -26,110 +28,142 @@ const Login: React.FC<{
   const [code, setCode] = useState<string>("")
   const pinInputRef = React.createRef<SmoothPinCodeInput>()
   const [password, setPassword] = useState<string>("")
-  useEffect(() => {
-    db.transaction((tx) => {
-      tx.executeSql(
-        "SELECT name FROM sqlite_master WHERE type='table' AND name='user';",
-        [],
-        (_, { rows }) => {
-          const tableExists = rows.length > 0
-
-          if (!tableExists) {
-            console.log("User table does not exist in sqlite")
-            navigation.navigate("SignUp")
-          } else {
-            tx.executeSql("SELECT * FROM user;", [], (_, { rows }) => {
-              const userData = rows._array
-              console.log(userData)
-              const wordsOnly = userData.map((item) => item.password)
-              const wordsString = wordsOnly.join(" ")
-              setPassword(wordsString)
-              console.log(wordsString)
-              if (userData.length === 0) {
-                console.log("User table has no data")
-                navigation.navigate("SignUp")
-              }
-            })
+  useFocusEffect(
+    React.useCallback(() => {
+      db.transaction((tx) => {
+        tx.executeSql(
+          "SELECT name FROM sqlite_master WHERE type='table' AND name='user';",
+          [],
+          (_, { rows }) => {
+            const tableExists = rows.length > 0;
+  
+            if (!tableExists) {
+              console.log("User table does not exist in sqlite");
+              navigation.navigate("SignUp");
+            } else {
+              tx.executeSql("SELECT * FROM user;", [], (_, { rows }) => {
+                const userData = rows._array;
+                console.log(userData);
+                const wordsOnly = userData.map((item) => item.password);
+                const wordsString = wordsOnly.join(" ");
+                setPassword(wordsString);
+                console.log(wordsString);
+                if (userData.length === 0) {
+                  console.log("User table has no data");
+                  navigation.navigate("SignUp");
+                }
+              });
+            }
           }
-        }
-      )
-    })
-
-    db.transaction((tx) => {
-      tx.executeSql(
-        "SELECT name FROM sqlite_master WHERE type='table' AND name='recoveryPhrase';",
-        [],
-        (_, { rows }) => {
-          const tableExists = rows.length > 0
-
-          if (!tableExists) {
-            tx.executeSql(
-              "CREATE TABLE IF NOT EXISTS recoveryPhrase (id INTEGER PRIMARY KEY AUTOINCREMENT, word TEXT);",
-              [],
-              () => {
-                console.log("recoveryPhrase table created successfully!")
-
-                // Insert data into the recoveryPhrase table
-                const randomWords = generateRandomWords(12)
-                randomWords.forEach((word) => {
-                  tx.executeSql(
-                    "INSERT INTO recoveryPhrase (word) VALUES (?);",
-                    [word],
-                    () => {
-                      console.log(`Inserted word: ${word}`)
-                    },
-                    (error) => {
-                      console.log("Error inserting word:", error.message)
-                    }
-                  )
-                })
-              },
-              (error) => {
-                console.log(
-                  "Error creating recoveryPhrase table: " + error.message
-                )
-              }
-            )
-          } else {
-            // Table exists, check if it has data
-            tx.executeSql(
-              "SELECT * FROM recoveryPhrase;",
-              [],
-              (_, { rows }) => {
-                const recoveryPhraseData = rows._array
-                const wordsOnly = recoveryPhraseData.map((item) => item.word)
-                const wordsString = wordsOnly.join(" ")
-                console.log(wordsString)
-                if (recoveryPhraseData.length === 0) {
-                  console.log("recoveryPhrase table has no data")
-
-                  const randomWords = generateRandomWords(12)
+        );
+      });
+  
+      db.transaction((tx) => {
+        tx.executeSql(
+          "SELECT name FROM sqlite_master WHERE type='table' AND name='recoveryPhrase';",
+          [],
+          (_, { rows }) => {
+            const tableExists = rows.length > 0;
+  
+            if (!tableExists) {
+              tx.executeSql(
+                "CREATE TABLE IF NOT EXISTS recoveryPhrase (id INTEGER PRIMARY KEY AUTOINCREMENT, word TEXT);",
+                [],
+                () => {
+                  console.log("recoveryPhrase table created successfully!");
+  
+                  const randomWords = generateRandomWords(12);
                   randomWords.forEach((word) => {
                     tx.executeSql(
                       "INSERT INTO recoveryPhrase (word) VALUES (?);",
                       [word],
                       () => {
-                        console.log(`Inserted word: ${word}`)
+                        console.log(`Inserted word: ${word}`);
                       },
                       (error) => {
-                        console.log("Error inserting word:", error.message)
+                        console.log("Error inserting word:", error.message);
                       }
-                    )
-                  })
+                    );
+                  });
+                },
+                (error) => {
+                  console.log(
+                    "Error creating recoveryPhrase table: " + error.message
+                  );
                 }
-              }
-            )
+              );
+            } else {
+              tx.executeSql(
+                "SELECT * FROM recoveryPhrase;",
+                [],
+                (_, { rows }) => {
+                  const recoveryPhraseData = rows._array;
+                  const wordsOnly = recoveryPhraseData.map((item) => item.word);
+                  const wordsString = wordsOnly.join(" ");
+                  console.log(wordsString);
+                  if (recoveryPhraseData.length === 0) {
+                    console.log("recoveryPhrase table has no data");
+  
+                    const randomWords = generateRandomWords(12);
+                    randomWords.forEach((word) => {
+                      tx.executeSql(
+                        "INSERT INTO recoveryPhrase (word) VALUES (?);",
+                        [word],
+                        () => {
+                          console.log(`Inserted word: ${word}`);
+                        },
+                        (error) => {
+                          console.log("Error inserting word:", error.message);
+                        }
+                      );
+                    });
+                  }
+                }
+              );
+            }
           }
-        }
-      )
-    })
-  }, [navigation])
+        );
+      });
+    }, [navigation])
+  );
+  const [errorAnimation] = useState(new Animated.Value(0))
 
-  const checkPinAndNavigate = () => {
+  const startErrorAnimation = () => {
+    Animated.sequence([
+      Animated.timing(errorAnimation, {
+        toValue: 10,
+        duration: 100,
+        useNativeDriver: false,
+      }),
+      Animated.timing(errorAnimation, {
+        toValue: -10,
+        duration: 100,
+        useNativeDriver: false,
+      }),
+      Animated.timing(errorAnimation, {
+        toValue: 10,
+        duration: 100,
+        useNativeDriver: false,
+      }),
+      Animated.timing(errorAnimation, {
+        toValue: 0,
+        duration: 100,
+        useNativeDriver: false,
+      }),
+    ]).start()
+  }
+
+  const checkPinAndNavigate = async () => {
     console.log(password)
+
     if (code.length === passwordLength) {
       if (code === password) {
         onLogin(true)
+      } else {
+        setCode("")
+        startErrorAnimation()
+        await new Promise((resolve) => setTimeout(resolve, 500))
+        errorAnimation.setValue(0)
       }
     }
   }
@@ -167,11 +201,43 @@ const Login: React.FC<{
   return (
     <View style={styles.container}>
       <Image style={styles.image} source={require("../../assets/login.png")} />
+      <Animated.Text
+        style={[
+          styles.title,
+          {
+            color: errorAnimation.interpolate({
+              inputRange: [0, 10],
+              outputRange: ["#12283b", "red"],
+            }),
+          },
+        ]}
+      >
+        Enter PIN
+      </Animated.Text>
       <TouchableOpacity style={styles.forgotPin} onPress={handleForgotPin}>
         <Text style={styles.forgotPinText}>Forgot Your PIN?</Text>
       </TouchableOpacity>
-      <Text style={styles.title}>Enter PIN</Text>
-      <View style={styles.formContainer}>
+      <Animated.View
+        style={[
+          styles.formContainer,
+          {
+            transform: [
+              {
+                translateX: errorAnimation.interpolate({
+                  inputRange: [0, 10],
+                  outputRange: [0, 10],
+                }),
+              },
+              {
+                translateY: errorAnimation.interpolate({
+                  inputRange: [0, 10],
+                  outputRange: [0, 10],
+                }),
+              },
+            ],
+          },
+        ]}
+      >
         <View style={styles.passCon}>
           <SmoothPinCodeInput
             ref={pinInputRef}
@@ -188,7 +254,7 @@ const Login: React.FC<{
           />
         </View>
         <NumberPad onKeyPress={onKeyPress} onDelete={onDelete} />
-      </View>
+      </Animated.View>
     </View>
   )
 }

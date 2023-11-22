@@ -1,2 +1,10 @@
 export { genesis } from "./genesis"
-export { agent } from "./agent"
+export {
+  getAgent,
+  config,
+  agent,
+  recoveryPhraseLocal,
+  walletLocal,
+  getAgentConfig,
+  createLinkSecretIfRequired,
+} from "./agent"
