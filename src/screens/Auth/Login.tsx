@@ -2,12 +2,17 @@ import React, { useEffect, useState } from "react"
 import { View, Text, StyleSheet, Image, TouchableOpacity } from "react-native"
 import SmoothPinCodeInput from "react-native-smooth-pincode-input"
 import NumberPad from "./components/NumberPad"
-import { RouteProp, NavigationProp, useFocusEffect } from "@react-navigation/native"
+import {
+  RouteProp,
+  NavigationProp,
+  useFocusEffect,
+} from "@react-navigation/native"
 import * as SQLite from "expo-sqlite"
 import wordsList from "../../../en.json"
 import Toast from "react-native-toast-message"
 import { Alert } from "react-native"
 import { Animated } from "react-native"
+import { useAuth } from "../../../context/AuthProvider"
 type RootStackParamList = {
   RecoveryPhrases: undefined
   Login: undefined
@@ -35,97 +40,97 @@ const Login: React.FC<{
           "SELECT name FROM sqlite_master WHERE type='table' AND name='user';",
           [],
           (_, { rows }) => {
-            const tableExists = rows.length > 0;
-  
+            const tableExists = rows.length > 0
+
             if (!tableExists) {
-              console.log("User table does not exist in sqlite");
-              navigation.navigate("SignUp");
+              console.log("User table does not exist in sqlite")
+              navigation.navigate("SignUp")
             } else {
               tx.executeSql("SELECT * FROM user;", [], (_, { rows }) => {
-                const userData = rows._array;
-                console.log(userData);
-                const wordsOnly = userData.map((item) => item.password);
-                const wordsString = wordsOnly.join(" ");
-                setPassword(wordsString);
-                console.log(wordsString);
+                const userData = rows._array
+                console.log(userData)
+                const wordsOnly = userData.map((item) => item.password)
+                const wordsString = wordsOnly.join(" ")
+                setPassword(wordsString)
+                console.log(wordsString)
                 if (userData.length === 0) {
-                  console.log("User table has no data");
-                  navigation.navigate("SignUp");
+                  console.log("User table has no data")
+                  navigation.navigate("SignUp")
                 }
-              });
+              })
             }
           }
-        );
-      });
-  
+        )
+      })
+
       db.transaction((tx) => {
         tx.executeSql(
           "SELECT name FROM sqlite_master WHERE type='table' AND name='recoveryPhrase';",
           [],
           (_, { rows }) => {
-            const tableExists = rows.length > 0;
-  
+            const tableExists = rows.length > 0
+
             if (!tableExists) {
               tx.executeSql(
                 "CREATE TABLE IF NOT EXISTS recoveryPhrase (id INTEGER PRIMARY KEY AUTOINCREMENT, word TEXT);",
                 [],
                 () => {
-                  console.log("recoveryPhrase table created successfully!");
-  
-                  const randomWords = generateRandomWords(12);
+                  console.log("recoveryPhrase table created successfully!")
+
+                  const randomWords = generateRandomWords(12)
                   randomWords.forEach((word) => {
                     tx.executeSql(
                       "INSERT INTO recoveryPhrase (word) VALUES (?);",
                       [word],
                       () => {
-                        console.log(`Inserted word: ${word}`);
+                        console.log(`Inserted word: ${word}`)
                       },
                       (error) => {
-                        console.log("Error inserting word:", error.message);
+                        console.log("Error inserting word:", error.message)
                       }
-                    );
-                  });
+                    )
+                  })
                 },
                 (error) => {
                   console.log(
                     "Error creating recoveryPhrase table: " + error.message
-                  );
+                  )
                 }
-              );
+              )
             } else {
               tx.executeSql(
                 "SELECT * FROM recoveryPhrase;",
                 [],
                 (_, { rows }) => {
-                  const recoveryPhraseData = rows._array;
-                  const wordsOnly = recoveryPhraseData.map((item) => item.word);
-                  const wordsString = wordsOnly.join(" ");
-                  console.log(wordsString);
+                  const recoveryPhraseData = rows._array
+                  const wordsOnly = recoveryPhraseData.map((item) => item.word)
+                  const wordsString = wordsOnly.join(" ")
+                  console.log(wordsString)
                   if (recoveryPhraseData.length === 0) {
-                    console.log("recoveryPhrase table has no data");
-  
-                    const randomWords = generateRandomWords(12);
+                    console.log("recoveryPhrase table has no data")
+
+                    const randomWords = generateRandomWords(12)
                     randomWords.forEach((word) => {
                       tx.executeSql(
                         "INSERT INTO recoveryPhrase (word) VALUES (?);",
                         [word],
                         () => {
-                          console.log(`Inserted word: ${word}`);
+                          console.log(`Inserted word: ${word}`)
                         },
                         (error) => {
-                          console.log("Error inserting word:", error.message);
+                          console.log("Error inserting word:", error.message)
                         }
-                      );
-                    });
+                      )
+                    })
                   }
                 }
-              );
+              )
             }
           }
-        );
-      });
+        )
+      })
     }, [navigation])
-  );
+  )
   const [errorAnimation] = useState(new Animated.Value(0))
 
   const startErrorAnimation = () => {
@@ -158,7 +163,8 @@ const Login: React.FC<{
 
     if (code.length === passwordLength) {
       if (code === password) {
-        onLogin(true)
+        login()
+        //onLogin(true)
       } else {
         setCode("")
         startErrorAnimation()
@@ -167,6 +173,8 @@ const Login: React.FC<{
       }
     }
   }
+
+  const { loggedIn, login, logout } = useAuth()
 
   function generateRandomWords(count: number) {
     const selectedWords = []

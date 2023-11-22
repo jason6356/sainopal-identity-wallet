@@ -27,6 +27,8 @@ import {
   getAgentConfig,
   createLinkSecretIfRequired,
 } from "../../../config/index"
+import { useAgent } from "@aries-framework/react-hooks"
+import { useAuth } from "../../../context/AuthProvider"
 type Props = StackScreenProps<SettingStackParamList, "RecoverWalletKey">
 
 const db = SQLite.openDatabase("db.db")
@@ -34,6 +36,9 @@ const RecoverWalletKey = ({ navigation, route }: Props) => {
   const { path } = route.params
   const [recoveryPhrase, setRecoveryPhrase] = useState("")
   const [storedRecoveryPhrase, setStoredRecoveryPhrase] = useState([])
+  const agent = useAgent()
+  const { loggedIn, login, logout } = useAuth()
+
   const wordCount = recoveryPhrase.trim()
     ? recoveryPhrase.trim().split(/\s+/).length
     : 0
@@ -87,8 +92,9 @@ const RecoverWalletKey = ({ navigation, route }: Props) => {
       console.log(recoveryPhrase)
       await updateRecoveryPhrase(recoveryPhrase)
 
+      logout()
       // onLogin(true)
-      // navigation.push("App")
+      // navigation.navigate("Login")
 
       console.log("Imported Wallet Successfully")
       Alert.alert(
