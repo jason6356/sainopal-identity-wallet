@@ -88,7 +88,7 @@ const RecoverWalletKey = ({ navigation, route }: Props) => {
       await updateRecoveryPhrase(recoveryPhrase)
 
       // onLogin(true)
-      navigation.push("App")
+      // navigation.push("App")
 
       console.log("Imported Wallet Successfully")
       Alert.alert(
