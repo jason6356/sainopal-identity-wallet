@@ -8,6 +8,7 @@ import RecoveryPhrase from "../screens/RecoverWallet/RecoveryPhrase"
 import Login from "../../App"
 import RecoverWalletKey from "../screens/RecoverWallet/RecoverWalletKey"
 import { DocumentPickerResponse } from "react-native-document-picker"
+import App from "../../App"
 
 export type SettingStackParamList = {
   Settings: undefined
@@ -17,6 +18,7 @@ export type SettingStackParamList = {
   RecoveryPhrase: { msg: string }
   RecoverWalletKey: { path: DocumentPickerResponse }
   Login: undefined
+  App: undefined
 }
 
 const SettingStack = createStackNavigator<SettingStackParamList>()
@@ -33,6 +35,9 @@ const SettingStackScreen: React.FC = () => {
         name="RecoverWalletKey"
         component={RecoverWalletKey}
       />
+      <SettingStack.Screen name="App" options={{ headerShown: false }}>
+        {(props) => <App />}
+      </SettingStack.Screen>
     </SettingStack.Navigator>
   )
 }

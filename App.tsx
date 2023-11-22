@@ -30,6 +30,7 @@ const App: React.FC = () => {
         await agent.initialize()
         await createLinkSecretIfRequired(agent)
         setInitializedAgent(agent)
+
         setTimeout(() => {
           setLoading(false)
         }, 2000)
@@ -38,7 +39,6 @@ const App: React.FC = () => {
       } finally {
       }
     }
-
     if (loggedIn) {
       initializeAgent()
     }
