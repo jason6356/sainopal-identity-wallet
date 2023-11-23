@@ -1,39 +1,35 @@
 import {
+  CredentialExchangeRecord,
+  CredentialState,
+} from "@aries-framework/core";
+import {
   useAgent,
   useConnectionById,
+  useCredentialByState,
   useProofById,
 } from "@aries-framework/react-hooks";
 import { StackScreenProps } from "@react-navigation/stack";
 import React, { useEffect, useState } from "react";
-import {
-  StyleSheet,
-  Text,
-  View,
-  Image,
-  TouchableHighlight,
-  ActivityIndicator,
-  Alert,
-} from "react-native";
-import ContactCard from "../../components/Card/ContactCard";
+import { Alert, Image, StyleSheet, Text, View } from "react-native";
+import { ScrollView } from "react-native-gesture-handler";
 import { ContactStackParamList } from "../../navigators/ContactStack";
+import { getCredentialFormat, getCredentialName } from "../../utils";
+import { getCredentialDefinition } from "../../utils/credentials";
 import {
   MappedAttributes,
   RequestedAttributes,
   RequestedPredicate,
   getAttributesRequested,
-  getAvailableCredentialsForProof,
   getPredicateFromFormatData,
   getProofFormatData,
-  getRequestAttributesFromFormatData,
-  mapRequestAttributes,
 } from "../../utils/proof";
-import { ScrollView } from "react-native-gesture-handler";
+import { CredentialFormatData } from "../Offer/CredentialOffer";
 
-type Props = StackScreenProps<ContactStackParamList, "CredentialProof">;
+type Props = StackScreenProps<ContactStackParamList, "Proof">;
 
 const credentialImage = require("../../assets/degree.png");
 
-const CredentialProof: React.FC<Props> = ({ navigation, route }: Props) => {
+const Proof: React.FC<Props> = ({ navigation, route }: Props) => {
   const agent = useAgent();
   const { presentation_id, connection_id } = route.params;
   const proof = useProofById(presentation_id);
@@ -49,34 +45,68 @@ const CredentialProof: React.FC<Props> = ({ navigation, route }: Props) => {
 
   const [loading, setIsLoading] = useState(false);
 
+  const [credentialName, setCredentialName] = useState<string>("");
+  const [credentialFormatData, setCredentialFormatData] = useState<
+    CredentialFormatData[]
+  >([]);
+  const credentials = useCredentialByState(CredentialState.Done);
+  const [proofCredential, setProofCredential] =
+    useState<CredentialExchangeRecord>();
+
+  const presentationOffer = useProofById(presentation_id);
+
   useEffect(() => {
     retrieveProofFormatData();
   }, [proof]);
 
+  async function findCredentialWithSameCredDefID(
+    ls: CredentialExchangeRecord[],
+    cred_def_id: string
+  ): Promise<CredentialExchangeRecord | undefined> {
+    const result = undefined;
+
+    for (const e of ls) {
+      const id = await getCredentialDefinition(agent.agent, e.id);
+      if (id === cred_def_id) {
+        return e;
+      }
+    }
+
+    return result;
+  }
+
+  async function updateNameAndFormat(id: string) {
+    setCredentialName(await getCredentialName(agent.agent, id));
+    setCredentialFormatData(await getCredentialFormat(agent.agent, id));
+  }
+
   async function retrieveProofFormatData() {
     const data = await getProofFormatData(agent.agent, presentation_id);
+    console.log(presentation_id);
+    console.log(presentationOffer);
     const predicate = getPredicateFromFormatData(data);
     const attributesNeeded = getAttributesRequested(data);
 
     if (predicate.length > 0) {
       console.log("Predicate Type Credentials?");
       console.log(JSON.stringify(predicate));
+      const credential = await findCredentialWithSameCredDefID(
+        credentials,
+        predicate[0].cred_def_id
+      );
+      setProofCredential(credential);
       setPredicate(predicate);
     }
 
     if (attributesNeeded.length > 0) {
       console.log("Interesting");
       console.log(JSON.stringify(attributesNeeded));
-      const availableCredentials = await getAvailableCredentialsForProof(
-        agent.agent,
-        presentation_id
+      const credential = await findCredentialWithSameCredDefID(
+        credentials,
+        predicate[0].cred_def_id
       );
-      const mappedAttributes = mapRequestAttributes(
-        availableCredentials.proofFormats.indy.attributes,
-        attributesNeeded
-      );
-      setRequestedAttributes(attributesNeeded);
-      setMappedAttributes(mappedAttributes);
+      setProofCredential(credential);
+      updateNameAndFormat(credential?.id);
     }
 
     setProofFormatData(data);
@@ -134,16 +164,12 @@ const CredentialProof: React.FC<Props> = ({ navigation, route }: Props) => {
       <View style={styles.container}>
         <View>
           <Text style={styles.title}>
-            An organization is asking for information.
+            You have shared the following information
           </Text>
-
-          <ContactCard connectionInvitation={connectionInvitation} />
 
           {predicate.length > 0 && (
             <View style={styles.instructionsContainer}>
-              <Text style={styles.instructions}>
-                The organization would like to you to proof these information
-              </Text>
+              <Text style={styles.instructions}></Text>
             </View>
           )}
 
@@ -184,57 +210,36 @@ const CredentialProof: React.FC<Props> = ({ navigation, route }: Props) => {
               </Text>
             </View>
           )}
-
-          {mappedAttributes.map((e, i) => (
-            <View style={styles.card} key={i}>
-              <View style={styles.credentialHeader}>
-                <View style={styles.leftContent}>
-                  <Image
-                    style={{ width: 70, height: 70 }}
-                    source={credentialImage}
-                  />
-                </View>
-                <View style={styles.rightContent}>
-                  <Text style={{ fontWeight: "bold", fontSize: 16 }}>
-                    {e.credential_name}
-                  </Text>
-                </View>
+        </View>
+        {mappedAttributes.map((e, i) => (
+          <View style={styles.card} key={i}>
+            <View style={styles.credentialHeader}>
+              <View style={styles.leftContent}>
+                <Image
+                  style={{ width: 70, height: 70 }}
+                  source={credentialImage}
+                />
               </View>
-              <View style={styles.credentialFormData}>
-                {e.attributes.map((e, index) => (
-                  <View key={index} style={{ flexDirection: "row" }}>
-                    <View style={{ width: "50%", paddingVertical: 5 }}>
-                      <Text style={styles.credentialAttribute}>{e.name}</Text>
-                    </View>
-                    <View style={{ width: "50%", paddingVertical: 5 }}>
-                      <Text style={styles.credentialValue}>{e.value}</Text>
-                    </View>
+              <View style={styles.rightContent}>
+                <Text style={{ fontWeight: "bold", fontSize: 16 }}>
+                  {e.credential_name}
+                </Text>
+              </View>
+            </View>
+            <View style={styles.credentialFormData}>
+              {e.attributes.map((e, index) => (
+                <View key={index} style={{ flexDirection: "row" }}>
+                  <View style={{ width: "50%", paddingVertical: 5 }}>
+                    <Text style={styles.credentialAttribute}>{e.name}</Text>
                   </View>
-                ))}
-              </View>
-            </View>
-          ))}
-        </View>
-        <View style={styles.buttonContainer}>
-          {loading ? (
-            <View>
-              <ActivityIndicator size="large" color="#0000ff" />
-            </View>
-          ) : (
-            <>
-              <TouchableHighlight onPress={acceptRequest}>
-                <View style={styles.acceptButton}>
-                  <Text style={styles.acceptText}>Send</Text>
+                  <View style={{ width: "50%", paddingVertical: 5 }}>
+                    <Text style={styles.credentialValue}>{e.value}</Text>
+                  </View>
                 </View>
-              </TouchableHighlight>
-              <TouchableHighlight onPress={declineRequest}>
-                <View style={styles.declineButton}>
-                  <Text style={styles.declineText}>Decline</Text>
-                </View>
-              </TouchableHighlight>
-            </>
-          )}
-        </View>
+              ))}
+            </View>
+          </View>
+        ))}
       </View>
     </ScrollView>
   );
@@ -388,4 +393,4 @@ const styles = StyleSheet.create({
     marginBottom: 5,
   },
 });
-export default CredentialProof;
+export default Proof;

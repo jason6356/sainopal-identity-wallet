@@ -18,7 +18,6 @@
     "@aries-framework/redux-store": "^0.4.0",
     "@fortawesome/free-solid-svg-icons": "^6.4.2",
     "@fortawesome/react-native-fontawesome": "^0.3.0",
-    "@gluestack-style/animation-plugin": "^0.1.7",
     "@gluestack-style/react": "^0.1.33",
     "@gluestack-ui/react": "^0.1.2",
     "@hyperledger/anoncreds-react-native": "^0.1.0",

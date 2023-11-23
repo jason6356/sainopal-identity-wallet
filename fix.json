@@ -1,32 +1,36 @@
 {
   "auto_issue": true,
   "auto_remove": true,
-  "comment": "string",
-  "connection_id": "0d7e133d-4320-4a77-b6e4-ef44c01ecb5c",
+  "comment": "Here is your degree",
+  "connection_id": "073761a6-b067-4182-9936-0d1bf559d173",
   "credential_preview": {
     "@type": "issue-credential/2.0/credential-preview",
     "attributes": [
       {
-        "name": "merit",
-        "value": "bad"
+        "name": "CGPA",
+        "value": "345"
       },
       {
-        "name": "cgpa",
-        "value": "4"
+        "name": "Course Name",
+        "value": "Degree in Software Engineering"
       },
       {
-        "name": "course name",
-        "value": "skipped the proposal"
+        "name": "Merit",
+        "value": "Distinction"
+      },
+      {
+        "name": "Year",
+        "value": "3 Years"
       }
     ]
   },
   "filter": {
     "indy": {
-      "cred_def_id": "NypRCRGykSwKUuRBQx2b9o:3:CL:44:diploma",
+      "cred_def_id": "NypRCRGykSwKUuRBQx2b9o:3:CL:8:Degree",
       "issuer_did": "NypRCRGykSwKUuRBQx2b9o",
-      "schema_id": "NypRCRGykSwKUuRBQx2b9o:2:diploma:1.0",
+      "schema_id": "NypRCRGykSwKUuRBQx2b9o:2:Degree:1.0",
       "schema_issuer_did": "NypRCRGykSwKUuRBQx2b9o",
-      "schema_name": "diploma",
+      "schema_name": "Degree",
       "schema_version": "1.0"
     }
   },

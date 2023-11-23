@@ -11,13 +11,17 @@ import {
 } from "@aries-framework/react-hooks";
 import { StackScreenProps } from "@react-navigation/stack";
 import React, { useEffect, useState } from "react";
-import { Pressable, ScrollView, StyleSheet, View } from "react-native";
-import Card from "../../components/Card";
+import { ScrollView, StyleSheet, View } from "react-native";
 import { CredentialOfferCard } from "../../components/CredentialOfferCard";
+import { CredentialReceivedCard } from "../../components/CredentialReceivedCard";
+import { PresentationOfferCard } from "../../components/PresentationOfferCard";
 import useHideBottomTabBar from "../../hooks/useHideBottomTabBar";
 import { ContactStackParamList } from "../../navigators/ContactStack";
-import { getSchemaNameFromOfferID } from "../../utils/schema";
-import { CredentialReceivedCard } from "../../components/CredentialReceivedCard";
+import { getProofNameFromID, getSchemaNameFromOfferID } from "../../utils";
+import {
+  PresentationDoneCard,
+  PresentationDoneCardProps,
+} from "../../components/PresentationDoneCard";
 
 const schemaIdToImageMapping = {
   "NypRCRGykSwKUuRBQx2b9o:2:degree:1.0": require("../../assets/degree.png"),
@@ -33,6 +37,7 @@ const ConnectionDetails = ({ navigation, route }: Props) => {
   const presentationOffer = useProofsByConnectionId(connection_id);
   const agent = useAgent();
   const [credentialMap, setCredentialMap] = useState(new Map());
+  const [proofMap, setProofMap] = useState(new Map());
   const hidden = useHideBottomTabBar();
 
   const mapCredentials = async () => {
@@ -46,12 +51,25 @@ const ConnectionDetails = ({ navigation, route }: Props) => {
     setCredentialMap(newCredentialMap);
   };
 
+  const mapProofs = async () => {
+    const newProofsMap = new Map();
+
+    for (const e of presentationOffer) {
+      const name = await getProofNameFromID(agent.agent, e.id);
+      newProofsMap.set(e.id, name);
+    }
+
+    setProofMap(newProofsMap);
+  };
+
   useEffect(() => {
     mapCredentials();
+    mapProofs();
     navigation.setOptions({
       title: connection?.theirLabel,
     });
-  }, [credentialsOffer, connection_id]);
+    presentationOffer.forEach((e) => console.log(e.state));
+  }, [credentialsOffer, presentationOffer, connection_id]);
 
   return (
     <View style={styles.container}>
@@ -82,29 +100,25 @@ const ConnectionDetails = ({ navigation, route }: Props) => {
           })}
         {presentationOffer
           .filter((e) => e.state !== ProofState.Done)
-          .map((e, index) => {
-            const formData = credentialMap.get(e.id);
-            const schemaId = formData ? formData.schema_id : "";
-            const imageSource =
-              schemaIdToImageMapping["NypRCRGykSwKUuRBQx2b9o:2:degree:1.0"];
-            return (
-              <Pressable
-                key={e.id}
-                onPress={() =>
-                  navigation.navigate("CredentialProof", {
-                    presentation_id: e.id,
-                  })
-                }
-              >
-                <Card
-                  key={index}
-                  title={e.state}
-                  content={`Credential Offer\n`}
-                  imageSource={imageSource}
-                />
-              </Pressable>
-            );
-          })}
+          .map((e, index) => (
+            <PresentationOfferCard
+              key={e.id}
+              name={proofMap.get(e.id)}
+              navigation={navigation}
+              proofExchangeRecord={e}
+            />
+          ))}
+        {presentationOffer
+          .filter((e) => e.state === ProofState.Done)
+          .map((e, index) => (
+            <PresentationDoneCard
+              id={e.id}
+              key={e.id}
+              name={proofMap.get(e.id)}
+              navigation={navigation}
+              proofExchangeRecord={e}
+            />
+          ))}
       </ScrollView>
     </View>
   );

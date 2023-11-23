@@ -5,16 +5,20 @@ import {
   useCredentialById,
 } from "@aries-framework/react-hooks";
 import { MaterialIcons } from "@expo/vector-icons";
+import { StackScreenProps } from "@react-navigation/stack";
 import React, { useEffect, useLayoutEffect, useState } from "react";
 import {
   ActivityIndicator,
   Alert,
   Image,
+  Modal,
+  Pressable,
   StyleSheet,
   Text,
   TouchableHighlight,
   View,
 } from "react-native";
+import { ContactStackParamList } from "../../navigators/ContactStack";
 import {
   getCredentialFormat,
   getCredentialName,
@@ -24,12 +28,14 @@ const defaultUserAvatar = `data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAOEAAAD
 
 const credentialImage = require("../../assets/degree.png");
 
-type CredentialFormatData = {
+export type CredentialFormatData = {
   name: string;
   value: string;
 };
 
-const CredentialOffer = ({ navigation, route }) => {
+type Props = StackScreenProps<ContactStackParamList, "CredentialOffer">;
+
+const CredentialOffer = ({ navigation, route }: Props) => {
   const { credential_offer_id, connection_id } = route.params;
   const credentialOffer = useCredentialById(credential_offer_id);
   const connectionInvitation = useConnectionById(connection_id);
@@ -39,6 +45,9 @@ const CredentialOffer = ({ navigation, route }) => {
     CredentialFormatData[]
   >([]);
   const [credentialName, setCredentialName] = useState<string>("");
+
+  const [modalVisible, setModalVisible] = useState(false);
+  const [imageText, setImageText] = useState("");
 
   useLayoutEffect(() => {
     navigation.setOptions({
@@ -90,8 +99,36 @@ const CredentialOffer = ({ navigation, route }) => {
       });
   }
 
+  function isBase64Image(input: string): boolean {
+    return input === "picture";
+  }
+
   return (
     <View style={styles.container}>
+      <Modal
+        animationType="fade"
+        transparent={true}
+        visible={modalVisible}
+        onRequestClose={() => {
+          setModalVisible(!modalVisible);
+        }}
+      >
+        <View
+          style={{
+            flex: 1,
+            justifyContent: "center",
+            alignItems: "center",
+            zIndex: 3,
+          }}
+        >
+          <Pressable
+            style={[styles.androidBackdrop, styles.backdrop]}
+            onPress={() => setModalVisible(false)}
+          />
+          <Image source={{ uri: imageText }} width={300} height={350} />
+        </View>
+      </Modal>
+
       <View>
         <Text style={styles.title}>Do you want to accept the credential?</Text>
         <View style={styles.card}>
@@ -141,7 +178,22 @@ const CredentialOffer = ({ navigation, route }) => {
                   <Text style={styles.credentialAttribute}>{e.name}</Text>
                 </View>
                 <View style={{ width: "50%", paddingVertical: 5 }}>
-                  <Text style={styles.credentialValue}>{e.value}</Text>
+                  {isBase64Image(e.name) ? (
+                    <Text style={styles.credentialValue}>
+                      <TouchableHighlight
+                        onPress={() => {
+                          setImageText(e.value);
+                          setModalVisible(true);
+                        }}
+                      >
+                        <Text style={{ color: "#8CB1FF" }}>
+                          Click to view image
+                        </Text>
+                      </TouchableHighlight>
+                    </Text>
+                  ) : (
+                    <Text style={styles.credentialValue}>{e.value}</Text>
+                  )}
                 </View>
               </View>
             ))}
@@ -293,6 +345,21 @@ const styles = StyleSheet.create({
   },
   credentialValue: {
     fontSize: 15,
+  },
+  iOSBackdrop: {
+    backgroundColor: "#000000",
+    opacity: 0.3,
+  },
+  androidBackdrop: {
+    backgroundColor: "#232f34",
+    opacity: 0.32,
+  },
+  backdrop: {
+    position: "absolute",
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
   },
 });
 

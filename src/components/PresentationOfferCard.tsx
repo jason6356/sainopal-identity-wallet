@@ -1,37 +1,37 @@
-import { CredentialExchangeRecord } from "@aries-framework/core";
-import {
-  Image,
-  StyleSheet,
-  Text,
-  TouchableHighlight,
-  View,
-} from "react-native";
+import React from "react";
+import { StyleSheet, Text, View, TouchableHighlight } from "react-native";
+import { FontAwesome } from "@expo/vector-icons";
+import { ProofExchangeRecord } from "@aries-framework/core";
 
-type CredentialOfferCardProps = {
-  key: number;
-  credentialExchangeRecord: CredentialExchangeRecord;
+type PresentationOfferProps = {
+  key: string;
+  proofExchangeRecord: ProofExchangeRecord;
   name: string;
   navigation: any;
 };
 
 const imageSource = require("../assets/degree.png");
 
-export function CredentialOfferCard({
-  credentialExchangeRecord: e,
+export function PresentationOfferCard({
   name,
+  proofExchangeRecord: e,
   navigation,
-}: CredentialOfferCardProps) {
+}: PresentationOfferProps) {
   return (
     <View style={styles.card}>
-      <Image source={imageSource} style={styles.imageOverlay} />
       <View style={styles.contentContainer}>
-        <Text style={styles.title}>Credential Offer</Text>
-        <Text style={styles.offerContent}>{name}</Text>
+        <View style={styles.leftContent}>
+          <FontAwesome name="exchange" size={32} />
+        </View>
+        <View>
+          <Text style={styles.title}>Information Request</Text>
+          <Text style={styles.presentationName}>{name}</Text>
+        </View>
       </View>
       <TouchableHighlight
         onPress={() =>
-          navigation.push("CredentialOffer", {
-            credential_offer_id: e.id,
+          navigation.push("CredentialProof", {
+            presentation_id: e.id,
             connection_id: e.connectionId,
           })
         }
@@ -58,22 +58,31 @@ const styles = StyleSheet.create({
   },
   contentContainer: {
     zIndex: 1, // Ensure content is above the overlay
+    flexDirection: "row",
+    marginBottom: 12,
   },
   title: {
     fontSize: 18,
     color: "#808080",
   },
-  offerContent: {
+  leftContent: {
+    marginRight: 24,
+    justifyContent: "center",
+    padding: 14,
+    borderRadius: 34,
+    borderStyle: "solid",
+    borderWidth: 1,
+    borderColor: "#808080",
+    shadowColor: "#000",
+    shadowOpacity: 0.1,
+    shadowOffset: { width: 0, height: 2 },
+    shadowRadius: 4,
+  },
+  presentationName: {
     fontSize: 16,
+    marginTop: 8,
     marginBottom: 8,
     fontWeight: "bold",
-  },
-  imageOverlay: {
-    alignSelf: "center",
-    position: "relative",
-    marginBottom: 20,
-    width: 300,
-    height: 250,
   },
   openButton: {
     backgroundColor: "#8CB1FF",

@@ -33,6 +33,7 @@ const Contacts = ({ navigation, route }: Props) => {
 
   useEffect(() => {
     setFilteredConnections(connections.records);
+    console.log(connections.records);
     //console.log(connections.records);
   }, [connections.records]);
 

@@ -38,9 +38,9 @@ const ledgers: IndySdkPoolConfig[] = _ledger;
 
 const poolConfig: IndySdkPoolConfig = {
   indyNamespace: "",
-  id: "HisSovrin", // <----<<< as shown here
+  id: "AwSovrin", // <----<<< as shown here
   genesisTransactions: genesis,
-  connectOnStartup: true,
+  connectOnStartup: false,
   isProduction: false,
 };
 
@@ -61,7 +61,7 @@ const localMediatorUrl = `https://b3ca-103-52-192-245.ngrok.io/?c_i=eyJAdHlwZSI6
 const config: InitConfig = {
   label: "SainoPal Mobile Wallet",
   walletConfig: {
-    id: "sainpopal983",
+    id: "sainoWallet-11h",
     key: "testkey0040020000000000000000000",
   },
   logger: new ConsoleLogger(LogLevel.trace),

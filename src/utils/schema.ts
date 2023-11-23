@@ -6,12 +6,14 @@ import {
   CredentialFormat,
 } from "@aries-framework/core";
 
-export type Schema = {
+type Schema = {
   name: string;
   version: string;
 };
 
-export function parseSchemaFromId(schemaId?: string): Schema {
+//did:sov:WRfXPg8dantKVubE3HX8pw:Diploma:
+
+function parseSchemaFromId(schemaId?: string): Schema {
   let name = "Credential";
   let version = "";
   if (schemaId) {
@@ -32,25 +34,22 @@ export function parseSchemaFromId(schemaId?: string): Schema {
   return { name, version };
 }
 
-export function credentialSchema(
-  credential: CredentialRecord
-): string | undefined {
+function credentialSchema(credential: CredentialRecord): string | undefined {
   return credential.metadata?.get(AnonCredsCredentialMetadataKey)?.schemaId;
 }
 
-export function parsedSchema(credential: CredentialRecord): {
+function parsedSchema(credential: CredentialRecord): {
   name: string;
   version: string;
 } {
   return parseSchemaFromId(credentialSchema(credential));
 }
 
-export async function getSchemaID(agent: Agent, offerID: string) {
+async function getSchemaID(agent: Agent, offerID: string) {
   try {
     const formatData: GetCredentialFormatDataReturn<CredentialFormat[]> =
       await agent.credentials.getFormatData(offerID);
 
-    //Avoid Null Condition
     if (formatData.offer) {
       const { schema_id } = formatData.offer?.indy;
       return schema_id;
@@ -60,8 +59,10 @@ export async function getSchemaID(agent: Agent, offerID: string) {
   }
 }
 
-export async function getSchemaNameFromOfferID(agent: Agent, offerID: string) {
+async function getSchemaNameFromOfferID(agent: Agent, offerID: string) {
   const schemaID = await getSchemaID(agent, offerID);
   const schema = parseSchemaFromId(schemaID);
   return schema.name;
 }
+
+export { getSchemaNameFromOfferID, parsedSchema };

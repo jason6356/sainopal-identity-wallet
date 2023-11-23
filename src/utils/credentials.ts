@@ -7,12 +7,18 @@ type CredentialFormatData = {
   name: string;
   value: string;
 };
-export async function getCredentialName(agent: Agent, id: string) {
+async function getCredentialName(agent: Agent, id: string) {
   const name = await getSchemaNameFromOfferID(agent, id);
   return name;
 }
 
-export async function getCredentialFormat(agent: Agent, id: string) {
+async function getCredentialDefinition(agent: Agent, id: string) {
+  const formatData = await agent.credentials.getFormatData(id);
+
+  return formatData.credential?.indy?.cred_def_id;
+}
+
+async function getCredentialFormat(agent: Agent, id: string) {
   const formatData: GetCredentialFormatDataReturn<CredentialFormat[]> =
     await agent.credentials.getFormatData(id);
   let newCredentialFormatData: CredentialFormatData[] = [];
@@ -26,7 +32,9 @@ export async function getCredentialFormat(agent: Agent, id: string) {
     });
     return newCredentialFormatData;
   } else {
-    console.log("Error!, this offer does not have any attributes");
+    console.error("Error!, this offer does not have any attributes");
     return [];
   }
 }
+
+export { getCredentialName, getCredentialFormat, getCredentialDefinition };
