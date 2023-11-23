@@ -2,7 +2,7 @@ import { Agent } from "@aries-framework/core";
 import AgentProvider from "@aries-framework/react-hooks";
 import React, { useEffect, useState } from "react";
 import { agent } from "./config"; // Assuming this is where you have your agent configuration
-import BottomNavigation from "./src/navigators/BottomNavigation";
+import BottomNavigation from "./src/navigation/BottomNavigation";
 import { GluestackUIProvider } from "@gluestack-ui/react";
 import { createLinkSecretIfRequired } from "./config/agent";
 

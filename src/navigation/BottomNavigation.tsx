@@ -1,14 +1,12 @@
 import React from "react";
 import { Platform, Text, View, ViewStyle } from "react-native";
-
 import { Entypo, FontAwesome, Ionicons } from "@expo/vector-icons";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import { NavigationContainer } from "@react-navigation/native";
-import Scan from "../screens/Scan/Scan";
 import ContactScreenStack from "./ContactStack";
+import ScanScreenStack from "./ScanStack";
 import SettingStackScreen from "./SettingStack";
 import WalletScreenStack from "./WalletStack";
-import ScanScreenStack from "./ScanStack";
 
 export type RootStackParamList = {
   WalletStack: undefined;

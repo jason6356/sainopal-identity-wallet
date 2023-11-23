@@ -1,5 +1,4 @@
 import { MaterialIcons } from "@expo/vector-icons";
-import { Buffer, ProofExchangeRecord } from "@aries-framework/core";
 import {
   Image,
   StyleSheet,
@@ -7,42 +6,36 @@ import {
   TouchableHighlight,
   View,
 } from "react-native";
-import React from "react";
-import { FontAwesome } from "@expo/vector-icons";
+import { credentialImage } from "../../constants";
 
-type PresentationDoneCardProps = {
+type CredentialReceivedCardProps = {
   key: string;
   id: string;
   name: string;
-  proofExchangeRecord: ProofExchangeRecord;
   navigation: any;
 };
 
-const imageSource = require("../assets/degree.png");
-
-export function PresentationDoneCard({
+export function CredentialReceivedCard({
   name,
   id,
   navigation,
-}: PresentationDoneCardProps) {
+}: CredentialReceivedCardProps) {
   return (
     <View style={styles.card}>
+      <Image source={credentialImage} style={styles.imageOverlay} />
       <TouchableHighlight
         onPress={() => {
-          navigation.push("Proof", {
-            presentation_id: id,
-            connection_id: id,
-            parentRoute: "ConnectionDetails",
+          console.log("testing");
+          navigation.push("Credential", {
+            credential_offer_id: id,
+            parentRoute: "Connection",
           });
         }}
       >
         <View style={styles.contentContainer}>
-          <View style={styles.exchangeIcon}>
-            <FontAwesome name="exchange" size={32} />
-          </View>
           <View style={styles.leftContent}>
             <Text style={styles.credentialName}>{name}</Text>
-            <Text style={styles.credentialStatus}>Presented</Text>
+            <Text style={styles.credentialStatus}>added</Text>
           </View>
           <MaterialIcons
             name="keyboard-arrow-right"
@@ -76,19 +69,6 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 18,
     color: "#808080",
-  },
-  exchangeIcon: {
-    marginRight: 24,
-    justifyContent: "center",
-    padding: 18,
-    borderRadius: 32,
-    borderStyle: "solid",
-    borderWidth: 1,
-    borderColor: "#808080",
-    shadowColor: "#000",
-    shadowOpacity: 0.1,
-    shadowOffset: { width: 0, height: 2 },
-    shadowRadius: 4,
   },
   leftContent: {
     flex: 1,

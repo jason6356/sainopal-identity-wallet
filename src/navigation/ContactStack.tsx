@@ -1,11 +1,11 @@
 import { createStackNavigator } from "@react-navigation/stack";
 import React from "react";
-import ConnectionDetails from "../screens/Connections/ConnectionDetails";
-import Contacts from "../screens/Connections/Contacts";
-import CredentialProof from "../screens/Proof/CredentialProof";
-import Credential from "../screens/Wallet/Credential";
-import CredentialOffer from "../screens/Offer/CredentialOffer";
-import Proof from "../screens/Proof/Proof";
+import ConnectionDetails from "screens/Connection/ConnectionDetails";
+import Contacts from "screens/Connection/Contacts";
+import CredentialProof from "screens/Proof/CredentialProof";
+import Credential from "screens/Wallet/Credential";
+import CredentialOffer from "screens/Offer/CredentialOffer";
+import Proof from "screens/Proof/Proof";
 
 export type ContactStackParamList = {
   Contacts: undefined;
@@ -22,6 +22,7 @@ export type ContactStackParamList = {
   };
   Credential: {
     credential_offer_id: string;
+    parentRoute: string;
   };
   Proof: {
     preentation_id: string;

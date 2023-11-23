@@ -12,7 +12,7 @@ import {
   Dimensions,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { ScanStackParamList } from "../../navigators/ScanStack";
+import { ScanStackParamList } from "../../navigation/ScanStack";
 
 type Props = StackScreenProps<ScanStackParamList, "Scan">;
 

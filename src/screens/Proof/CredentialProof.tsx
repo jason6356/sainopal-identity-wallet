@@ -15,7 +15,7 @@ import {
   Alert,
 } from "react-native";
 import ContactCard from "../../components/Card/ContactCard";
-import { ContactStackParamList } from "../../navigators/ContactStack";
+import { ContactStackParamList } from "../../navigation/ContactStack";
 import {
   MappedAttributes,
   RequestedAttributes,

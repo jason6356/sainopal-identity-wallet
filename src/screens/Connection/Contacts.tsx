@@ -5,17 +5,15 @@ import { StackScreenProps } from "@react-navigation/stack";
 import React, { useEffect, useState } from "react";
 import {
   FlatList,
+  Image,
   Pressable,
   SafeAreaView,
   StyleSheet,
   Text,
   TextInput,
   View,
-  Image,
-  ScrollView,
 } from "react-native";
-import { ContactStackParamList } from "../../navigators/ContactStack";
-
+import { ContactStackParamList } from "../../navigation/ContactStack";
 type Props = StackScreenProps<
   ContactStackParamList,
   "Contacts",

@@ -10,7 +10,7 @@ import {
   Text,
   View,
 } from "react-native";
-import { WalletStackParamList } from "../../navigators/WalletStack";
+import { WalletStackParamList } from "../../navigation/WalletStack";
 import { getSchemaNameFromOfferID } from "../../utils/schema";
 
 const schemaIdToImageMapping = {

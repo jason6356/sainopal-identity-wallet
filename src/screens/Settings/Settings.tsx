@@ -1,7 +1,7 @@
-import { MaterialIcons } from "@expo/vector-icons"
-import { useNavigation } from "@react-navigation/native"
-import { StackNavigationProp, StackScreenProps } from "@react-navigation/stack"
-import React from "react"
+import { MaterialIcons } from "@expo/vector-icons";
+import { useNavigation } from "@react-navigation/native";
+import { StackNavigationProp, StackScreenProps } from "@react-navigation/stack";
+import React from "react";
 import {
   FlatList,
   Image,
@@ -10,11 +10,15 @@ import {
   Text,
   TouchableOpacity,
   View,
-} from "react-native"
+} from "react-native";
 
-import { SettingStackParamList } from "../../navigators/SettingStack"
+import { SettingStackParamList } from "../../navigation/SettingStack";
 
-type Props = StackScreenProps<SettingStackParamList, "Settings", "BackUpWallet">
+type Props = StackScreenProps<
+  SettingStackParamList,
+  "Settings",
+  "BackUpWallet"
+>;
 
 const Settings: React.FC<Props> = ({ navigation, route }: Props) => {
   const settingsData = [
@@ -28,25 +32,25 @@ const Settings: React.FC<Props> = ({ navigation, route }: Props) => {
       title: "Wallet Backup",
       icon: require("../../assets/backup.png"), // Replace with actual image path
     },
-  ]
+  ];
 
   const handleSettingPress = (title: string) => {
     if (title === "Change Pin") {
       // navigation.navigate("Wallet Backup", { msg: "Your message here" })
     } else if (title === "Wallet Backup") {
       // navigation.navigate("WalletBackupScreen")
-      navigation.push("BackUpWallet", { msg: "Your message 22here" })
+      navigation.push("BackUpWallet", { msg: "Your message 22here" });
     }
     /**
      * @Comment : Use navigation.push to improve tracability
      */
     // Add more cases for other setting titles
-  }
+  };
 
   const renderItem = ({
     item,
   }: {
-    item: { id: number; title: string; icon: any }
+    item: { id: number; title: string; icon: any };
   }) => (
     <TouchableOpacity
       onPress={() => handleSettingPress(item.title)} // Call the handleSettingPress function
@@ -66,7 +70,7 @@ const Settings: React.FC<Props> = ({ navigation, route }: Props) => {
         </View>
       </View>
     </TouchableOpacity>
-  )
+  );
 
   return (
     <SafeAreaView style={styles.container}>
@@ -77,8 +81,8 @@ const Settings: React.FC<Props> = ({ navigation, route }: Props) => {
         renderItem={renderItem}
       />
     </SafeAreaView>
-  )
-}
+  );
+};
 
 const styles = StyleSheet.create({
   container: {
@@ -124,9 +128,9 @@ const styles = StyleSheet.create({
     resizeMode: "contain",
   },
   rightArrowContainer: {},
-})
+});
 
-export default Settings
+export default Settings;
 function handleSettingPress(title: string) {
-  throw new Error("Function not implemented.")
+  throw new Error("Function not implemented.");
 }

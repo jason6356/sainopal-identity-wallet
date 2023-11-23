@@ -1,22 +1,22 @@
-import { StackScreenProps } from "@react-navigation/stack"
-import React from "react"
-import { StyleSheet, Text, View } from "react-native"
-import { SettingStackParamList } from "../../navigators/SettingStack"
+import { StackScreenProps } from "@react-navigation/stack";
+import React from "react";
+import { StyleSheet, Text, View } from "react-native";
+import { SettingStackParamList } from "../../navigation/SettingStack";
 
-type Props = StackScreenProps<SettingStackParamList, "BackUpWallet">
+type Props = StackScreenProps<SettingStackParamList, "BackUpWallet">;
 
 const NestedScreen1: React.FC<Props> = ({ navigation, route }: Props) => {
-  const { msg } = route.params // Access the passed parameter
+  const { msg } = route.params; // Access the passed parameter
 
   return (
     <View style={styles.screen}>
       <Text style={styles.text}>I am NestedScreen1</Text>
       <Text>{msg}</Text>
     </View>
-  )
-}
+  );
+};
 
-export default NestedScreen1
+export default NestedScreen1;
 
 const styles = StyleSheet.create({
   screen: {
@@ -31,4 +31,4 @@ const styles = StyleSheet.create({
     fontWeight: "700",
     fontSize: 30,
   },
-})
+});

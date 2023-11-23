@@ -7,7 +7,7 @@ interface CardProps {
   imageSource?: any; // Image source for the image overlay
 }
 
-const Card: React.FC<CardProps> = ({ title, content, imageSource }) => {
+export function Card({ title, content, imageSource }: CardProps) {
   return (
     <View style={styles.card}>
       {imageSource && (
@@ -19,7 +19,7 @@ const Card: React.FC<CardProps> = ({ title, content, imageSource }) => {
       </View>
     </View>
   );
-};
+}
 
 const styles = StyleSheet.create({
   card: {
@@ -48,5 +48,3 @@ const styles = StyleSheet.create({
     height: "100%",
   },
 });
-
-export default Card;

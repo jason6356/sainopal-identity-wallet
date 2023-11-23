@@ -18,7 +18,7 @@ import {
   TouchableHighlight,
   View,
 } from "react-native";
-import { ContactStackParamList } from "../../navigators/ContactStack";
+import { ContactStackParamList } from "../../navigation/ContactStack";
 import {
   getCredentialFormat,
   getCredentialName,

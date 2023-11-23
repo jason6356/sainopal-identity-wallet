@@ -1,4 +1,4 @@
-import { Agent, CredentialFormat } from "@aries-framework/core";
+import { Agent } from "@aries-framework/core";
 import { CredentialFormatData } from "../screens/Offer/CredentialOffer";
 
 async function getProofNameFromID(agent: Agent, id: string) {
@@ -134,13 +134,13 @@ function mapRequestAttributes(
 }
 
 export {
-  getProofNameFromID,
-  getRequestAttributes,
-  getProofFormatData,
-  getPredicates,
+  getAttributesRequested,
   getAvailableCredentialsForProof,
   getPredicateFromFormatData,
+  getPredicates,
+  getProofFormatData,
+  getProofNameFromID,
+  getRequestAttributes,
   getRequestAttributesFromFormatData,
-  getAttributesRequested,
   mapRequestAttributes,
 };

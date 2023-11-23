@@ -12,7 +12,7 @@ import { StackScreenProps } from "@react-navigation/stack";
 import React, { useEffect, useState } from "react";
 import { Alert, Image, StyleSheet, Text, View } from "react-native";
 import { ScrollView } from "react-native-gesture-handler";
-import { ContactStackParamList } from "../../navigators/ContactStack";
+import { ContactStackParamList } from "../../navigation/ContactStack";
 import { getCredentialFormat, getCredentialName } from "../../utils";
 import { getCredentialDefinition } from "../../utils/credentials";
 import {

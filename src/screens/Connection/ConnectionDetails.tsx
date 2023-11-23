@@ -9,23 +9,19 @@ import {
   useCredentialsByConnectionId,
   useProofsByConnectionId,
 } from "@aries-framework/react-hooks";
+import { CredentialOfferCard } from "@components/Card/CredentialOfferCard";
+import { CredentialReceivedCard } from "@components/Card/CredentialReceivedCard";
+import { PresentationDoneCard } from "@components/Card/PresentationDoneCard";
+import { PresentationOfferCard } from "@components/Card/PresentationOfferCard";
+import useHideBottomTabBar from "@hooks/useHideBottomTabBar";
+import { ContactStackParamList } from "@navigation/ContactStack";
 import { StackScreenProps } from "@react-navigation/stack";
+import {
+  getProofNameFromID,
+  getSchemaNameFromOfferID,
+} from "../../utils/index";
 import React, { useEffect, useState } from "react";
 import { ScrollView, StyleSheet, View } from "react-native";
-import { CredentialOfferCard } from "../../components/CredentialOfferCard";
-import { CredentialReceivedCard } from "../../components/CredentialReceivedCard";
-import { PresentationOfferCard } from "../../components/PresentationOfferCard";
-import useHideBottomTabBar from "../../hooks/useHideBottomTabBar";
-import { ContactStackParamList } from "../../navigators/ContactStack";
-import { getProofNameFromID, getSchemaNameFromOfferID } from "../../utils";
-import {
-  PresentationDoneCard,
-  PresentationDoneCardProps,
-} from "../../components/PresentationDoneCard";
-
-const schemaIdToImageMapping = {
-  "NypRCRGykSwKUuRBQx2b9o:2:degree:1.0": require("../../assets/degree.png"),
-};
 
 type Props = StackScreenProps<ContactStackParamList, "ConnectionDetails">;
 

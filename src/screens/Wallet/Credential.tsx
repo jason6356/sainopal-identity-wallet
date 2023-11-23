@@ -6,19 +6,22 @@ import {
 import { StackScreenProps } from "@react-navigation/stack";
 import React, { useEffect, useLayoutEffect, useState } from "react";
 import { Image, ScrollView, StyleSheet, Text, View } from "react-native";
-import { WalletStackParamList } from "../../navigators/WalletStack";
+import { WalletStackParamList } from "../../navigation/WalletStack";
 
 import {
   getCredentialFormat,
   getCredentialName,
 } from "../../utils/credentials";
+import { ContactStackParamList } from "../../navigation/ContactStack";
 
 type CredentialFormatData = {
   name: string;
   value: string;
 };
 
-type Props = StackScreenProps<WalletStackParamList, "Credential">;
+type Props =
+  | StackScreenProps<WalletStackParamList, "Credential">
+  | StackScreenProps<ContactStackParamList, "Credential">;
 
 const credentialImage = require("../../assets/degree.png");
 
