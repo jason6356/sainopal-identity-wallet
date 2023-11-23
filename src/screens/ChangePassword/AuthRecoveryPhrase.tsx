@@ -14,27 +14,16 @@ import { RouteProp, NavigationProp } from "@react-navigation/native"
 import * as SQLite from "expo-sqlite"
 import { useAuth } from "../../../context/AuthProvider"
 import RecoveryPhraseTable from "../../../sqlite/recoveryPhrase"
+import { SettingStackParamList } from "../../navigators/SettingStack"
+import { StackScreenProps } from "@react-navigation/stack"
 
-type RootStackParamList = {
-  RecoveryPhrases: undefined
-  Login: undefined
-}
+type Props = StackScreenProps<SettingStackParamList, "AuthChangePassword">
 
-type SignUpScreenNavigationProp = NavigationProp<
-  RootStackParamList,
-  "RecoveryPhrases"
->
-
-type SignUpScreenRouteProp = RouteProp<RootStackParamList, "RecoveryPhrases">
-
-const RecoveryPhrases: React.FC<{
-  navigation: SignUpScreenNavigationProp
-  route: SignUpScreenRouteProp
-}> = ({ navigation, route }) => {
+const AuthRecoveryPhrase = ({ navigation }: Props) => {
   const [recoveryPhrase, setRecoveryPhrase] = useState("")
   const [storedRecoveryPhrase, setStoredRecoveryPhrase] = useState([])
   const wordCount = recoveryPhrase.trim().split(/\s+/).length
-  const { login }: any = useAuth()
+  const { logout }: any = useAuth()
 
   useEffect(() => {
     RecoveryPhraseTable.getAllPhrasesArray((phrases: any) => {
@@ -69,7 +58,7 @@ const RecoveryPhrases: React.FC<{
         (word, index) => word === storedRecoveryPhrase[index]?.word
       )
       if (match) {
-        login()
+        navigation.navigate("ChangeNewPassword")
       } else {
         alert("Recovery phrases do not match. Please try again.")
       }
@@ -227,4 +216,4 @@ const styles = StyleSheet.create({
   },
 })
 
-export default RecoveryPhrases
+export default AuthRecoveryPhrase

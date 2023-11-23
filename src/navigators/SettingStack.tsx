@@ -5,18 +5,22 @@ import WalletManager from "../screens/Backupwallet/WalletManager"
 import RecoverWallet from "../screens/RecoverWallet/RecoverWallet"
 import Home from "../screens/Home/Home"
 import RecoveryPhrase from "../screens/RecoverWallet/RecoveryPhrase"
-import Login from "../../App"
 import RecoverWalletKey from "../screens/RecoverWallet/RecoverWalletKey"
+import AuthChangePassword from "../screens/ChangePassword/AuthChangePassword"
+import ChangeNewPassword from "../screens/ChangePassword/ChangeNewPassword"
+import AuthRecoveryPhrase from "../screens/ChangePassword/AuthRecoveryPhrase"
 import { DocumentPickerResponse } from "react-native-document-picker"
 
 export type SettingStackParamList = {
   Settings: undefined
-  ChangePin: { msg: string }
-  WalletManager: { msg: string }
-  RecoverWallet: { msg: string }
-  RecoveryPhrase: { msg: string }
+  AuthChangePassword: undefined
+  AuthRecoveryPhrase: undefined
+  Testing: undefined
+  WalletManager: undefined
+  RecoverWallet: undefined
+  RecoveryPhrase: undefined
   RecoverWalletKey: { path: DocumentPickerResponse }
-  Login: undefined
+  ChangeNewPassword: undefined
 }
 
 const SettingStack = createStackNavigator<SettingStackParamList>()
@@ -25,7 +29,18 @@ const SettingStackScreen: React.FC = () => {
   return (
     <SettingStack.Navigator>
       <SettingStack.Screen name="Settings" component={Settings} />
-      <SettingStack.Screen name="ChangePin" component={Home} />
+      <SettingStack.Screen
+        name="AuthChangePassword"
+        component={AuthChangePassword}
+      />
+      <SettingStack.Screen
+        name="ChangeNewPassword"
+        component={ChangeNewPassword}
+      />
+      <SettingStack.Screen
+        name="AuthRecoveryPhrase"
+        component={AuthRecoveryPhrase}
+      />
       <SettingStack.Screen name="WalletManager" component={WalletManager} />
       <SettingStack.Screen name="RecoverWallet" component={RecoverWallet} />
       <SettingStack.Screen name="RecoveryPhrase" component={RecoveryPhrase} />
@@ -33,6 +48,7 @@ const SettingStackScreen: React.FC = () => {
         name="RecoverWalletKey"
         component={RecoverWalletKey}
       />
+      <SettingStack.Screen name="Testing" component={Home} />
     </SettingStack.Navigator>
   )
 }

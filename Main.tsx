@@ -19,13 +19,14 @@ const Main: React.FC = () => {
     null
   )
   // const [loggedIn, setLoggedIn] = useState(false)
-  const { loggedIn, login, logout } = useAuth()
+  const { loggedIn, login, logout }: any = useAuth()
   const [loading, setLoading] = useState(false)
 
   useEffect(() => {
     console.log(`Testing Context Var loggedIn: ${loggedIn}`)
     async function initializeAgent() {
       try {
+        setLoading(true)
         const id = await walletLocal()
         const recoveryPhrase = await recoveryPhraseLocal()
         const config = getAgentConfig(id, recoveryPhrase)

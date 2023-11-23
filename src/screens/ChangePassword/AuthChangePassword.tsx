@@ -1,7 +1,6 @@
-import React, { useEffect, useState } from "react"
+import React, { useEffect, useLayoutEffect, useState } from "react"
 import { View, Text, StyleSheet, Image, TouchableOpacity } from "react-native"
 import SmoothPinCodeInput from "react-native-smooth-pincode-input"
-import NumberPad from "./components/NumberPad"
 import {
   RouteProp,
   NavigationProp,
@@ -11,20 +10,13 @@ import { Animated } from "react-native"
 import { useAuth } from "../../../context/AuthProvider"
 import UserTable from "../../../sqlite/userTable"
 import RecoveryPhraseTable from "../../../sqlite/recoveryPhrase"
-type RootStackParamList = {
-  RecoveryPhrases: undefined
-  Login: undefined
-  SignUp: undefined
-}
+import { SettingStackParamList } from "../../navigators/SettingStack"
+import { StackScreenProps } from "@react-navigation/stack"
+import NumberPad from "../Auth/components/NumberPad"
 
-type LoginScreenNavigationProp = NavigationProp<RootStackParamList, "Login">
+type Props = StackScreenProps<SettingStackParamList, "AuthChangePassword">
 
-type LoginScreenRouteProp = RouteProp<RootStackParamList, "Login">
-
-const Login: React.FC<{
-  navigation: LoginScreenNavigationProp
-  route: LoginScreenRouteProp
-}> = ({ navigation, route }) => {
+const AuthChangePassword = ({ navigation }: Props) => {
   const passwordLength = 6
   const [code, setCode] = useState<string>("")
   const pinInputRef = React.createRef<SmoothPinCodeInput>()
@@ -47,19 +39,8 @@ const Login: React.FC<{
           console.log("Retrieved Password:", password)
           setPassword(password)
         },
-        (error) => {
-          navigation.navigate("SignUp")
-        }
+        (error) => {}
       )
-
-      RecoveryPhraseTable.addPhrasesIfNotExist(() => {
-        console.log("All phrases added successfully!")
-      })
-
-      RecoveryPhraseTable.getAllPhrases((phrases) => {
-        console.log("Retrieved Phrases:", phrases)
-      })
-
       checkPinAndNavigate()
     }, [navigation])
   )
@@ -99,7 +80,7 @@ const Login: React.FC<{
 
     if (code.length === passwordLength) {
       if (code === password) {
-        login()
+        navigation.navigate("ChangeNewPassword")
       } else {
         setCode("")
         startErrorAnimation()
@@ -120,7 +101,7 @@ const Login: React.FC<{
   }
 
   const handleForgotPin = () => {
-    navigation.navigate("RecoveryPhrases")
+    navigation.navigate("AuthRecoveryPhrase")
   }
 
   return (
@@ -249,4 +230,4 @@ const styles = StyleSheet.create({
   },
 })
 
-export default Login
+export default AuthChangePassword

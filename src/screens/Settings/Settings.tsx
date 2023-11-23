@@ -38,17 +38,24 @@ const Settings: React.FC<Props> = ({ navigation, route }: Props) => {
       title: "Recover Phrase",
       icon: require("../../assets/recoveryPhrase.png"),
     },
+    {
+      id: 5,
+      title: "Developer Testing",
+      icon: require("../../assets/developerIcon.gif"), //Only for testing Connection purpose
+    },
   ]
 
   const handleSettingPress = (title: string) => {
     if (title === "Change Pin") {
-      navigation.push("ChangePin", { msg: "Your message here" })
+      navigation.push("AuthChangePassword")
     } else if (title === "Backup Wallet") {
-      navigation.push("WalletManager", { msg: "Your message here" })
+      navigation.push("WalletManager")
     } else if (title === "Recover Wallet") {
-      navigation.push("RecoverWallet", { msg: "Your message here" })
+      navigation.push("RecoverWallet")
     } else if (title === "Recover Phrase") {
-      navigation.push("RecoveryPhrase", { msg: "Your message here" })
+      navigation.push("RecoveryPhrase")
+    } else if (title === "Developer Testing") {
+      navigation.push("Testing")
     }
   }
 

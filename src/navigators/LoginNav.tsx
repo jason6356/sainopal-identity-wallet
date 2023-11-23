@@ -7,24 +7,25 @@ import RecoveryPhrases from "../screens/Auth/RecoveryPhrase"
 import App from "../../App"
 const Stack = createNativeStackNavigator()
 
-const LoginNav = ({ onLogin }: LoginNavProps) => {
+const LoginNav = () => {
   return (
     <Stack.Navigator>
-      <Stack.Screen name="Login" options={{ headerShown: false }}>
-        {(props) => <Login {...props} onLogin={onLogin} />}
-      </Stack.Screen>
-      <Stack.Screen name="SignUp" options={{ headerShown: false }}>
-        {(props) => <SignUp {...props} />}
-      </Stack.Screen>
-      <Stack.Screen name="RecoveryPhrases">
-        {(props) => <RecoveryPhrases {...props} onLogin={onLogin} />}
-      </Stack.Screen>
+      <Stack.Screen
+        name="Login"
+        options={{ headerShown: false }}
+        component={Login}
+      ></Stack.Screen>
+      <Stack.Screen
+        name="SignUp"
+        options={{ headerShown: false }}
+        component={SignUp}
+      ></Stack.Screen>
+      <Stack.Screen
+        name="RecoveryPhrases"
+        component={RecoveryPhrases}
+      ></Stack.Screen>
     </Stack.Navigator>
   )
 }
 
 export default LoginNav
-
-interface LoginNavProps {
-  onLogin: (isLoggedIn: boolean) => void
-}

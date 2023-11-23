@@ -2,46 +2,23 @@ import React, { useEffect, useState } from "react"
 import { View, Text, StyleSheet, Image, TouchableOpacity } from "react-native"
 import { useNavigation } from "@react-navigation/native"
 import SmoothPinCodeInput from "react-native-smooth-pincode-input"
-import NumberPad from "./components/NumberPad"
 import { RouteProp, NavigationProp } from "@react-navigation/native"
 import * as SQLite from "expo-sqlite"
 import UserTable from "../../../sqlite/userTable"
+import NumberPad from "../Auth/components/NumberPad"
+import { SettingStackParamList } from "../../navigators/SettingStack"
+import { StackScreenProps } from "@react-navigation/stack"
+import { useAuth } from "../../../context/AuthProvider"
 
-type RootStackParamList = {
-  SignUp: undefined
-  Login: undefined
-}
+type Props = StackScreenProps<SettingStackParamList, "ChangeNewPassword">
 
-type SignUpScreenNavigationProp = NavigationProp<RootStackParamList, "SignUp">
-
-type SignUpScreenRouteProp = RouteProp<RootStackParamList, "SignUp">
-
-const db = SQLite.openDatabase("db.db")
-
-const SignUp: React.FC<{
-  navigation: SignUpScreenNavigationProp
-  route: SignUpScreenRouteProp
-}> = ({ navigation, route }) => {
+const ChangeNewPassword = ({ navigation }: Props) => {
   const passwordLength = 6
   const [firstCode, setFirstCode] = useState<string>("")
   const [secondCode, setSecondCode] = useState<string>("")
   const [step, setStep] = useState<number>(1)
   const pinInputRef = React.createRef<SmoothPinCodeInput>()
-
-  const logUserData = () => {
-    db.transaction((tx) => {
-      tx.executeSql("select * from user;", [], (_, { rows }) => {
-        console.log("User Data:", rows._array)
-      })
-    })
-  }
-
-  useEffect(() => {
-    const unsubscribe = navigation.addListener("focus", () => {
-      logUserData()
-    })
-    return unsubscribe
-  }, [navigation])
+  const { logout }: any = useAuth()
 
   const checkPinAndNavigate = () => {
     if (step === 1 && firstCode.length === passwordLength) {
@@ -52,8 +29,9 @@ const SignUp: React.FC<{
           Math.random() * 1000
         )}`
         const walletName = `imported_wallet_${uniqueIdentifier}`
-        UserTable.storeUserData(secondCode, walletName)
-        navigation.navigate("Login")
+        UserTable.updatePassword(secondCode)
+        alert("Password Changed Successfully! Kindly Login Again.")
+        logout()
       } else {
         setFirstCode("")
         setSecondCode("")
@@ -98,12 +76,6 @@ const SignUp: React.FC<{
   return (
     <View style={styles.container}>
       <Image style={styles.image} source={require("../../assets/signUp.png")} />
-      <TouchableOpacity
-        style={styles.forgotPin}
-        onPress={() => navigation.navigate("Login")}
-      >
-        <Text style={styles.forgotPinText}>Back to Login</Text>
-      </TouchableOpacity>
       <Text style={styles.title}>
         {step === 1 ? "Enter New PIN" : "Confirm New PIN"}
       </Text>
@@ -195,4 +167,4 @@ const styles = StyleSheet.create({
   },
 })
 
-export default SignUp
+export default ChangeNewPassword
