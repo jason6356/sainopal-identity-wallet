@@ -37,7 +37,7 @@ const RecoverWalletKey = ({ navigation, route }: Props) => {
   const [recoveryPhrase, setRecoveryPhrase] = useState("")
   const [storedRecoveryPhrase, setStoredRecoveryPhrase] = useState([])
   const agent = useAgent()
-  const { loggedIn, login, logout } = useAuth()
+  const { logout }: any = useAuth()
 
   const wordCount = recoveryPhrase.trim()
     ? recoveryPhrase.trim().split(/\s+/).length

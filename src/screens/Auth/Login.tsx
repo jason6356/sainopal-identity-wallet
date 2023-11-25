@@ -11,6 +11,8 @@ import { Animated } from "react-native"
 import { useAuth } from "../../../context/AuthProvider"
 import UserTable from "../../../sqlite/userTable"
 import RecoveryPhraseTable from "../../../sqlite/recoveryPhrase"
+import { decode } from "base-64"
+
 type RootStackParamList = {
   RecoveryPhrases: undefined
   Login: undefined
@@ -98,7 +100,7 @@ const Login: React.FC<{
     console.log(password)
 
     if (code.length === passwordLength) {
-      if (code === password) {
+      if (code === decode(password)) {
         login()
       } else {
         setCode("")

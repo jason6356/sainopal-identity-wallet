@@ -42,7 +42,7 @@ const AuthRecoveryPhrase = ({ navigation }: Props) => {
 
   useLayoutEffect(() => {
     navigation.setOptions({
-      title: "Set Pin",
+      title: "",
 
       headerTitleStyle: {
         color: "#0e2e47",

@@ -24,6 +24,17 @@ const AuthChangePassword = ({ navigation }: Props) => {
   const { login }: any = useAuth()
   const [errorAnimation] = useState(new Animated.Value(0))
 
+  useLayoutEffect(() => {
+    navigation.setOptions({
+      title: "",
+
+      headerTitleStyle: {
+        color: "#0e2e47",
+      },
+      headerTintColor: "#0e2e47",
+    })
+  }, [])
+
   useFocusEffect(
     React.useCallback(() => {
       UserTable.getAllUsers()

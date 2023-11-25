@@ -1,6 +1,6 @@
 import * as SQLite from "expo-sqlite"
 import wordsList from "../en.json"
-
+import { encode, decode } from "base-64"
 const db = SQLite.openDatabase("db.db")
 
 class RecoveryPhraseTable {
@@ -40,9 +40,8 @@ class RecoveryPhraseTable {
 
                 const selectedWords = []
                 const shuffledWords = wordsList.sort(() => Math.random() - 0.5)
-
                 for (let i = 0; i < 12; i++) {
-                  selectedWords.push(shuffledWords[i])
+                  selectedWords.push(encode(shuffledWords[i]))
                 }
 
                 selectedWords.forEach((selectedWords) => {
@@ -82,9 +81,11 @@ class RecoveryPhraseTable {
     db.transaction((tx) => {
       tx.executeSql("SELECT * FROM recoveryPhrase;", [], (_, { rows }) => {
         const recoveryPhraseData: any[] = rows._array
-        const wordsOnly: string[] = recoveryPhraseData.map((item) => item.word)
-        const wordsString: string = wordsOnly.join(" ")
-        callback(wordsString)
+        const decodedWords: string[] = recoveryPhraseData.map((item) =>
+          decode(item.word)
+        )
+        const decodedString: string = decodedWords.join(" ")
+        callback(decodedString)
       })
     })
   }
@@ -92,9 +93,15 @@ class RecoveryPhraseTable {
   static getAllPhrasesArray(callback: (phrases: any[]) => void) {
     db.transaction((tx) => {
       tx.executeSql("SELECT * FROM recoveryPhrase;", [], (_, { rows }) => {
-        const recoveryPhraseData: any = rows._array
-        console.log(recoveryPhraseData)
-        callback(recoveryPhraseData)
+        const recoveryPhraseData: any[] = rows._array
+        const decodedData = recoveryPhraseData.map((item) => {
+          return {
+            ...item,
+            word: item.word ? decode(item.word) : null,
+          }
+        })
+
+        callback(decodedData)
       })
     })
   }

@@ -6,6 +6,7 @@ import NumberPad from "./components/NumberPad"
 import { RouteProp, NavigationProp } from "@react-navigation/native"
 import * as SQLite from "expo-sqlite"
 import UserTable from "../../../sqlite/userTable"
+import { encode, decode } from "base-64"
 
 type RootStackParamList = {
   SignUp: undefined
@@ -52,7 +53,8 @@ const SignUp: React.FC<{
           Math.random() * 1000
         )}`
         const walletName = `imported_wallet_${uniqueIdentifier}`
-        UserTable.storeUserData(secondCode, walletName)
+        const encodedData = encode(secondCode)
+        UserTable.storeUserData(encodedData, walletName)
         navigation.navigate("Login")
       } else {
         setFirstCode("")

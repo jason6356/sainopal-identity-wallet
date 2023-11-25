@@ -12,6 +12,8 @@ import * as SQLite from "expo-sqlite"
 import Toast from "react-native-toast-message"
 import { Animated } from "react-native"
 import { SettingStackParamList } from "../../navigators/SettingStack"
+import RecoveryPhraseTable from "../../../sqlite/recoveryPhrase"
+import { decode } from "base-64"
 
 type Props = StackScreenProps<SettingStackParamList, "RecoveryPhrase">
 const db = SQLite.openDatabase("db.db")
@@ -33,14 +35,16 @@ const RecoveryPhrase = ({ navigation }: Props) => {
     db.transaction(
       (tx) => {
         tx.executeSql("SELECT * FROM recoveryPhrase;", [], (_, { rows }) => {
-          const recoveryPhraseData: any = rows._array
-          const wordsOnly = recoveryPhraseData.map(
-            (item: { word: any }) => item.word
-          )
-          const wordsString = wordsOnly.join(" ")
+          const recoveryPhraseData: any[] = rows._array
+          const decodedWords = recoveryPhraseData.map((item) => {
+            return item.word ? decode(item.word) : null
+          })
+
+          const wordsString = decodedWords.join(" ")
           console.log(wordsString)
+
           if (recoveryPhraseData.length > 0) {
-            setStoredRecoveryPhrase(wordsOnly)
+            setStoredRecoveryPhrase(decodedWords)
           }
         })
       },
@@ -48,6 +52,10 @@ const RecoveryPhrase = ({ navigation }: Props) => {
         console.log("Transaction Error: " + error.message)
       }
     )
+    // RecoveryPhraseTable.getAllPhrasesArray((phrases) => {
+    //   console.log("Retrieved Phrases:", phrases)
+    //   setStoredRecoveryPhrase(phrases)
+    // })
   }, [])
 
   const shakeAnimation = useRef(new Animated.Value(0)).current
