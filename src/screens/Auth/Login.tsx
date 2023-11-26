@@ -11,7 +11,7 @@ import { Animated } from "react-native"
 import { useAuth } from "../../../context/AuthProvider"
 import UserTable from "../../../sqlite/userTable"
 import RecoveryPhraseTable from "../../../sqlite/recoveryPhrase"
-import { decode } from "base-64"
+import * as LocalAuthentication from "expo-local-authentication"
 
 type RootStackParamList = {
   RecoveryPhrases: undefined
@@ -62,7 +62,10 @@ const Login: React.FC<{
         console.log("Retrieved Phrases:", phrases)
       })
 
+      //dropTables() //<-For testing purpose
+
       checkPinAndNavigate()
+      authenticate()
     }, [navigation])
   )
 
@@ -70,6 +73,40 @@ const Login: React.FC<{
     console.log("Code:", code)
     checkPinAndNavigate()
   }, [code])
+
+  async function authenticate() {
+    try {
+      const result = await LocalAuthentication.authenticateAsync({
+        promptMessage: "Authenticate to access sensitive info",
+        disableDeviceFallback: true,
+        fallbackLabel: "Use your device PIN",
+        cancelLabel: "Cancel",
+      })
+
+      if (result.success) {
+        login()
+      }
+    } catch (error) {
+      console.error("Authentication error:", error)
+    }
+  }
+
+  async function dropTables() {
+    await new Promise<void>((resolve, reject) => {
+      RecoveryPhraseTable.dropTable(() => {
+        console.log("RecoveryPhraseTable dropped successfully!")
+        resolve()
+      })
+    })
+
+    await new Promise<void>((resolve, reject) => {
+      UserTable.dropTable(() => {
+        console.log("UserTable dropped successfully!")
+        resolve()
+      })
+    })
+    console.log("All tables dropped successfully!")
+  }
 
   const startErrorAnimation = () => {
     Animated.sequence([
@@ -100,7 +137,7 @@ const Login: React.FC<{
     console.log(password)
 
     if (code.length === passwordLength) {
-      if (code === decode(password)) {
+      if (code === password) {
         login()
       } else {
         setCode("")

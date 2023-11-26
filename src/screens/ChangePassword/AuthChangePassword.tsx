@@ -13,6 +13,7 @@ import RecoveryPhraseTable from "../../../sqlite/recoveryPhrase"
 import { SettingStackParamList } from "../../navigators/SettingStack"
 import { StackScreenProps } from "@react-navigation/stack"
 import NumberPad from "../Auth/components/NumberPad"
+import * as LocalAuthentication from "expo-local-authentication"
 
 type Props = StackScreenProps<SettingStackParamList, "AuthChangePassword">
 
@@ -21,7 +22,6 @@ const AuthChangePassword = ({ navigation }: Props) => {
   const [code, setCode] = useState<string>("")
   const pinInputRef = React.createRef<SmoothPinCodeInput>()
   const [password, setPassword] = useState<string>("")
-  const { login }: any = useAuth()
   const [errorAnimation] = useState(new Animated.Value(0))
 
   useLayoutEffect(() => {
@@ -53,6 +53,7 @@ const AuthChangePassword = ({ navigation }: Props) => {
         (error) => {}
       )
       checkPinAndNavigate()
+      authenticate()
     }, [navigation])
   )
 
@@ -60,6 +61,23 @@ const AuthChangePassword = ({ navigation }: Props) => {
     console.log("Code:", code)
     checkPinAndNavigate()
   }, [code])
+
+  async function authenticate() {
+    try {
+      const result = await LocalAuthentication.authenticateAsync({
+        promptMessage: "Authenticate to access sensitive info",
+        disableDeviceFallback: true,
+        fallbackLabel: "Use your device PIN",
+        cancelLabel: "Cancel",
+      })
+
+      if (result.success) {
+        navigation.navigate("ChangeNewPassword")
+      }
+    } catch (error) {
+      console.error("Authentication error:", error)
+    }
+  }
 
   const startErrorAnimation = () => {
     Animated.sequence([

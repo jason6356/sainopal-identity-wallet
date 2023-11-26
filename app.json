@@ -33,6 +33,12 @@
         {
           "cameraPermission": "Allow $(PRODUCT_NAME) to access camera."
         }
+      ],
+      [
+        "expo-local-authentication",
+        {
+          "FINGERPRINT": "Allow $(PRODUCT_NAME) to use Face ID."
+        }
       ]
     ]
   }

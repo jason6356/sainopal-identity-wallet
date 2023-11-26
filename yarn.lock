@@ -5713,6 +5713,13 @@ expo-keep-awake@~12.3.0:
   resolved "https://registry.npmjs.org/expo-keep-awake/-/expo-keep-awake-12.3.0.tgz"
   integrity sha512-ujiJg1p9EdCOYS05jh5PtUrfiZnK0yyLy+UewzqrjUqIT8eAGMQbkfOn3C3fHE7AKd5AefSMzJnS3lYZcZYHDw==
 
+expo-local-authentication@^13.6.0:
+  version "13.6.0"
+  resolved "https://registry.yarnpkg.com/expo-local-authentication/-/expo-local-authentication-13.6.0.tgz#8f2567563ae64ab23d523af00230bb4888e0c736"
+  integrity sha512-kvM3oZc+K0xHMBFdNAVEVUbynaq0A2coqxk8kECx25hJ3vxgIY1Dktx+UD6Y+H9zMyQwYtcGhRPW4BOK1cqRuA==
+  dependencies:
+    invariant "^2.2.4"
+
 expo-modules-autolinking@1.5.0:
   version "1.5.0"
   resolved "https://registry.npmjs.org/expo-modules-autolinking/-/expo-modules-autolinking-1.5.0.tgz"

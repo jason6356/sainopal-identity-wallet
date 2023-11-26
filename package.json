@@ -42,6 +42,7 @@
     "expo-asset": "~8.10.1",
     "expo-barcode-scanner": "~12.5.3",
     "expo-file-system": "~15.4.4",
+    "expo-local-authentication": "^13.6.0",
     "expo-splash-screen": "~0.20.5",
     "expo-sqlite": "~11.3.3",
     "expo-status-bar": "~1.6.0",

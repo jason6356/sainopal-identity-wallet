@@ -1,4 +1,5 @@
 import * as SQLite from "expo-sqlite"
+import { encode, decode } from "base-64"
 
 const db = SQLite.openDatabase("db.db")
 
@@ -41,7 +42,7 @@ class UserTable {
         tx.executeSql("SELECT * FROM user;", [], (_, { rows }) => {
           const userData = rows._array
           const password = userData.length > 0 ? userData[0].password : ""
-          successCallback(password)
+          successCallback(decode(password))
         })
       },
       (error) => {
@@ -62,12 +63,12 @@ class UserTable {
           if (_array.length > 0) {
             tx.executeSql(
               "update user set password = ?, wallet = ? where id = ?;",
-              [encryptedPassword, wallet, _array[0].id]
+              [encode(encryptedPassword), wallet, _array[0].id]
             )
           } else {
             tx.executeSql(
               "insert into user (password, wallet) values (?, ?);",
-              [encryptedPassword, wallet]
+              [encode(encryptedPassword), wallet]
             )
           }
         }
@@ -86,7 +87,7 @@ class UserTable {
         (_, { rows: { _array } }) => {
           if (_array.length > 0) {
             tx.executeSql("UPDATE user SET password = ? WHERE id = ?;", [
-              encryptedPassword,
+              encode(encryptedPassword),
               _array[0].id,
             ])
           } else {
@@ -144,6 +145,30 @@ class UserTable {
         )
       })
     })
+  }
+
+  static dropTable(callback?: () => void) {
+    db.transaction(
+      (tx) => {
+        tx.executeSql(
+          "DROP TABLE IF EXISTS user;",
+          [],
+          () => {
+            console.log("User table dropped successfully!")
+            if (callback) {
+              callback()
+            }
+          },
+          (transaction, error) => {
+            console.log("Error dropping user table: " + error.message)
+            return true
+          }
+        )
+      },
+      (error) => {
+        console.log("Transaction error: " + error.message)
+      }
+    )
   }
 
   static deleteUser(id: number): Promise<void> {

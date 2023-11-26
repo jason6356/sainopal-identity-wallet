@@ -13,8 +13,7 @@ import Toast from "react-native-toast-message"
 import { Animated } from "react-native"
 import { SettingStackParamList } from "../../navigators/SettingStack"
 import RecoveryPhraseTable from "../../../sqlite/recoveryPhrase"
-import { decode } from "base-64"
-
+import decode from "base-64"
 type Props = StackScreenProps<SettingStackParamList, "RecoveryPhrase">
 const db = SQLite.openDatabase("db.db")
 
@@ -32,30 +31,31 @@ const RecoveryPhrase = ({ navigation }: Props) => {
   const [storedRecoveryPhrase, setStoredRecoveryPhrase] = useState<string[]>([])
 
   useEffect(() => {
-    db.transaction(
-      (tx) => {
-        tx.executeSql("SELECT * FROM recoveryPhrase;", [], (_, { rows }) => {
-          const recoveryPhraseData: any[] = rows._array
-          const decodedWords = recoveryPhraseData.map((item) => {
-            return item.word ? decode(item.word) : null
-          })
+    // db.transaction(
+    //   (tx) => {
+    //     tx.executeSql("SELECT * FROM recoveryPhrase;", [], (_, { rows }) => {
+    //       const recoveryPhraseData: any[] = rows._array
+    //       const decodedWords = recoveryPhraseData.map((item) => {
+    //         return item.word ? item.word : null
+    //       })
 
-          const wordsString = decodedWords.join(" ")
-          console.log(wordsString)
+    //       const wordsString = decodedWords.join(" ")
+    //       console.log(wordsString)
 
-          if (recoveryPhraseData.length > 0) {
-            setStoredRecoveryPhrase(decodedWords)
-          }
-        })
-      },
-      (error) => {
-        console.log("Transaction Error: " + error.message)
-      }
-    )
-    // RecoveryPhraseTable.getAllPhrasesArray((phrases) => {
-    //   console.log("Retrieved Phrases:", phrases)
-    //   setStoredRecoveryPhrase(phrases)
-    // })
+    //       if (recoveryPhraseData.length > 0) {
+    //         setStoredRecoveryPhrase(decodedWords)
+    //       }
+    //     })
+    //   },
+    //   (error) => {
+    //     console.log("Transaction Error: " + error.message)
+    //   }
+    // )
+    RecoveryPhraseTable.getAllPhrasesArray((phrases) => {
+      console.log("Retrieved Phrases:", phrases)
+      const decodedWords = phrases.map((item) => (item.word ? item.word : null))
+      setStoredRecoveryPhrase(decodedWords)
+    })
   }, [])
 
   const shakeAnimation = useRef(new Animated.Value(0)).current

@@ -16,18 +16,16 @@ import { useAuth } from "../../../context/AuthProvider"
 import RecoveryPhraseTable from "../../../sqlite/recoveryPhrase"
 import { SettingStackParamList } from "../../navigators/SettingStack"
 import { StackScreenProps } from "@react-navigation/stack"
-
 type Props = StackScreenProps<SettingStackParamList, "AuthChangePassword">
 
 const AuthRecoveryPhrase = ({ navigation }: Props) => {
   const [recoveryPhrase, setRecoveryPhrase] = useState("")
   const [storedRecoveryPhrase, setStoredRecoveryPhrase] = useState([])
   const wordCount = recoveryPhrase.trim().split(/\s+/).length
-  const { logout }: any = useAuth()
 
   useEffect(() => {
     RecoveryPhraseTable.getAllPhrasesArray((phrases: any) => {
-      console.log("Retrieved Phrases Array:", phrases)
+      console.log("Retrieved Phrases Array:",phrases)
       setStoredRecoveryPhrase(phrases)
     })
   }, [])

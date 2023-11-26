@@ -131,6 +131,25 @@ class RecoveryPhraseTable {
       })
     })
   }
+
+  static dropTable(callback?: () => void) {
+    db.transaction((tx) => {
+      tx.executeSql(
+        "DROP TABLE IF EXISTS recoveryPhrase;",
+        [],
+        () => {
+          console.log("RecoveryPhrase table dropped successfully!")
+          if (callback) {
+            callback()
+          }
+        },
+        (transaction, error) => {
+          console.log("Error dropping recoveryPhrase table: " + error.message)
+          return true
+        }
+      )
+    })
+  }
 }
 
 export default RecoveryPhraseTable

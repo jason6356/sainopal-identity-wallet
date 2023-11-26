@@ -18,7 +18,7 @@ const Main: React.FC = () => {
   const [initializedAgent, setInitializedAgent] = useState<Agent<any> | null>(
     null
   )
-  // const [loggedIn, setLoggedIn] = useState(false)
+
   const { loggedIn, login, logout }: any = useAuth()
   const [loading, setLoading] = useState(false)
 
@@ -50,7 +50,6 @@ const Main: React.FC = () => {
 
   const handleLogin = async (isLoggedIn: boolean) => {
     if (isLoggedIn) {
-      // setLoggedIn(true)
       login()
       setLoading(true)
     }

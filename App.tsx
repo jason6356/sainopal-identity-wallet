@@ -14,6 +14,7 @@ import LoginNav from "./src/navigators/LoginNav"
 import { NavigationContainer } from "@react-navigation/native"
 import { AuthProvider, useAuth } from "./context/AuthProvider"
 import Main from "./Main"
+import Bio from "./bio"
 
 const App: React.FC = () => {
   return (
