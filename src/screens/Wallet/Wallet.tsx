@@ -40,6 +40,16 @@ const Wallet = ({ navigation, route }: Props) => {
   }, [credentials]);
   return (
     <View style={styles.container}>
+      <Pressable onPress={() => navigation.navigate("SelfCredential")}>
+        <View style={styles.card}>
+          <Image
+            source={require("../../assets/selfCredential.png")}
+            style={styles.image}
+          />
+          <Text style={styles.credentialName}>{"Self Credential"}</Text>
+        </View>
+      </Pressable>
+
       {credentials.length > 0 ? (
         <ScrollView>
           {credentials.map((credential, index) => {

@@ -1,6 +1,5 @@
 import { MaterialIcons } from "@expo/vector-icons";
-import { useNavigation } from "@react-navigation/native";
-import { StackNavigationProp, StackScreenProps } from "@react-navigation/stack";
+import { StackScreenProps } from "@react-navigation/stack";
 import React from "react";
 import {
   FlatList,
@@ -25,26 +24,42 @@ const Settings: React.FC<Props> = ({ navigation, route }: Props) => {
     {
       id: 1,
       title: "Change Pin",
-      icon: require("../../assets/change_pin.png"), // Replace with actual image path
+      icon: require("../../assets/change_pin.png"),
     },
     {
       id: 2,
-      title: "Wallet Backup",
-      icon: require("../../assets/backup.png"), // Replace with actual image path
+      title: "Backup Wallet",
+      icon: require("../../assets/backup.png"),
+    },
+    {
+      id: 3,
+      title: "Recover Wallet",
+      icon: require("../../assets/recover.png"),
+    },
+    {
+      id: 4,
+      title: "Recover Phrase",
+      icon: require("../../assets/recoveryPhrase.png"),
+    },
+    {
+      id: 5,
+      title: "Developer Testing",
+      icon: require("../../assets/developerIcon.gif"), //Only for testing Connection purpose
     },
   ];
 
   const handleSettingPress = (title: string) => {
     if (title === "Change Pin") {
-      // navigation.navigate("Wallet Backup", { msg: "Your message here" })
-    } else if (title === "Wallet Backup") {
-      // navigation.navigate("WalletBackupScreen")
-      navigation.push("BackUpWallet", { msg: "Your message 22here" });
+      navigation.push("AuthChangePassword");
+    } else if (title === "Backup Wallet") {
+      navigation.push("WalletManager");
+    } else if (title === "Recover Wallet") {
+      navigation.push("RecoverWallet");
+    } else if (title === "Recover Phrase") {
+      navigation.push("RecoveryPhrase");
+    } else if (title === "Developer Testing") {
+      navigation.push("Testing");
     }
-    /**
-     * @Comment : Use navigation.push to improve tracability
-     */
-    // Add more cases for other setting titles
   };
 
   const renderItem = ({
@@ -53,7 +68,7 @@ const Settings: React.FC<Props> = ({ navigation, route }: Props) => {
     item: { id: number; title: string; icon: any };
   }) => (
     <TouchableOpacity
-      onPress={() => handleSettingPress(item.title)} // Call the handleSettingPress function
+      onPress={() => handleSettingPress(item.title)}
       style={styles.settingItem}
     >
       <View style={styles.settingItem}>

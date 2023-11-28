@@ -12,6 +12,7 @@
       "@services/*": ["src/services/*"],
       "@types/*": ["src/types/*"],
       "@utils/*": ["src/utils/*"]
-    }
+    },
+    "jsx": "react"
   }
 }
