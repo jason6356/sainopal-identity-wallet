@@ -1,15 +1,7 @@
-import { MaterialIcons } from "@expo/vector-icons";
-import { Buffer, ProofExchangeRecord } from "@aries-framework/core";
-import {
-  Image,
-  StyleSheet,
-  Text,
-  TouchableHighlight,
-  View,
-} from "react-native";
-import { credentialImage } from "../../constants";
+import { ProofExchangeRecord } from "@aries-framework/core";
+import { FontAwesome, MaterialIcons } from "@expo/vector-icons";
 import React from "react";
-import { FontAwesome } from "@expo/vector-icons";
+import { StyleSheet, Text, TouchableHighlight, View } from "react-native";
 
 export type PresentationDoneCardProps = {
   key: string;
@@ -79,7 +71,7 @@ const styles = StyleSheet.create({
   exchangeIcon: {
     marginRight: 24,
     justifyContent: "center",
-    padding: 18,
+    padding: 16,
     borderRadius: 32,
     borderStyle: "solid",
     borderWidth: 1,

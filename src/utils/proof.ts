@@ -52,7 +52,6 @@ function getPredicateFromFormatData(data: any) {
       let cred_def_id = predicates[key]["restrictions"][0]["cred_def_id"];
       result.push({ predicateName, name, predicate, threshold, cred_def_id });
     });
-
     return result;
   }
   return [];
@@ -72,7 +71,7 @@ function getAttributesRequested(data: any): RequestedAttributes[] {
   const attributes = data.request.indy?.requested_attributes;
   const result: RequestedAttributes[] = [];
 
-  console.log(attributes);
+  console.log(`Attributes : ${JSON.stringify(attributes)}`);
   Object.keys(attributes).forEach((key) => {
     const attribute = attributes[key];
     const cred_def_id = attribute["restrictions"][0]["cred_def_id"];
@@ -106,6 +105,8 @@ export type MappedAttributes = {
   credential_name: string;
   attributes: CredentialFormatData[];
 };
+
+function mapPresentedAttributes(attributes: any, agent: Agent) {}
 
 function mapRequestAttributes(
   attributes: any,

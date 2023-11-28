@@ -6,7 +6,7 @@ import {
   TouchableHighlight,
   View,
 } from "react-native";
-import { credentialImage } from "../../constants";
+import { credentialImage } from "@constants/index";
 
 type CredentialReceivedCardProps = {
   key: string;

@@ -1,9 +1,8 @@
+import { OutOfBandInvitation } from "@aries-framework/core";
 import { createStackNavigator } from "@react-navigation/stack";
 import React from "react";
-import Scan from "../screens/Scan/Scan";
-import { ConnectionRecord, OutOfBandInvitation } from "@aries-framework/core";
-import ConnectionRequest from "../screens/Connection/ConnectionRequest";
-import { Text } from "react-native";
+import ConnectionRequest from "@screens/Connection/ConnectionRequest";
+import Scan from "@screens/Scan/Scan";
 
 type ScanStackProps = {};
 

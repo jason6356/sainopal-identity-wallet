@@ -16,12 +16,12 @@ import { PresentationOfferCard } from "@components/Card/PresentationOfferCard";
 import useHideBottomTabBar from "@hooks/useHideBottomTabBar";
 import { ContactStackParamList } from "@navigation/ContactStack";
 import { StackScreenProps } from "@react-navigation/stack";
+import React, { useEffect, useState } from "react";
+import { ScrollView, StyleSheet, View } from "react-native";
 import {
   getProofNameFromID,
   getSchemaNameFromOfferID,
 } from "../../utils/index";
-import React, { useEffect, useState } from "react";
-import { ScrollView, StyleSheet, View } from "react-native";
 
 type Props = StackScreenProps<ContactStackParamList, "ConnectionDetails">;
 

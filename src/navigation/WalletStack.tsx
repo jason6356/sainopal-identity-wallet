@@ -1,8 +1,8 @@
 import { createStackNavigator } from "@react-navigation/stack";
-import Wallet from "../screens/Wallet/Wallet";
+import Wallet from "@screens/Wallet/Wallet";
 
 import React from "react";
-import Credential from "../screens/Wallet/Credential";
+import Credential from "@screens/Wallet/Credential";
 
 type WalletStackProps = {};
 

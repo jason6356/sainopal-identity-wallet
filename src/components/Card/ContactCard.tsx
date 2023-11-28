@@ -1,7 +1,7 @@
 import { Image, StyleSheet, Text, View } from "react-native";
 import { ConnectionRecord } from "@aries-framework/core";
 import { MaterialIcons } from "@expo/vector-icons";
-import { defaultUserAvatar } from "../../constants";
+import { defaultUserAvatar } from "@constants/index";
 
 type ContactCardProps = {
   connectionInvitation: ConnectionRecord | undefined;

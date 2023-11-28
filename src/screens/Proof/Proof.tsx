@@ -61,7 +61,7 @@ const Proof: React.FC<Props> = ({ navigation, route }: Props) => {
 
   async function findCredentialWithSameCredDefID(
     ls: CredentialExchangeRecord[],
-    cred_def_id: string
+    cred_def_id: string | undefined
   ): Promise<CredentialExchangeRecord | undefined> {
     const result = undefined;
 
@@ -82,8 +82,8 @@ const Proof: React.FC<Props> = ({ navigation, route }: Props) => {
 
   async function retrieveProofFormatData() {
     const data = await getProofFormatData(agent.agent, presentation_id);
-    console.log(presentation_id);
-    console.log(presentationOffer);
+    console.log(`Presentation ID : ${presentation_id}`);
+    console.log(`Presentation Offer : ${presentationOffer}`);
     const predicate = getPredicateFromFormatData(data);
     const attributesNeeded = getAttributesRequested(data);
 
@@ -99,14 +99,38 @@ const Proof: React.FC<Props> = ({ navigation, route }: Props) => {
     }
 
     if (attributesNeeded.length > 0) {
-      console.log("Interesting");
-      console.log(JSON.stringify(attributesNeeded));
-      const credential = await findCredentialWithSameCredDefID(
-        credentials,
-        predicate[0].cred_def_id
-      );
-      setProofCredential(credential);
-      updateNameAndFormat(credential?.id);
+      const result: MappedAttributes[] = [];
+      for (const e of attributesNeeded) {
+        console.log("Attributes Type Credentials?");
+        console.log(JSON.stringify(e));
+        const attributesPresented = e.attributes;
+        const credential = await findCredentialWithSameCredDefID(
+          credentials,
+          e.cred_def_id
+        );
+
+        const credentialName = await getCredentialName(
+          agent.agent,
+          credential?.id
+        );
+        console.log(credentialName);
+
+        const credentialFormatData = await getCredentialFormat(
+          agent.agent,
+          credential?.id
+        );
+
+        const filteredFormatData = credentialFormatData.filter((e) =>
+          attributesPresented.includes(e.name)
+        );
+        console.log(filteredFormatData);
+
+        result.push({
+          credential_name: credentialName,
+          attributes: filteredFormatData,
+        });
+      }
+      setMappedAttributes(result);
     }
 
     setProofFormatData(data);
@@ -160,59 +184,20 @@ const Proof: React.FC<Props> = ({ navigation, route }: Props) => {
   }
 
   return (
-    <ScrollView>
-      <View style={styles.container}>
-        <View>
-          <Text style={styles.title}>
-            You have shared the following information
-          </Text>
+    <View style={styles.container}>
+      <View>
+        <Text style={styles.title}>
+          You have shared the following information
+        </Text>
 
-          {predicate.length > 0 && (
-            <View style={styles.instructionsContainer}>
-              <Text style={styles.instructions}></Text>
-            </View>
-          )}
+        {predicate.length > 0 && (
+          <View style={styles.instructionsContainer}>
+            <Text style={styles.instructions}></Text>
+          </View>
+        )}
 
-          {predicate.map((e, index) => (
-            <View style={styles.card} key={index * 10}>
-              <View style={styles.credentialHeader}>
-                <View style={styles.leftContent}>
-                  <Image
-                    style={{ width: 70, height: 70 }}
-                    source={credentialImage}
-                  />
-                </View>
-                <View style={styles.rightContent}>
-                  <Text style={{ fontWeight: "bold", fontSize: 16 }}>
-                    {e.predicateName}
-                  </Text>
-                </View>
-              </View>
-              <View style={styles.credentialFormData}>
-                <View
-                  style={{
-                    flexDirection: "row",
-                    justifyContent: "space-between",
-                  }}
-                >
-                  <Text style={{}}>{e.name}</Text>
-                  <Text style={{}}>{e.predicate}</Text>
-                  <Text style={{}}>{e.threshold}</Text>
-                </View>
-              </View>
-            </View>
-          ))}
-
-          {mappedAttributes.length > 0 && (
-            <View style={styles.instructionsContainer}>
-              <Text style={styles.instructions}>
-                The organization would like to verify these information
-              </Text>
-            </View>
-          )}
-        </View>
-        {mappedAttributes.map((e, i) => (
-          <View style={styles.card} key={i}>
+        {predicate.map((e, index) => (
+          <View style={styles.card} key={index * 10}>
             <View style={styles.credentialHeader}>
               <View style={styles.leftContent}>
                 <Image
@@ -222,26 +207,55 @@ const Proof: React.FC<Props> = ({ navigation, route }: Props) => {
               </View>
               <View style={styles.rightContent}>
                 <Text style={{ fontWeight: "bold", fontSize: 16 }}>
-                  {e.credential_name}
+                  {e.predicateName}
                 </Text>
               </View>
             </View>
             <View style={styles.credentialFormData}>
-              {e.attributes.map((e, index) => (
-                <View key={index} style={{ flexDirection: "row" }}>
-                  <View style={{ width: "50%", paddingVertical: 5 }}>
-                    <Text style={styles.credentialAttribute}>{e.name}</Text>
-                  </View>
-                  <View style={{ width: "50%", paddingVertical: 5 }}>
-                    <Text style={styles.credentialValue}>{e.value}</Text>
-                  </View>
-                </View>
-              ))}
+              <View
+                style={{
+                  flexDirection: "row",
+                  justifyContent: "space-between",
+                }}
+              >
+                <Text style={{}}>{e.name}</Text>
+                <Text style={{}}>{e.predicate}</Text>
+                <Text style={{}}>{e.threshold}</Text>
+              </View>
             </View>
           </View>
         ))}
       </View>
-    </ScrollView>
+      {mappedAttributes.map((e, i) => (
+        <View style={styles.card} key={i}>
+          <View style={styles.credentialHeader}>
+            <View style={styles.leftContent}>
+              <Image
+                style={{ width: 70, height: 70 }}
+                source={credentialImage}
+              />
+            </View>
+            <View style={styles.rightContent}>
+              <Text style={{ fontWeight: "bold", fontSize: 16 }}>
+                {e.credential_name}
+              </Text>
+            </View>
+          </View>
+          <View style={styles.credentialFormData}>
+            {e.attributes.map((e, index) => (
+              <View key={index} style={{ flexDirection: "row" }}>
+                <View style={{ width: "50%", paddingVertical: 5 }}>
+                  <Text style={styles.credentialAttribute}>{e.name}</Text>
+                </View>
+                <View style={{ width: "50%", paddingVertical: 5 }}>
+                  <Text style={styles.credentialValue}>{e.value}</Text>
+                </View>
+              </View>
+            ))}
+          </View>
+        </View>
+      ))}
+    </View>
   );
 };
 
@@ -250,7 +264,6 @@ const styles = StyleSheet.create({
     flex: 1,
     alignItems: "center",
     backgroundColor: "#fff",
-    justifyContent: "space-between",
     padding: 20,
   },
   title: {

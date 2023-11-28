@@ -8,7 +8,7 @@
       "@constants/*": ["src/constants/*"],
       "@hooks/*": ["src/hooks/*"],
       "@navigation/*": ["src/navigation/*"],
-      "screens/*": ["src/screens/*"],
+      "@screens/*": ["src/screens/*"],
       "@services/*": ["src/services/*"],
       "@types/*": ["src/types/*"],
       "@utils/*": ["src/utils/*"]

@@ -1,14 +1,14 @@
-import { createStackNavigator } from "@react-navigation/stack"
-import React from "react"
-import Settings from "../screens/Settings/Settings"
-import NestedScreen1 from "../screens/Settings/Screen1"
+import { createStackNavigator } from "@react-navigation/stack";
+import React from "react";
+import Settings from "@screens/Settings/Settings";
+import NestedScreen1 from "@screens/Settings/Screen1";
 
 export type SettingStackParamList = {
-  Settings: undefined
-  BackUpWallet: { msg: string }
-}
+  Settings: undefined;
+  BackUpWallet: { msg: string };
+};
 
-const SettingStack = createStackNavigator<SettingStackParamList>()
+const SettingStack = createStackNavigator<SettingStackParamList>();
 
 const SettingStackScreen: React.FC = () => {
   return (
@@ -16,7 +16,7 @@ const SettingStackScreen: React.FC = () => {
       <SettingStack.Screen name="Settings" component={Settings} />
       <SettingStack.Screen name="BackUpWallet" component={NestedScreen1} />
     </SettingStack.Navigator>
-  )
-}
+  );
+};
 
-export default SettingStackScreen
+export default SettingStackScreen;

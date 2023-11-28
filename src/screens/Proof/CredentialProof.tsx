@@ -14,8 +14,8 @@ import {
   ActivityIndicator,
   Alert,
 } from "react-native";
-import ContactCard from "../../components/Card/ContactCard";
-import { ContactStackParamList } from "../../navigation/ContactStack";
+import { ContactCard } from "@components/Card/ContactCard";
+import { ContactStackParamList } from "@navigation/ContactStack";
 import {
   MappedAttributes,
   RequestedAttributes,

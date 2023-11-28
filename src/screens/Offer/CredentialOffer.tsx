@@ -51,7 +51,7 @@ const CredentialOffer = ({ navigation, route }: Props) => {
 
   useLayoutEffect(() => {
     navigation.setOptions({
-      title: "Add Credential",
+      title: "Credential Offer",
     });
   });
 
