@@ -103,6 +103,7 @@ function getAgentConfig(
   return config;
 }
 
+
 function getAgent(config: InitConfig) {
   const indyProofFormat = new LegacyIndyProofFormatService();
 

@@ -1,59 +1,64 @@
-import { Agent } from "@aries-framework/core";
-import AgentProvider from "@aries-framework/react-hooks";
-import BottomNavigation from "@navigation/BottomNavigation";
-import LoginNav from "@navigation/LoginNav";
-import { NavigationContainer } from "@react-navigation/native";
-import React, { useEffect, useState } from "react";
-import { ActivityIndicator, Image, StyleSheet, View } from "react-native";
+import { Agent } from "@aries-framework/core"
+import AgentProvider from "@aries-framework/react-hooks"
+import BottomNavigation from "@navigation/BottomNavigation"
+import LoginNav from "@navigation/LoginNav"
+import { NavigationContainer } from "@react-navigation/native"
+import React, { useEffect, useState } from "react"
+import { ActivityIndicator, Image, StyleSheet, View } from "react-native"
 import {
   createLinkSecretIfRequired,
   getAgent,
   getAgentConfig,
   recoveryPhraseLocal,
   walletLocal,
-} from "./config";
-import { useAuth } from "./context/AuthProvider";
+} from "./config"
+import { useAuth } from "./context/AuthProvider"
 
 const Main: React.FC = () => {
   const [initializedAgent, setInitializedAgent] = useState<Agent<any> | null>(
     null
-  );
+  )
 
-  const { loggedIn, login, logout }: any = useAuth();
-  const [loading, setLoading] = useState(false);
+  const { loggedIn, login, logout }: any = useAuth()
+  const [loading, setLoading] = useState(false)
 
   useEffect(() => {
-    console.log(`Testing Context Var loggedIn: ${loggedIn}`);
+    console.log(`Testing Context Var loggedIn: ${loggedIn}`)
     async function initializeAgent() {
       try {
-        setLoading(true);
-        const id = await walletLocal();
-        const recoveryPhrase = await recoveryPhraseLocal();
-        const config = getAgentConfig(id, recoveryPhrase);
-        const agent = getAgent(config);
-        await agent.initialize();
-        await createLinkSecretIfRequired(agent);
-        setInitializedAgent(agent);
+        setLoading(true)
+        const id = await walletLocal()
+        const recoveryPhrase = await recoveryPhraseLocal()
+        const config = getAgentConfig(id, recoveryPhrase)
+        const agent = getAgent(config)
+        await agent.initialize()
+        await createLinkSecretIfRequired(agent)
+        // await agent.modules.pushNotificationsFcm.sendDeviceInfo(
+        //   'a-valid-connection-id',
+        //   { deviceToken: '123' }
+        // );
+
+        setInitializedAgent(agent)
 
         setTimeout(() => {
-          setLoading(false);
-        }, 2000);
+          setLoading(false)
+        }, 2000)
       } catch (error) {
-        console.error("Error initializing agent:", error);
+        console.error("Error initializing agent:", error)
       } finally {
       }
     }
     if (loggedIn) {
-      initializeAgent();
+      initializeAgent()
     }
-  }, [loggedIn]);
+  }, [loggedIn])
 
   const handleLogin = async (isLoggedIn: boolean) => {
     if (isLoggedIn) {
-      login();
-      setLoading(true);
+      login()
+      setLoading(true)
     }
-  };
+  }
 
   if (loading) {
     return (
@@ -71,7 +76,7 @@ const Main: React.FC = () => {
         />
         <ActivityIndicator size="large" color="white" />
       </View>
-    );
+    )
   }
 
   return (
@@ -88,14 +93,14 @@ const Main: React.FC = () => {
         )
       )}
     </>
-  );
-};
+  )
+}
 const styles = StyleSheet.create({
   image: {
     width: "30%",
     height: "30%",
     resizeMode: "contain",
   },
-});
+})
 
-export default Main;
+export default Main

@@ -1,5 +1,12 @@
 import React, { useEffect, useState } from "react"
-import { View, Text, StyleSheet, Image, TouchableOpacity } from "react-native"
+import {
+  View,
+  Text,
+  StyleSheet,
+  Image,
+  TouchableOpacity,
+  Alert,
+} from "react-native"
 import SmoothPinCodeInput from "react-native-smooth-pincode-input"
 import NumberPad from "./components/NumberPad"
 import {
@@ -12,6 +19,7 @@ import { useAuth } from "../../../context/AuthProvider"
 import UserTable from "../../../sqlite/userTable"
 import RecoveryPhraseTable from "../../../sqlite/recoveryPhrase"
 import * as LocalAuthentication from "expo-local-authentication"
+import LoginFailedTable from "../../../sqlite/loginFailed"
 
 type RootStackParamList = {
   RecoveryPhrases: undefined
@@ -28,14 +36,20 @@ const Login: React.FC<{
   route: LoginScreenRouteProp
 }> = ({ navigation, route }) => {
   const passwordLength = 6
+  const lockoutDuration = 180000 // 3 minutes in milliseconds
+  const maxFailedAttempts = 3
   const [code, setCode] = useState<string>("")
   const pinInputRef = React.createRef<SmoothPinCodeInput>()
   const [password, setPassword] = useState<string>("")
   const { login }: any = useAuth()
   const [errorAnimation] = useState(new Animated.Value(0))
-
+  const [loginFail, setLoginFailed] = useState<number>(0)
+  const [pinLabelText, setPinLabelText] = useState<string>("Enter PIN")
+  const [pinDisabled, setPinDisabled] = useState<boolean>(false)
   useFocusEffect(
     React.useCallback(() => {
+      handleFailedLogin()
+
       UserTable.getAllUsers()
         .then((users) => {
           console.log("Users:", users)
@@ -74,6 +88,45 @@ const Login: React.FC<{
     checkPinAndNavigate()
   }, [code])
 
+  async function handleFailedLogin(): Promise<void> {
+    try {
+      const lastFailedLogin = await LoginFailedTable.getLastFailedLogin()
+      if (lastFailedLogin) {
+        const elapsedTime =
+          Date.now() - new Date(lastFailedLogin.timestamp).getTime()
+        let remainingTime = lockoutDuration - elapsedTime
+
+        const intervalId = setInterval(() => {
+          if (remainingTime > 0) {
+            setPinDisabled(true)
+
+            const remainingMinutes = Math.floor(remainingTime / (60 * 1000))
+            const remainingSeconds = Math.ceil(
+              (remainingTime % (60 * 1000)) / 1000
+            )
+
+            const formattedMinutes = remainingMinutes
+              .toString()
+              .padStart(2, "0")
+            const formattedSeconds = remainingSeconds
+              .toString()
+              .padStart(2, "0")
+
+            setPinLabelText(`${formattedMinutes}:${formattedSeconds}`)
+
+            remainingTime -= 1000
+          } else {
+            setPinDisabled(false)
+            setPinLabelText("Enter PIN")
+            clearInterval(intervalId)
+          }
+        }, 1000)
+      }
+    } catch (error) {
+      console.error("Error fetching last failed login:", error)
+    }
+  }
+
   async function authenticate() {
     try {
       const result = await LocalAuthentication.authenticateAsync({
@@ -92,13 +145,13 @@ const Login: React.FC<{
   }
 
   async function dropTables() {
+    await LoginFailedTable.dropTable()
     await new Promise<void>((resolve, reject) => {
       RecoveryPhraseTable.dropTable(() => {
         console.log("RecoveryPhraseTable dropped successfully!")
         resolve()
       })
     })
-
     await new Promise<void>((resolve, reject) => {
       UserTable.dropTable(() => {
         console.log("UserTable dropped successfully!")
@@ -142,6 +195,33 @@ const Login: React.FC<{
       } else {
         setCode("")
         startErrorAnimation()
+        if (loginFail == 3) {
+          setLoginFailed(0)
+          setPinDisabled(true)
+          LoginFailedTable.init().then(() => {
+            console.log("LoginFailed table initialized successfully!")
+          })
+          LoginFailedTable.updateFailedLogin().catch((error) => {
+            console.error("Error recording failed login:", error)
+          })
+          LoginFailedTable.getLastFailedLogin().then((lastFailedLogin) => {
+            console.log("Last Failed Login:", lastFailedLogin)
+          })
+          handleFailedLogin()
+        }
+        if (loginFail <= 3) {
+          setLoginFailed((prevAttempts) => prevAttempts + 1)
+          console.log(loginFail)
+          if (loginFail != 3) {
+            Alert.alert(
+              "Warning",
+              `${
+                maxFailedAttempts - loginFail
+              } more attempts else will get blocked.`
+            )
+          }
+        }
+
         await new Promise((resolve) => setTimeout(resolve, 500))
         errorAnimation.setValue(0)
       }
@@ -164,23 +244,30 @@ const Login: React.FC<{
 
   return (
     <View style={styles.container}>
+      <TouchableOpacity style={styles.forgotPin} onPress={handleForgotPin}>
+        <Text style={styles.forgotPinText}>Forgot Your PIN?</Text>
+      </TouchableOpacity>
       <Image style={styles.image} source={require("../../assets/login.png")} />
       <Animated.Text
         style={[
           styles.title,
           {
-            color: errorAnimation.interpolate({
-              inputRange: [0, 10],
-              outputRange: ["#12283b", "red"],
-            }),
+            color: pinDisabled
+              ? "red"
+              : errorAnimation.interpolate({
+                  inputRange: [0, 10],
+                  outputRange: ["#12283b", "red"],
+                }),
           },
         ]}
       >
-        Enter PIN
+        {pinDisabled ? pinLabelText : "Enter PIN"}
       </Animated.Text>
-      <TouchableOpacity style={styles.forgotPin} onPress={handleForgotPin}>
-        <Text style={styles.forgotPinText}>Forgot Your PIN?</Text>
-      </TouchableOpacity>
+      {!pinDisabled && (
+        <TouchableOpacity style={styles.forgotPin} onPress={handleForgotPin}>
+          <Text style={styles.forgotPinText}>Forgot Your PIN?</Text>
+        </TouchableOpacity>
+      )}
       <Animated.View
         style={[
           styles.formContainer,
@@ -199,6 +286,7 @@ const Login: React.FC<{
                 }),
               },
             ],
+            display: pinDisabled ? "none" : "flex",
           },
         ]}
       >
