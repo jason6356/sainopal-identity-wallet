@@ -1,68 +1,74 @@
-import React, { useLayoutEffect, useState } from "react";
-import { View, Text, StyleSheet, TouchableOpacity, Alert } from "react-native";
+import React, { useLayoutEffect, useState } from "react"
+import { View, Text, StyleSheet, TouchableOpacity, Alert } from "react-native"
 import DocumentPicker, {
   DocumentPickerResponse,
-} from "react-native-document-picker";
-import RNFS from "react-native-fs";
-import IndySdk, { WalletConfig } from "indy-sdk-react-native";
-import { config, recoveryPhraseLocal } from "../../../config/agent";
+} from "react-native-document-picker"
+import RNFS from "react-native-fs"
+import IndySdk, { WalletConfig } from "indy-sdk-react-native"
+import { config, recoveryPhraseLocal } from "../../../config/agent"
 
-import { StackScreenProps } from "@react-navigation/stack";
-import { ConsoleLogger, InitConfig, LogLevel } from "@aries-framework/core";
+import { StackScreenProps } from "@react-navigation/stack"
+import { ConsoleLogger, InitConfig, LogLevel } from "@aries-framework/core"
 
-import { SettingStackParamList } from "../../navigators/SettingStack";
-import useHideBottomTabBar from "@hooks/useHideBottomTabBar";
+import { SettingStackParamList } from "../../navigators/SettingStack"
+import useHideBottomTabBar from "@hooks/useHideBottomTabBar"
 
-type Props = StackScreenProps<SettingStackParamList, "RecoverWallet">;
+type Props = StackScreenProps<SettingStackParamList, "RecoverWallet">
 
 const RecoverWallet = ({ navigation }: Props) => {
-  useHideBottomTabBar();
+  useHideBottomTabBar()
   useLayoutEffect(() => {
     navigation.setOptions({
       title: "Recover Wallet",
-    });
-  }, [navigation]);
+      headerStyle: {
+        backgroundColor: "#09182d",
+        borderBottomLeftRadius: 20,
+        borderBottomRightRadius: 20,
+      },
+      headerTintColor: "white",
+    })
+  }, [navigation])
 
-  const [importedFileName, setImportedFileName] = useState<string | null>(null);
+  const [importedFileName, setImportedFileName] = useState<string | null>(null)
 
   const pickDocument = async () => {
     try {
       const response = await DocumentPicker.pick({
         type: [DocumentPicker.types.allFiles],
         copyTo: "documentDirectory",
-      });
+      })
 
-      const selectedFile = response[0];
-      setImportedFileName(selectedFile.name);
-      console.log(`${selectedFile.name} file picked`);
+      const selectedFile = response[0]
+      setImportedFileName(selectedFile.name)
+      console.log(`${selectedFile.name} file picked`)
       // handleImport(selectedFile)
       // navigation.navigate("RecoverWalletKey", "sohai")
       navigation.push("RecoverWalletKey", {
         path: selectedFile,
-      });
+      })
     } catch (err) {
       if (!DocumentPicker.isCancel(err)) {
-        console.error("Error picking document:", err);
-        Alert.alert("Error", "An error occurred while picking the document.");
+        console.error("Error picking document:", err)
+        Alert.alert("Error", "An error occurred while picking the document.")
       }
     }
-  };
+  }
 
   const handleImport = async (selectedFile: DocumentPickerResponse | null) => {
     try {
       if (!selectedFile) {
-        console.log("No file selected");
-        return;
+        console.log("No file selected")
+        return
       }
 
       const uniqueIdentifier = `${Date.now()}_${Math.floor(
         Math.random() * 1000
-      )}`;
-      const walletName = `imported_wallet_${uniqueIdentifier}`;
-      const localFilePath = `${RNFS.DocumentDirectoryPath}/${selectedFile.name}`;
+      )}`
+      const walletName = `imported_wallet_${uniqueIdentifier}`
+      const localFilePath = `${RNFS.DocumentDirectoryPath}/${selectedFile.name}`
 
-      await RNFS.moveFile(selectedFile.uri, localFilePath);
-      const recovertWallet: string = await recoveryPhraseLocal();
+      await RNFS.moveFile(selectedFile.uri, localFilePath)
+      const recovertWallet: string = await recoveryPhraseLocal()
       const configNew: InitConfig = {
         label: "SainoPal Mobile Wallet",
         walletConfig: {
@@ -70,21 +76,21 @@ const RecoverWallet = ({ navigation }: Props) => {
           key: recovertWallet,
         },
         logger: new ConsoleLogger(LogLevel.trace),
-      };
+      }
 
-      const walletConfig: WalletConfig = configNew.walletConfig || {};
-      const walletCredentials = { key: configNew.walletConfig?.key || "" };
+      const walletConfig: WalletConfig = configNew.walletConfig || {}
+      const walletCredentials = { key: configNew.walletConfig?.key || "" }
 
       // Check if the wallet already exists
-      const existingWalletPath = `${RNFS.DocumentDirectoryPath}/.indy_client/wallet/${walletName}`;
-      const walletExists = await RNFS.exists(existingWalletPath);
+      const existingWalletPath = `${RNFS.DocumentDirectoryPath}/.indy_client/wallet/${walletName}`
+      const walletExists = await RNFS.exists(existingWalletPath)
 
-      console.log("localFilePath  ", localFilePath);
+      console.log("localFilePath  ", localFilePath)
 
       // Delete existing wallet if it exists
       if (walletExists) {
-        await RNFS.unlink(existingWalletPath);
-        console.log("Deleted existing wallet:", walletName);
+        await RNFS.unlink(existingWalletPath)
+        console.log("Deleted existing wallet:", walletName)
       }
 
       // Import the wallet
@@ -96,15 +102,15 @@ const RecoverWallet = ({ navigation }: Props) => {
       await IndySdk.importWallet(walletConfig, walletCredentials, {
         path: localFilePath,
         key: recovertWallet,
-      });
+      })
 
-      console.log("Imported Wallet Successfully");
-      Alert.alert("Success", "Wallet imported successfully!");
+      console.log("Imported Wallet Successfully")
+      Alert.alert("Success", "Wallet imported successfully!")
     } catch (error) {
-      console.error("Error during import:", error);
-      Alert.alert("Error", "An error occurred during wallet import.");
+      console.error("Error during import:", error)
+      Alert.alert("Error", "An error occurred during wallet import.")
     }
-  };
+  }
 
   return (
     <View style={styles.container}>
@@ -135,8 +141,8 @@ const RecoverWallet = ({ navigation }: Props) => {
         </TouchableOpacity>
       </View>
     </View>
-  );
-};
+  )
+}
 
 const styles = StyleSheet.create({
   container: {
@@ -180,6 +186,6 @@ const styles = StyleSheet.create({
     justifyContent: "flex-end",
     marginBottom: 90,
   },
-});
+})
 
-export default RecoverWallet;
+export default RecoverWallet

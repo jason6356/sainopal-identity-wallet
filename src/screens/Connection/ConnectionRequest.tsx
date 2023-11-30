@@ -1,7 +1,7 @@
-import { useAgent } from "@aries-framework/react-hooks";
-import { MaterialIcons } from "@expo/vector-icons";
-import { StackScreenProps } from "@react-navigation/stack";
-import React, { useState } from "react";
+import { useAgent } from "@aries-framework/react-hooks"
+import { MaterialIcons } from "@expo/vector-icons"
+import { StackScreenProps } from "@react-navigation/stack"
+import React, { useLayoutEffect, useState } from "react"
 import {
   Alert,
   Image,
@@ -11,54 +11,66 @@ import {
   View,
   ActivityIndicator,
   ToastAndroid,
-} from "react-native";
-import { defaultUserAvatar } from "../../constants/constants";
-import { ScanStackParamList } from "../../navigation/ScanStack";
+} from "react-native"
+import { defaultUserAvatar } from "../../constants/constants"
+import { ScanStackParamList } from "../../navigation/ScanStack"
 
-type Props = StackScreenProps<ScanStackParamList, "ConnectionRequest">;
+type Props = StackScreenProps<ScanStackParamList, "ConnectionRequest">
 
 export default function ConnectionRequest({ navigation, route }: Props) {
-  const connectionInvitation = route.params?.inviteObj;
-  const inviteUrl = route.params?.url;
-  const agent = useAgent();
-  const [loading, setIsLoading] = useState(false);
+  const connectionInvitation = route.params?.inviteObj
+  const inviteUrl = route.params?.url
+  const agent = useAgent()
+  const [loading, setIsLoading] = useState(false)
 
   function handleAccept() {
     if (inviteUrl) {
-      setIsLoading(true);
+      setIsLoading(true)
       agent.agent.oob
         .receiveInvitationFromUrl(inviteUrl, {})
         .then((e) => {
-          setIsLoading(false);
+          setIsLoading(false)
           ToastAndroid.show(
             "Successfully established Connection",
             ToastAndroid.LONG
-          );
+          )
         })
         .catch((e) => {
-          setIsLoading(false);
+          setIsLoading(false)
           ToastAndroid.show(
             `Error has occured : ${e.message}`,
             ToastAndroid.LONG
-          );
+          )
         })
         .finally(() => {
-          navigation.navigate("ContactsStack" as keyof ScanStackParamList);
+          navigation.navigate("ContactsStack" as keyof ScanStackParamList)
           navigation.reset({
             index: 0,
             routes: [{ name: "Scan" }],
-          });
-        });
+          })
+        })
     }
   }
 
+  useLayoutEffect(() => {
+    //change header color to #09182d and text to white
+    navigation.setOptions({
+      headerStyle: {
+        backgroundColor: "#09182d",
+        borderBottomLeftRadius: 20,
+        borderBottomRightRadius: 20,
+      },
+      headerTintColor: "white",
+    })
+  })
+
   function handleDecline() {
-    ToastAndroid.show(`Successfully Declined!`, ToastAndroid.LONG);
-    navigation.navigate("ContactsStack" as keyof ScanStackParamList);
+    ToastAndroid.show(`Successfully Declined!`, ToastAndroid.LONG)
+    navigation.navigate("ContactsStack" as keyof ScanStackParamList)
     navigation.reset({
       index: 0,
       routes: [{ name: "Scan" }],
-    });
+    })
   }
 
   return (
@@ -113,7 +125,7 @@ export default function ConnectionRequest({ navigation, route }: Props) {
         )}
       </View>
     </View>
-  );
+  )
 }
 
 const styles = StyleSheet.create({
@@ -218,4 +230,4 @@ const styles = StyleSheet.create({
     alignItems: "center",
     zIndex: 1, // Ensure it's above other elements
   },
-});
+})

@@ -1,7 +1,10 @@
-import React from "react";
-import { StyleSheet } from "react-native";
-import Main from "./Main";
-import { AuthProvider } from "./context/AuthProvider";
+import React from "react"
+import { StyleSheet } from "react-native"
+import Main from "./Main"
+import { AuthProvider } from "./context/AuthProvider"
+import { LogBox } from "react-native"
+
+LogBox.ignoreAllLogs()
 
 const App: React.FC = () => {
   return (
@@ -10,14 +13,14 @@ const App: React.FC = () => {
         <Main />
       </AuthProvider>
     </>
-  );
-};
+  )
+}
 const styles = StyleSheet.create({
   image: {
     width: "30%",
     height: "30%",
     resizeMode: "contain",
   },
-});
+})
 
-export default App;
+export default App

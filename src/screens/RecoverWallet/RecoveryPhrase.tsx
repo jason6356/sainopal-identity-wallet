@@ -1,6 +1,6 @@
-import { StackScreenProps } from "@react-navigation/stack";
-import * as SQLite from "expo-sqlite";
-import React, { useEffect, useLayoutEffect, useRef, useState } from "react";
+import { StackScreenProps } from "@react-navigation/stack"
+import * as SQLite from "expo-sqlite"
+import React, { useEffect, useLayoutEffect, useRef, useState } from "react"
 import {
   Animated,
   Clipboard,
@@ -8,42 +8,40 @@ import {
   Text,
   TouchableOpacity,
   View,
-} from "react-native";
-import Toast from "react-native-toast-message";
-import RecoveryPhraseTable from "../../../sqlite/recoveryPhrase";
-import { SettingStackParamList } from "@navigation/SettingStack";
-import useHideBottomTabBar from "@hooks/useHideBottomTabBar";
-type Props = StackScreenProps<SettingStackParamList, "RecoveryPhrase">;
-const db = SQLite.openDatabase("db.db");
+} from "react-native"
+import Toast from "react-native-toast-message"
+import RecoveryPhraseTable from "../../../sqlite/recoveryPhrase"
+import { SettingStackParamList } from "@navigation/SettingStack"
+import useHideBottomTabBar from "@hooks/useHideBottomTabBar"
+type Props = StackScreenProps<SettingStackParamList, "RecoveryPhrase">
+const db = SQLite.openDatabase("db.db")
 
 const RecoveryPhrase = ({ navigation }: Props) => {
-  useHideBottomTabBar();
+  useHideBottomTabBar()
 
   useLayoutEffect(() => {
     navigation.setOptions({
       title: "Recover Wallet",
       headerStyle: {
-        borderBottomWidth: 1,
-        borderBottomColor: "#ccc",
+        backgroundColor: "#09182d",
+        borderBottomLeftRadius: 20,
+        borderBottomRightRadius: 20,
       },
-    });
-  }, [navigation]);
+      headerTintColor: "white",
+    })
+  }, [navigation])
 
-  const [storedRecoveryPhrase, setStoredRecoveryPhrase] = useState<string[]>(
-    []
-  );
+  const [storedRecoveryPhrase, setStoredRecoveryPhrase] = useState<string[]>([])
 
   useEffect(() => {
     RecoveryPhraseTable.getAllPhrasesArray((phrases) => {
-      console.log("Retrieved Phrases:", phrases);
-      const decodedWords = phrases.map((item) =>
-        item.word ? item.word : null
-      );
-      setStoredRecoveryPhrase(decodedWords);
-    });
-  }, []);
+      console.log("Retrieved Phrases:", phrases)
+      const decodedWords = phrases.map((item) => (item.word ? item.word : null))
+      setStoredRecoveryPhrase(decodedWords)
+    })
+  }, [])
 
-  const shakeAnimation = useRef(new Animated.Value(0)).current;
+  const shakeAnimation = useRef(new Animated.Value(0)).current
 
   const startShakeAnimation = () => {
     Animated.sequence([
@@ -67,19 +65,19 @@ const RecoveryPhrase = ({ navigation }: Props) => {
         duration: 50,
         useNativeDriver: false,
       }),
-    ]).start();
-  };
+    ]).start()
+  }
 
   const handleCopyToClipboard = async () => {
-    const recoveryPhraseText = storedRecoveryPhrase.join(" ");
-    Clipboard.setString(recoveryPhraseText);
-    startShakeAnimation();
-  };
+    const recoveryPhraseText = storedRecoveryPhrase.join(" ")
+    Clipboard.setString(recoveryPhraseText)
+    startShakeAnimation()
+  }
 
   const textColorInterpolation = shakeAnimation.interpolate({
     inputRange: [-10, 0, 10],
     outputRange: ["#465360", "#465360", "lightgreen"],
-  });
+  })
 
   return (
     <View style={styles.container}>
@@ -123,8 +121,8 @@ const RecoveryPhrase = ({ navigation }: Props) => {
         </TouchableOpacity>
       </View>
     </View>
-  );
-};
+  )
+}
 const styles = StyleSheet.create({
   container: {
     padding: 20,
@@ -189,6 +187,6 @@ const styles = StyleSheet.create({
     marginBottom: 5,
     paddingTop: 10,
   },
-});
+})
 
-export default RecoveryPhrase;
+export default RecoveryPhrase

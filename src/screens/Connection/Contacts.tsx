@@ -2,7 +2,7 @@ import { ConnectionRecord } from "@aries-framework/core"
 import { useConnections } from "@aries-framework/react-hooks"
 import { MaterialIcons } from "@expo/vector-icons"
 import { StackScreenProps } from "@react-navigation/stack"
-import React, { useEffect, useState } from "react"
+import React, { useEffect, useLayoutEffect, useState } from "react"
 import {
   FlatList,
   Image,
@@ -47,6 +47,18 @@ const Contacts = ({ navigation, route }: Props) => {
     }
     setSearch(text)
   }
+
+  useLayoutEffect(() => {
+    //change header color to #09182d and text to white
+    navigation.setOptions({
+      headerStyle: {
+        backgroundColor: "#09182d",
+        borderBottomLeftRadius: 20,
+        borderBottomRightRadius: 20,
+      },
+      headerTintColor: "white",
+    })
+  })
 
   const clearSearch = () => {
     setFilteredConnections(connections.records)

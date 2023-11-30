@@ -1,19 +1,13 @@
-import { CredentialExchangeRecord } from "@aries-framework/core";
-import {
-  Image,
-  StyleSheet,
-  Text,
-  TouchableHighlight,
-  View,
-} from "react-native";
-import { credentialImage } from "../../constants";
+import { CredentialExchangeRecord } from "@aries-framework/core"
+import { Image, StyleSheet, Text, TouchableHighlight, View } from "react-native"
+import { credentialImage } from "../../constants"
 
 type CredentialOfferCardProps = {
-  key: number;
-  credentialExchangeRecord: CredentialExchangeRecord;
-  name: string;
-  navigation: any;
-};
+  key: number
+  credentialExchangeRecord: CredentialExchangeRecord
+  name: string
+  navigation: any
+}
 
 export function CredentialOfferCard({
   credentialExchangeRecord: e,
@@ -40,7 +34,7 @@ export function CredentialOfferCard({
         </View>
       </TouchableHighlight>
     </View>
-  );
+  )
 }
 const styles = StyleSheet.create({
   card: {
@@ -86,4 +80,4 @@ const styles = StyleSheet.create({
     color: "#fff",
     fontSize: 18,
   },
-});
+})

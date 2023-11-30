@@ -1,7 +1,7 @@
-import { CredentialState } from "@aries-framework/core";
-import { useCredentialByState, useAgent } from "@aries-framework/react-hooks";
-import { StackScreenProps } from "@react-navigation/stack";
-import React, { useEffect, useState } from "react";
+import { CredentialState } from "@aries-framework/core"
+import { useCredentialByState, useAgent } from "@aries-framework/react-hooks"
+import { StackScreenProps } from "@react-navigation/stack"
+import React, { useEffect, useLayoutEffect, useState } from "react"
 import {
   Image,
   Pressable,
@@ -9,35 +9,48 @@ import {
   StyleSheet,
   Text,
   View,
-} from "react-native";
-import { WalletStackParamList } from "../../navigation/WalletStack";
-import { getSchemaNameFromOfferID } from "../../utils/schema";
+} from "react-native"
+import { WalletStackParamList } from "../../navigation/WalletStack"
+import { getSchemaNameFromOfferID } from "../../utils/schema"
 
 const schemaIdToImageMapping = {
   "NypRCRGykSwKUuRBQx2b9o:2:degree:1.0": require("../../assets/degree.png"),
-};
+}
 
-type Props = StackScreenProps<WalletStackParamList, "Wallet", "Credential">;
+type Props = StackScreenProps<WalletStackParamList, "Wallet", "Credential">
 
 const Wallet = ({ navigation, route }: Props) => {
-  const credentials = useCredentialByState(CredentialState.Done);
-  const agent = useAgent();
-  const [credentialMap, setCredentialMap] = useState(new Map());
+  const credentials = useCredentialByState(CredentialState.Done)
+  const agent = useAgent()
+  const [credentialMap, setCredentialMap] = useState(new Map())
 
   const mapCredentials = async () => {
-    const newCredentialMap = new Map();
+    const newCredentialMap = new Map()
 
     for (const e of credentials) {
-      const name = await getSchemaNameFromOfferID(agent.agent, e.id);
-      newCredentialMap.set(e.id, name);
+      const name = await getSchemaNameFromOfferID(agent.agent, e.id)
+      newCredentialMap.set(e.id, name)
     }
 
-    setCredentialMap(newCredentialMap);
-  };
+    setCredentialMap(newCredentialMap)
+  }
 
   useEffect(() => {
-    mapCredentials();
-  }, [credentials]);
+    mapCredentials()
+  }, [credentials])
+
+  useLayoutEffect(() => {
+    //change header color to #09182d and text to white
+    navigation.setOptions({
+      headerStyle: {
+        backgroundColor: "#09182d",
+        borderBottomLeftRadius: 20,
+        borderBottomRightRadius: 20,
+      },
+      headerTintColor: "white",
+    })
+  })
+
   return (
     <View style={styles.container}>
       <Pressable onPress={() => navigation.navigate("SelfCredential")}>
@@ -55,11 +68,11 @@ const Wallet = ({ navigation, route }: Props) => {
           {credentials.map((credential, index) => {
             const schemaId = credential.metadata.get(
               "_anoncreds/credential"
-            )?.schemaId;
-            const credentialName = credentialMap.get(credential.id);
+            )?.schemaId
+            const credentialName = credentialMap.get(credential.id)
             const imageSource =
-              schemaIdToImageMapping["NypRCRGykSwKUuRBQx2b9o:2:degree:1.0"];
-            console.log(credential.id);
+              schemaIdToImageMapping["NypRCRGykSwKUuRBQx2b9o:2:degree:1.0"]
+            console.log(credential.id)
 
             return (
               <Pressable
@@ -76,15 +89,15 @@ const Wallet = ({ navigation, route }: Props) => {
                   <Text style={styles.credentialName}>{credentialName}</Text>
                 </View>
               </Pressable>
-            );
+            )
           })}
         </ScrollView>
       ) : (
         <Text>There is no credentials yet</Text>
       )}
     </View>
-  );
-};
+  )
+}
 
 const styles = StyleSheet.create({
   container: {
@@ -112,6 +125,6 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
   },
   emptyCredential: {},
-});
+})
 
-export default Wallet;
+export default Wallet

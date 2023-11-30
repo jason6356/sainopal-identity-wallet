@@ -1,6 +1,6 @@
 import { MaterialIcons } from "@expo/vector-icons"
 import { StackScreenProps } from "@react-navigation/stack"
-import React from "react"
+import React, { useLayoutEffect } from "react"
 import {
   FlatList,
   Image,
@@ -51,6 +51,18 @@ const Settings: React.FC<Props> = ({ navigation, route }: Props) => {
       icon: require("../../assets/logout.png"),
     },
   ]
+
+  useLayoutEffect(() => {
+    //change header color to #09182d and text to white
+    navigation.setOptions({
+      headerStyle: {
+        backgroundColor: "#09182d",
+        borderBottomLeftRadius: 20,
+        borderBottomRightRadius: 20,
+      },
+      headerTintColor: "white",
+    })
+  })
 
   const handleSettingPress = (title: string) => {
     if (title === "Change Pin") {

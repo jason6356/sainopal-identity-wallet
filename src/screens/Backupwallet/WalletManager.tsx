@@ -29,6 +29,12 @@ const WalletManager = ({ navigation }: Props) => {
   useLayoutEffect(() => {
     navigation.setOptions({
       title: "Backup Wallet",
+      headerStyle: {
+        backgroundColor: "#09182d",
+        borderBottomLeftRadius: 20,
+        borderBottomRightRadius: 20,
+      },
+      headerTintColor: "white",
     })
   })
 
