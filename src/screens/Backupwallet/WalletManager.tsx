@@ -1,67 +1,97 @@
-import { StackScreenProps } from "@react-navigation/stack";
-import IndySdk, { WalletConfig } from "indy-sdk-react-native";
-import React, { useEffect, useLayoutEffect, useState } from "react";
-import { Image, StyleSheet, Text, View } from "react-native";
-import RNFS from "react-native-fs";
-import { TouchableOpacity } from "react-native-gesture-handler";
-import { config, recoveryPhraseLocal } from "../../../config/index";
-import { WalletStackParamList } from "../../navigators/WalletStack";
-import useHideBottomTabBar from "@hooks/useHideBottomTabBar";
+import { useCallback, useEffect, useLayoutEffect, useState } from "react"
+import {
+  View,
+  Text,
+  TextInput,
+  Button,
+  ImageProps as DefaultImageProps,
+  ImageURISource,
+  StyleSheet,
+  Image,
+  Alert,
+  ActivityIndicator,
+} from "react-native"
+import { config, recoveryPhraseLocal } from "../../../config/index"
+import { WalletConfig } from "indy-sdk-react-native"
+import IndySdk from "indy-sdk-react-native"
+import RNFS from "react-native-fs"
+import DocumentPicker, {
+  DocumentPickerResponse,
+} from "react-native-document-picker"
+import { TouchableOpacity } from "react-native-gesture-handler"
+import { StackScreenProps } from "@react-navigation/stack"
+import { WalletStackParamList } from "../../navigators/WalletStack"
+import React from "react"
+import { InitConfig } from "@aries-framework/core"
 
-type Props = StackScreenProps<WalletStackParamList, "SelfCredential">;
+type Props = StackScreenProps<WalletStackParamList, "SelfCredential">
 const WalletManager = ({ navigation }: Props) => {
-  useHideBottomTabBar();
+  useHideBottomTabBar()
 
-  let recoveryPhrase: string = "";
+  const [loading, setLoading] = useState(false)
+  let recoveryPhrase: string = ""
+  const [exportConfig, setExportConfig] = useState({
+    path: ``,
+    key: "",
+  })
+
   useLayoutEffect(() => {
     navigation.setOptions({
       title: "Backup Wallet",
-    });
-  });
+    })
+  })
 
   useEffect(() => {
     const fetchData = async () => {
-      recoveryPhrase = await recoveryPhraseLocal();
+      recoveryPhrase = await recoveryPhraseLocal()
       setExportConfig({
         path: `${RNFS.DownloadDirectoryPath}/exported_wallet${Date.now()}.json`,
         key: recoveryPhrase,
-      });
-    };
-    fetchData();
-  }, []);
+      })
+    }
+    fetchData()
+  }, [])
 
-  const [exportConfig, setExportConfig] = useState({
-    path: `${RNFS.DownloadDirectoryPath}/exported_wallet${Date.now()}.json`,
-    key: "123456",
-  });
-
-  let walletConfig: WalletConfig | undefined;
-  let walletCredentials: { key: string } | undefined;
+  let walletConfig: WalletConfig | undefined
+  let walletCredentials: { key: string } | undefined
   const handleExport = async () => {
     try {
-      console.log("sss : ", exportConfig);
+      setLoading(true)
+      console.log("sss : ", exportConfig)
       if (config?.walletConfig) {
-        walletConfig = config.walletConfig;
-        walletCredentials = { key: config.walletConfig.key };
+        walletConfig = config.walletConfig
+        walletCredentials = { key: config.walletConfig.key }
       }
       if (walletConfig && walletCredentials) {
         const walletHandle = await IndySdk.openWallet(
           walletConfig,
           walletCredentials
-        );
-        await IndySdk.exportWallet(walletHandle, exportConfig);
-        await IndySdk.closeWallet(walletHandle);
-        console.log("Exported Wallet Successfully");
+        )
+        await IndySdk.exportWallet(walletHandle, exportConfig)
+        await IndySdk.closeWallet(walletHandle)
+
+        Alert.alert(
+          "Successfully",
+          `Exported wallet to your local dowload folder.`
+        )
+        console.log("Exported Wallet Successfully")
       } else {
-        console.log("CANNOT SIA");
+        console.log("CANNOT SIA")
       }
     } catch (error) {
-      console.log(error);
+      console.log(error)
+    } finally {
+      setLoading(false)
     }
-  };
+  }
 
   return (
     <View style={[styles.container]}>
+      {loading && (
+        <View style={styles.loadingContainer}>
+          <ActivityIndicator size="large" color="#fff" />
+        </View>
+      )}
       <View style={[styles.containerImage]}>
         <Image
           source={require("../../assets/backupIcon.png")}
@@ -77,22 +107,14 @@ const WalletManager = ({ navigation }: Props) => {
           your data with your recovery phrase and your exported file.
         </Text>
       </View>
-      {/* Input fields and export button */}
-      {/* <Button
-        title="Create a new backup file"
-        onPress={handleExport}
-      /> */}
       <View style={[styles.containerBtn]}>
         <TouchableOpacity style={styles.button} onPress={handleExport}>
           <Text style={styles.buttonText}> Create new backup file </Text>
         </TouchableOpacity>
       </View>
-      {/* <Text>Import Wallet</Text> */}
-      {/* Input fields and import button */}
-      {/* <Button title="Import" onPress={handleImport} /> */}
     </View>
-  );
-};
+  )
+}
 
 const styles = StyleSheet.create({
   container: {
@@ -139,6 +161,12 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
     color: "#aaafb8",
   },
-});
+  loadingContainer: {
+    ...StyleSheet.absoluteFillObject,
+    backgroundColor: "rgba(0, 0, 0, 0.7)",
+    justifyContent: "center",
+    alignItems: "center",
+  },
+})
 
-export default WalletManager;
+export default WalletManager

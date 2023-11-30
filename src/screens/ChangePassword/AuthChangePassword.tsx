@@ -1,31 +1,31 @@
-import React, { useEffect, useLayoutEffect, useState } from "react";
-import { View, Text, StyleSheet, Image, TouchableOpacity } from "react-native";
-import SmoothPinCodeInput from "react-native-smooth-pincode-input";
+import React, { useEffect, useLayoutEffect, useState } from "react"
+import { View, Text, StyleSheet, Image, TouchableOpacity } from "react-native"
+import SmoothPinCodeInput from "react-native-smooth-pincode-input"
 import {
   RouteProp,
   NavigationProp,
   useFocusEffect,
-} from "@react-navigation/native";
-import { Animated } from "react-native";
-import { useAuth } from "../../../context/AuthProvider";
-import UserTable from "../../../sqlite/userTable";
-import RecoveryPhraseTable from "../../../sqlite/recoveryPhrase";
-import { SettingStackParamList } from "../../navigators/SettingStack";
-import { StackScreenProps } from "@react-navigation/stack";
-import NumberPad from "../Auth/components/NumberPad";
-import * as LocalAuthentication from "expo-local-authentication";
-import useHideBottomTabBar from "@hooks/useHideBottomTabBar";
+} from "@react-navigation/native"
+import { Animated } from "react-native"
+import { useAuth } from "../../../context/AuthProvider"
+import UserTable from "../../../sqlite/userTable"
+import RecoveryPhraseTable from "../../../sqlite/recoveryPhrase"
+import { SettingStackParamList } from "../../navigators/SettingStack"
+import { StackScreenProps } from "@react-navigation/stack"
+import NumberPad from "../Auth/components/NumberPad"
+import * as LocalAuthentication from "expo-local-authentication"
+import useHideBottomTabBar from "@hooks/useHideBottomTabBar"
 
-type Props = StackScreenProps<SettingStackParamList, "AuthChangePassword">;
+type Props = StackScreenProps<SettingStackParamList, "AuthChangePassword">
 
 const AuthChangePassword = ({ navigation }: Props) => {
-  const passwordLength = 6;
-  const [code, setCode] = useState<string>("");
-  const pinInputRef = React.createRef<SmoothPinCodeInput>();
-  const [password, setPassword] = useState<string>("");
-  const [errorAnimation] = useState(new Animated.Value(0));
+  const passwordLength = 6
+  const [code, setCode] = useState<string>("")
+  const pinInputRef = React.createRef<SmoothPinCodeInput>()
+  const [password, setPassword] = useState<string>("")
+  const [errorAnimation] = useState(new Animated.Value(0))
 
-  useHideBottomTabBar();
+  useHideBottomTabBar()
 
   useLayoutEffect(() => {
     navigation.setOptions({
@@ -35,35 +35,35 @@ const AuthChangePassword = ({ navigation }: Props) => {
         color: "#0e2e47",
       },
       headerTintColor: "#0e2e47",
-    });
-  }, []);
+    })
+  }, [])
 
   useFocusEffect(
     React.useCallback(() => {
       UserTable.getAllUsers()
         .then((users) => {
-          console.log("Users:", users);
+          console.log("Users:", users)
         })
         .catch((error) => {
-          console.error("Error fetching users:", error);
-        });
+          console.error("Error fetching users:", error)
+        })
 
       UserTable.getPassword(
         (password) => {
-          console.log("Retrieved Password:", password);
-          setPassword(password);
+          console.log("Retrieved Password:", password)
+          setPassword(password)
         },
         (error) => {}
-      );
-      checkPinAndNavigate();
-      authenticate();
+      )
+      checkPinAndNavigate()
+      authenticate()
     }, [navigation])
-  );
+  )
 
   useEffect(() => {
-    console.log("Code:", code);
-    checkPinAndNavigate();
-  }, [code]);
+    console.log("Code:", code)
+    checkPinAndNavigate()
+  }, [code])
 
   async function authenticate() {
     try {
@@ -72,13 +72,13 @@ const AuthChangePassword = ({ navigation }: Props) => {
         disableDeviceFallback: true,
         fallbackLabel: "Use your device PIN",
         cancelLabel: "Cancel",
-      });
+      })
 
       if (result.success) {
-        navigation.navigate("ChangeNewPassword");
+        navigation.navigate("ChangeNewPassword")
       }
     } catch (error) {
-      console.error("Authentication error:", error);
+      console.error("Authentication error:", error)
     }
   }
 
@@ -104,37 +104,33 @@ const AuthChangePassword = ({ navigation }: Props) => {
         duration: 100,
         useNativeDriver: false,
       }),
-    ]).start();
-  };
+    ]).start()
+  }
 
   const checkPinAndNavigate = async () => {
-    console.log(password);
+    console.log(password)
 
     if (code.length === passwordLength) {
       if (code === password) {
-        navigation.navigate("ChangeNewPassword");
+        navigation.navigate("ChangeNewPassword")
       } else {
-        setCode("");
-        startErrorAnimation();
-        await new Promise((resolve) => setTimeout(resolve, 500));
-        errorAnimation.setValue(0);
+        setCode("")
+        startErrorAnimation()
+        await new Promise((resolve) => setTimeout(resolve, 500))
+        errorAnimation.setValue(0)
       }
     }
-  };
+  }
 
   const onKeyPress = (value: number) => {
     setCode((prevCode) =>
       prevCode.length < passwordLength ? prevCode + value.toString() : prevCode
-    );
-  };
+    )
+  }
 
   const onDelete = () => {
-    setCode((prevCode) => prevCode.slice(0, -1));
-  };
-
-  const handleForgotPin = () => {
-    navigation.navigate("AuthRecoveryPhrase");
-  };
+    setCode((prevCode) => prevCode.slice(0, -1))
+  }
 
   return (
     <View style={styles.container}>
@@ -152,9 +148,6 @@ const AuthChangePassword = ({ navigation }: Props) => {
       >
         Enter PIN
       </Animated.Text>
-      <TouchableOpacity style={styles.forgotPin} onPress={handleForgotPin}>
-        <Text style={styles.forgotPinText}>Forgot Your PIN?</Text>
-      </TouchableOpacity>
       <Animated.View
         style={[
           styles.formContainer,
@@ -194,13 +187,12 @@ const AuthChangePassword = ({ navigation }: Props) => {
         <NumberPad onKeyPress={onKeyPress} onDelete={onDelete} />
       </Animated.View>
     </View>
-  );
-};
+  )
+}
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    justifyContent: "center",
     alignItems: "center",
     padding: 16,
     backgroundColor: "white",
@@ -260,6 +252,6 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
     fontSize: 18,
   },
-});
+})
 
-export default AuthChangePassword;
+export default AuthChangePassword

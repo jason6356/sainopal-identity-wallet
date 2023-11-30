@@ -1,29 +1,29 @@
-import { createStackNavigator } from "@react-navigation/stack";
-import React from "react";
-import { DocumentPickerResponse } from "react-native-document-picker";
-import WalletManager from "../screens/Backupwallet/WalletManager";
-import AuthChangePassword from "../screens/ChangePassword/AuthChangePassword";
-import AuthRecoveryPhrase from "../screens/ChangePassword/AuthRecoveryPhrase";
-import ChangeNewPassword from "../screens/ChangePassword/ChangeNewPassword";
-import Home from "../screens/Home/Home";
-import RecoverWallet from "../screens/RecoverWallet/RecoverWallet";
-import RecoverWalletKey from "../screens/RecoverWallet/RecoverWalletKey";
-import RecoveryPhrase from "../screens/RecoverWallet/RecoveryPhrase";
-import Settings from "../screens/Settings/Settings";
+import { createStackNavigator } from "@react-navigation/stack"
+import React from "react"
+import { DocumentPickerResponse } from "react-native-document-picker"
+import WalletManager from "../screens/Backupwallet/WalletManager"
+import AuthChangePassword from "../screens/ChangePassword/AuthChangePassword"
+import AuthRecoveryPhrase from "../screens/ChangePassword/AuthRecoveryPhrase"
+import ChangeNewPassword from "../screens/ChangePassword/ChangeNewPassword"
+import Home from "../screens/Home/Home"
+import RecoverWallet from "../screens/RecoverWallet/RecoverWallet"
+import RecoverWalletKey from "../screens/RecoverWallet/RecoverWalletKey"
+import RecoveryPhrase from "../screens/RecoverWallet/RecoveryPhrase"
+import Settings from "../screens/Settings/Settings"
 
 export type SettingStackParamList = {
-  Settings: undefined;
-  AuthChangePassword: undefined;
-  AuthRecoveryPhrase: undefined;
-  Testing: undefined;
-  WalletManager: undefined;
-  RecoverWallet: undefined;
-  RecoveryPhrase: undefined;
-  RecoverWalletKey: { path: DocumentPickerResponse };
-  ChangeNewPassword: undefined;
-};
+  Settings: undefined
+  AuthChangePassword: undefined
+  AuthRecoveryPhrase: undefined
+  Testing: undefined
+  WalletManager: undefined
+  RecoverWallet: undefined
+  RecoveryPhrase: undefined
+  RecoverWalletKey: { path: DocumentPickerResponse }
+  ChangeNewPassword: undefined
+}
 
-const SettingStack = createStackNavigator<SettingStackParamList>();
+const SettingStack = createStackNavigator<SettingStackParamList>()
 
 const SettingStackScreen: React.FC = () => {
   return (
@@ -50,7 +50,7 @@ const SettingStackScreen: React.FC = () => {
       />
       <SettingStack.Screen name="Testing" component={Home} />
     </SettingStack.Navigator>
-  );
-};
+  )
+}
 
-export default SettingStackScreen;
+export default SettingStackScreen

@@ -7,6 +7,7 @@ import {
   TouchableOpacity,
   TextInput,
   Clipboard,
+  ActivityIndicator,
 } from "react-native"
 import { useNavigation } from "@react-navigation/native"
 import { RouteProp, NavigationProp } from "@react-navigation/native"
@@ -29,11 +30,16 @@ import {
 } from "../../../config/index"
 import { useAgent } from "@aries-framework/react-hooks"
 import { useAuth } from "../../../context/AuthProvider"
+import { encode, decode } from "base-64"
+import RecoveryPhrases from "../Auth/RecoveryPhrase"
+import RecoveryPhraseTable from "../../../sqlite/recoveryPhrase"
+
 type Props = StackScreenProps<SettingStackParamList, "RecoverWalletKey">
 
 const db = SQLite.openDatabase("db.db")
 const RecoverWalletKey = ({ navigation, route }: Props) => {
   const { path } = route.params
+  const [loading, setLoading] = useState(false)
   const [recoveryPhrase, setRecoveryPhrase] = useState("")
   const [storedRecoveryPhrase, setStoredRecoveryPhrase] = useState([])
   const agent = useAgent()
@@ -48,6 +54,8 @@ const RecoverWalletKey = ({ navigation, route }: Props) => {
   }, [])
 
   const handleImport = async (selectedFile: DocumentPickerResponse | null) => {
+    setLoading(true)
+
     try {
       if (!selectedFile) {
         console.log("No file selected")
@@ -59,13 +67,13 @@ const RecoverWalletKey = ({ navigation, route }: Props) => {
       )}`
       const walletName = `imported_wallet_${uniqueIdentifier}`
       const localFilePath = `${RNFS.DocumentDirectoryPath}/${selectedFile.name}`
-
+      const recovery = customEncode(recoveryPhrase)
       await RNFS.moveFile(selectedFile.uri, localFilePath)
       const configNew: InitConfig = {
         label: "SainoPal Mobile Wallet",
         walletConfig: {
           id: walletName,
-          key: recoveryPhrase,
+          key: recovery,
         },
         logger: new ConsoleLogger(LogLevel.trace),
       }
@@ -83,14 +91,17 @@ const RecoverWalletKey = ({ navigation, route }: Props) => {
         console.log("Deleted existing wallet:", walletName)
       }
 
+      console.log(customEncode(recoveryPhrase))
+
       await IndySdk.importWallet(walletConfig, walletCredentials, {
         path: localFilePath,
-        key: recoveryPhrase,
+        key: customEncode(recoveryPhrase),
       })
 
       await updateUserData(walletName)
-      console.log(recoveryPhrase)
-      await updateRecoveryPhrase(recoveryPhrase)
+      RecoveryPhraseTable.updatePhrase(recoveryPhrase, () => {
+        console.log("Callback after updating recovery phrase")
+      })
 
       logout()
       // onLogin(true)
@@ -104,6 +115,8 @@ const RecoverWalletKey = ({ navigation, route }: Props) => {
     } catch (error) {
       console.error("Error during import:", error)
       Alert.alert("Error", "An error occurred during wallet import.")
+    } finally {
+      setLoading(false)
     }
   }
 
@@ -125,6 +138,13 @@ const RecoverWalletKey = ({ navigation, route }: Props) => {
       headerTintColor: "#0e2e47",
     })
   }, [])
+
+  const customEncode = (text: string) => {
+    const words = text.trim().split(/\s+/)
+    const encodedWords = words.map((word) => encode(word))
+    const formattedText = encodedWords.join(" ")
+    return formattedText
+  }
 
   const handleConfirm = () => {
     if (wordCount === 12) {
@@ -169,48 +189,13 @@ const RecoverWalletKey = ({ navigation, route }: Props) => {
     })
   }
 
-  const updateRecoveryPhrase = async (recoveryPhrase: string) => {
-    const words = recoveryPhrase.split(/\s+/)
-
-    return new Promise<void>((resolve, reject) => {
-      db.transaction(
-        (tx) => {
-          tx.executeSql(
-            "DELETE FROM recoveryPhrase;",
-            [],
-            (_, result) => {
-              console.log("All rows in RecoveryPhrase deleted successfully")
-              words.forEach((word, index) => {
-                tx.executeSql(
-                  "INSERT INTO recoveryPhrase (word) VALUES (?);",
-                  [word],
-                  (_, result) => {
-                    console.log(`Inserted word: ${word}`)
-                  },
-                  (_, error) => {
-                    console.error(`Error inserting word ${word}:`, error)
-                    reject()
-                  }
-                )
-              })
-            },
-            (_, error) => {
-              console.error("Error deleting rows from RecoveryPhrase:", error)
-              reject()
-            }
-          )
-        },
-        null,
-        () => {
-          resolve()
-          console.log("Transaction completed")
-        }
-      )
-    })
-  }
-
   return (
     <View style={styles.container}>
+      {loading && (
+        <View style={styles.loadingContainer}>
+          <ActivityIndicator size="large" color="#fff" />
+        </View>
+      )}
       <View>
         <Text style={styles.title}>
           Please insert your recovery phrase to reset your PIN
@@ -345,6 +330,12 @@ const styles = StyleSheet.create({
     paddingRight: 15,
     borderRadius: 8,
     marginTop: 50,
+  },
+  loadingContainer: {
+    ...StyleSheet.absoluteFillObject,
+    backgroundColor: "rgba(0, 0, 0, 0.7)",
+    justifyContent: "center",
+    alignItems: "center",
   },
 })
 

@@ -1,6 +1,6 @@
-import { MaterialIcons } from "@expo/vector-icons";
-import { StackScreenProps } from "@react-navigation/stack";
-import React from "react";
+import { MaterialIcons } from "@expo/vector-icons"
+import { StackScreenProps } from "@react-navigation/stack"
+import React from "react"
 import {
   FlatList,
   Image,
@@ -9,17 +9,16 @@ import {
   Text,
   TouchableOpacity,
   View,
-} from "react-native";
+} from "react-native"
 
-import { SettingStackParamList } from "../../navigation/SettingStack";
+import { SettingStackParamList } from "../../navigators/SettingStack"
+import { useAuth } from "../../../context/AuthProvider"
 
-type Props = StackScreenProps<
-  SettingStackParamList,
-  "Settings",
-  "BackUpWallet"
->;
+type Props = StackScreenProps<SettingStackParamList, "Settings", "BackUpWallet">
 
 const Settings: React.FC<Props> = ({ navigation, route }: Props) => {
+  const { logout }: any = useAuth()
+
   const settingsData = [
     {
       id: 1,
@@ -44,28 +43,35 @@ const Settings: React.FC<Props> = ({ navigation, route }: Props) => {
     {
       id: 5,
       title: "Developer Testing",
-      icon: require("../../assets/developerIcon.gif"), //Only for testing Connection purpose
+      icon: require("../../assets/developerIcon.png"), //Only for testing Connection purpose
     },
-  ];
+    {
+      id: 5,
+      title: "Logout",
+      icon: require("../../assets/logout.png"),
+    },
+  ]
 
   const handleSettingPress = (title: string) => {
     if (title === "Change Pin") {
-      navigation.push("AuthChangePassword");
+      navigation.push("AuthChangePassword")
     } else if (title === "Backup Wallet") {
-      navigation.push("WalletManager");
+      navigation.push("WalletManager")
     } else if (title === "Recover Wallet") {
-      navigation.push("RecoverWallet");
+      navigation.push("RecoverWallet")
     } else if (title === "Recover Phrase") {
-      navigation.push("RecoveryPhrase");
+      navigation.push("RecoveryPhrase")
     } else if (title === "Developer Testing") {
-      navigation.push("Testing");
+      navigation.push("Testing")
+    } else if (title === "Logout") {
+      logout()
     }
-  };
+  }
 
   const renderItem = ({
     item,
   }: {
-    item: { id: number; title: string; icon: any };
+    item: { id: number; title: string; icon: any }
   }) => (
     <TouchableOpacity
       onPress={() => handleSettingPress(item.title)}
@@ -85,7 +91,7 @@ const Settings: React.FC<Props> = ({ navigation, route }: Props) => {
         </View>
       </View>
     </TouchableOpacity>
-  );
+  )
 
   return (
     <SafeAreaView style={styles.container}>
@@ -96,8 +102,8 @@ const Settings: React.FC<Props> = ({ navigation, route }: Props) => {
         renderItem={renderItem}
       />
     </SafeAreaView>
-  );
-};
+  )
+}
 
 const styles = StyleSheet.create({
   container: {
@@ -143,9 +149,9 @@ const styles = StyleSheet.create({
     resizeMode: "contain",
   },
   rightArrowContainer: {},
-});
+})
 
-export default Settings;
+export default Settings
 function handleSettingPress(title: string) {
-  throw new Error("Function not implemented.");
+  throw new Error("Function not implemented.")
 }

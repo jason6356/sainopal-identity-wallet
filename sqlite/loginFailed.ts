@@ -11,46 +11,47 @@ class LoginFailedTable {
             "CREATE TABLE IF NOT EXISTS loginFailed (id INTEGER PRIMARY KEY AUTOINCREMENT, timestamp TEXT);",
             [],
             () => {
-              console.log("LoginFailed table created successfully!")
-
+              console.log("LoginFailed table created successfully!");
+  
               // Check if there are any rows in the table
               tx.executeSql(
-                "SELECT COUNT(*) as count FROM loginFailed;",
+                "SELECT * FROM loginFailed;",
                 [],
                 (_, { rows }) => {
-                  const rowCount = rows.item(0).count
-
-                  if (rowCount === 0) {
+                  if (rows.length === 0) {
                     // If no rows, insert the default values
-                    tx.executeSql("INSERT INTO loginFailed DEFAULT VALUES;")
-                    console.log("Empty row inserted into LoginFailed table.")
+                    tx.executeSql("INSERT INTO loginFailed DEFAULT VALUES;");
+                    console.log("Empty row inserted into LoginFailed table.");
                   } else {
-                    console.log("LoginFailed table already contains rows.")
+                    console.log("LoginFailed table already contains rows.");
                   }
-
-                  resolve()
+  
+                  resolve();
                 },
                 (transaction, error) => {
-                  console.log("Error checking row count: " + error)
-                  reject(error)
-                  return true
+                  console.log("Error fetching rows from LoginFailed table: " + error);
+                  reject(error);
+                  return true;
                 }
-              )
+              );
             },
             (transaction, error) => {
-              console.log("Error creating loginFailed table: " + error)
-              reject(error)
-              return true
+              console.log("Error creating loginFailed table: " + error);
+              reject(error);
+              return true;
             }
-          )
+          );
         },
         (error) => {
-          console.log("Transaction error: " + error)
-          reject(error)
+          console.log("Transaction error: " + error);
+          reject(error);
         }
-      )
-    })
+      );
+    });
   }
+  
+
+
 
   static getLastFailedLogin(): Promise<{ timestamp: string } | null> {
     return new Promise((resolve, reject) => {

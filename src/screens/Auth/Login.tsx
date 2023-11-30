@@ -58,6 +58,8 @@ const Login: React.FC<{
           console.error("Error fetching users:", error)
         })
 
+      //dropTables() //<-For testing purpose  //remember comment it back when screen in signup
+
       UserTable.getPassword(
         (password) => {
           console.log("Retrieved Password:", password)
@@ -72,11 +74,13 @@ const Login: React.FC<{
         console.log("All phrases added successfully!")
       })
 
-      RecoveryPhraseTable.getAllPhrases((phrases) => {
+      RecoveryPhraseTable.getAllEncodedPhrasesArray((phrases) => {
         console.log("Retrieved Phrases:", phrases)
       })
 
-      //dropTables() //<-For testing purpose
+      RecoveryPhraseTable.getAllPhrases((phrases) => {
+        console.log("Retrieved Phrases:", phrases)
+      })
 
       checkPinAndNavigate()
       authenticate()
@@ -90,6 +94,7 @@ const Login: React.FC<{
 
   async function handleFailedLogin(): Promise<void> {
     try {
+      await LoginFailedTable.init()
       const lastFailedLogin = await LoginFailedTable.getLastFailedLogin()
       if (lastFailedLogin) {
         const elapsedTime =
@@ -145,7 +150,6 @@ const Login: React.FC<{
   }
 
   async function dropTables() {
-    await LoginFailedTable.dropTable()
     await new Promise<void>((resolve, reject) => {
       RecoveryPhraseTable.dropTable(() => {
         console.log("RecoveryPhraseTable dropped successfully!")

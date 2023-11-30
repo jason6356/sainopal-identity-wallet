@@ -34,26 +34,6 @@ const RecoveryPhrase = ({ navigation }: Props) => {
   );
 
   useEffect(() => {
-    // db.transaction(
-    //   (tx) => {
-    //     tx.executeSql("SELECT * FROM recoveryPhrase;", [], (_, { rows }) => {
-    //       const recoveryPhraseData: any[] = rows._array
-    //       const decodedWords = recoveryPhraseData.map((item) => {
-    //         return item.word ? item.word : null
-    //       })
-
-    //       const wordsString = decodedWords.join(" ")
-    //       console.log(wordsString)
-
-    //       if (recoveryPhraseData.length > 0) {
-    //         setStoredRecoveryPhrase(decodedWords)
-    //       }
-    //     })
-    //   },
-    //   (error) => {
-    //     console.log("Transaction Error: " + error.message)
-    //   }
-    // )
     RecoveryPhraseTable.getAllPhrasesArray((phrases) => {
       console.log("Retrieved Phrases:", phrases);
       const decodedWords = phrases.map((item) =>

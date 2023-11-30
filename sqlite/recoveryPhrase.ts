@@ -77,19 +77,6 @@ class RecoveryPhraseTable {
     })
   }
 
-  static getAllPhrases(callback: (phrases: string) => void) {
-    db.transaction((tx) => {
-      tx.executeSql("SELECT * FROM recoveryPhrase;", [], (_, { rows }) => {
-        const recoveryPhraseData: any[] = rows._array
-        const decodedWords: string[] = recoveryPhraseData.map((item) =>
-          decode(item.word)
-        )
-        const decodedString: string = decodedWords.join(" ")
-        callback(decodedString)
-      })
-    })
-  }
-
   static getAllPhrasesArray(callback: (phrases: any[]) => void) {
     db.transaction((tx) => {
       tx.executeSql("SELECT * FROM recoveryPhrase;", [], (_, { rows }) => {
@@ -106,28 +93,79 @@ class RecoveryPhraseTable {
     })
   }
 
-  static updatePhrase(id: number, word: string, callback: () => void) {
+  static getAllEncodedPhrases(callback: (phrases: string) => void) {
     db.transaction((tx) => {
-      tx.executeSql(
-        "UPDATE recoveryPhrase SET word = ? WHERE id = ?;",
-        [word, id],
-        () => {
-          console.log("Recovery phrase updated successfully!")
-          callback()
-        },
-        (transaction, error) => {
-          console.log("Error updating recovery phrase: " + error.message)
-          return true
-        }
-      )
+      tx.executeSql("SELECT * FROM recoveryPhrase;", [], (_, { rows }) => {
+        const recoveryPhraseData: any[] = rows._array
+        const decodedWords: string[] = recoveryPhraseData.map(
+          (item) => item.word
+        )
+        const decodedString: string = decodedWords.join(" ")
+        callback(decodedString)
+      })
     })
   }
+
+  static getAllEncodedPhrasesArray(callback: (phrases: any[]) => void) {
+    db.transaction((tx) => {
+      tx.executeSql("SELECT * FROM recoveryPhrase;", [], (_, { rows }) => {
+        const recoveryPhraseData: any[] = rows._array
+        const decodedData = recoveryPhraseData.map((item) => {
+          return {
+            ...item,
+            word: item.word ? item.word : null,
+          }
+        })
+
+        callback(decodedData)
+      })
+    })
+  }
+
+  static updatePhrase(recoveryPhrase: string, callback: () => void) {
+    const words = recoveryPhrase.split(/\s+/);
+  
+    db.transaction((tx) => {
+      words.forEach((word, index) => {
+        tx.executeSql(
+          "UPDATE recoveryPhrase SET word = ? WHERE id = ?;",
+          [encode(word), index + 1], // Assuming the index starts from 1
+          () => {
+            console.log(`Recovery phrase at index ${index + 1} updated successfully!`);
+            if (index === words.length - 1) {
+              // Call the callback after updating the last word
+              callback();
+            }
+          },
+          (transaction, error) => {
+            console.log(`Error updating recovery phrase at index ${index + 1}: ${error.message}`);
+            return true;
+          }
+        );
+      });
+    });
+  }
+  
 
   static deletePhrase(id: number, callback: () => void) {
     db.transaction((tx) => {
       tx.executeSql("DELETE FROM recoveryPhrase WHERE id = ?;", [id], () => {
         console.log("Recovery phrase deleted successfully!")
         callback()
+      })
+    })
+  }
+
+  //Only one decoded
+  static getAllPhrases(callback: (phrases: string) => void) {
+    db.transaction((tx) => {
+      tx.executeSql("SELECT * FROM recoveryPhrase;", [], (_, { rows }) => {
+        const recoveryPhraseData: any[] = rows._array
+        const decodedWords: string[] = recoveryPhraseData.map((item) =>
+          decode(item.word)
+        )
+        const decodedString: string = decodedWords.join(" ")
+        callback(decodedString)
       })
     })
   }
