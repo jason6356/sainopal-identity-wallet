@@ -1,20 +1,13 @@
-import React, { useEffect, useLayoutEffect, useState } from "react"
-import { View, Text, StyleSheet, Image, TouchableOpacity } from "react-native"
-import SmoothPinCodeInput from "react-native-smooth-pincode-input"
-import {
-  RouteProp,
-  NavigationProp,
-  useFocusEffect,
-} from "@react-navigation/native"
-import { Animated } from "react-native"
-import { useAuth } from "../../../context/AuthProvider"
-import UserTable from "../../../sqlite/userTable"
-import RecoveryPhraseTable from "../../../sqlite/recoveryPhrase"
-import { SettingStackParamList } from "../../navigators/SettingStack"
-import { StackScreenProps } from "@react-navigation/stack"
-import NumberPad from "../Auth/components/NumberPad"
-import * as LocalAuthentication from "expo-local-authentication"
 import useHideBottomTabBar from "@hooks/useHideBottomTabBar"
+import { SettingStackParamList } from "@navigation/SettingStack"
+import { useFocusEffect } from "@react-navigation/native"
+import { StackScreenProps } from "@react-navigation/stack"
+import * as LocalAuthentication from "expo-local-authentication"
+import React, { useEffect, useLayoutEffect, useState } from "react"
+import { Animated, Image, StyleSheet, View } from "react-native"
+import SmoothPinCodeInput from "react-native-smooth-pincode-input"
+import UserTable from "../../../sqlite/userTable"
+import NumberPad from "../Auth/components/NumberPad"
 
 type Props = StackScreenProps<SettingStackParamList, "AuthChangePassword">
 

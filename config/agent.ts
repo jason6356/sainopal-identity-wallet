@@ -30,11 +30,10 @@ import {
 } from "@aries-framework/indy-sdk"
 import { agentDependencies } from "@aries-framework/react-native"
 import { anoncreds } from "@hyperledger/anoncreds-react-native"
+import * as SQLite from "expo-sqlite"
 import indySdk from "indy-sdk-react-native"
 import { genesis } from "./genesis"
-import * as SQLite from "expo-sqlite"
-import { useEffect, useState } from "react"
-import { encode } from "base-64"
+import _ledger from "./ledger.json"
 
 const poolConfig: IndySdkPoolConfig = {
   indyNamespace: "",
@@ -42,6 +41,8 @@ const poolConfig: IndySdkPoolConfig = {
   genesisTransactions: genesis,
   isProduction: false,
 }
+
+const ledgers = _ledger
 
 const db = SQLite.openDatabase("db.db")
 

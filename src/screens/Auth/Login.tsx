@@ -64,6 +64,7 @@ const Login: React.FC<{
         (password) => {
           console.log("Retrieved Password:", password)
           setPassword(password)
+          authenticate()
         },
         (error) => {
           navigation.navigate("SignUp")
@@ -83,7 +84,6 @@ const Login: React.FC<{
       })
 
       checkPinAndNavigate()
-      authenticate()
     }, [navigation])
   )
 

@@ -1,28 +1,19 @@
-import { useCallback, useEffect, useLayoutEffect, useState } from "react"
-import {
-  View,
-  Text,
-  TextInput,
-  Button,
-  ImageProps as DefaultImageProps,
-  ImageURISource,
-  StyleSheet,
-  Image,
-  Alert,
-  ActivityIndicator,
-} from "react-native"
-import { config, recoveryPhraseLocal } from "../../../config/index"
-import { WalletConfig } from "indy-sdk-react-native"
-import IndySdk from "indy-sdk-react-native"
-import RNFS from "react-native-fs"
-import DocumentPicker, {
-  DocumentPickerResponse,
-} from "react-native-document-picker"
-import { TouchableOpacity } from "react-native-gesture-handler"
 import { StackScreenProps } from "@react-navigation/stack"
-import { WalletStackParamList } from "../../navigators/WalletStack"
-import React from "react"
-import { InitConfig } from "@aries-framework/core"
+import IndySdk, { WalletConfig } from "indy-sdk-react-native"
+import React, { useEffect, useLayoutEffect, useState } from "react"
+import {
+  ActivityIndicator,
+  Alert,
+  Image,
+  StyleSheet,
+  Text,
+  View,
+} from "react-native"
+import RNFS from "react-native-fs"
+import { TouchableOpacity } from "react-native-gesture-handler"
+import { config, recoveryPhraseLocal } from "../../../config/index"
+import { WalletStackParamList } from "@navigation/WalletStack"
+import useHideBottomTabBar from "@hooks/useHideBottomTabBar"
 
 type Props = StackScreenProps<WalletStackParamList, "SelfCredential">
 const WalletManager = ({ navigation }: Props) => {
@@ -45,7 +36,7 @@ const WalletManager = ({ navigation }: Props) => {
     const fetchData = async () => {
       recoveryPhrase = await recoveryPhraseLocal()
       setExportConfig({
-        path: `${RNFS.DownloadDirectoryPath}/exported_wallet${Date.now()}.json`,
+        path: `${RNFS.ExternalDirectoryPath}/exported_wallet${Date.now()}.json`,
         key: recoveryPhrase,
       })
     }

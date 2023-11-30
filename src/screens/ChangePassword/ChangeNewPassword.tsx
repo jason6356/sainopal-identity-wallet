@@ -1,14 +1,11 @@
-import React, { useEffect, useState } from "react"
-import { View, Text, StyleSheet, Image, TouchableOpacity } from "react-native"
-import { useNavigation } from "@react-navigation/native"
-import SmoothPinCodeInput from "react-native-smooth-pincode-input"
-import { RouteProp, NavigationProp } from "@react-navigation/native"
-import * as SQLite from "expo-sqlite"
-import UserTable from "../../../sqlite/userTable"
-import NumberPad from "../Auth/components/NumberPad"
-import { SettingStackParamList } from "../../navigators/SettingStack"
 import { StackScreenProps } from "@react-navigation/stack"
+import React, { useEffect, useState } from "react"
+import { Image, StyleSheet, Text, View } from "react-native"
+import SmoothPinCodeInput from "react-native-smooth-pincode-input"
 import { useAuth } from "../../../context/AuthProvider"
+import UserTable from "../../../sqlite/userTable"
+import { SettingStackParamList } from "../../navigators/SettingStack"
+import NumberPad from "../Auth/components/NumberPad"
 
 type Props = StackScreenProps<SettingStackParamList, "ChangeNewPassword">
 

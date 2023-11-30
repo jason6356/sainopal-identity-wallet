@@ -46,7 +46,7 @@ const Settings: React.FC<Props> = ({ navigation, route }: Props) => {
       icon: require("../../assets/developerIcon.png"), //Only for testing Connection purpose
     },
     {
-      id: 5,
+      id: 6,
       title: "Logout",
       icon: require("../../assets/logout.png"),
     },

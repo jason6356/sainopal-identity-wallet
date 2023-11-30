@@ -1,22 +1,33 @@
-import React, { useState, useEffect, useLayoutEffect, useRef } from "react"
 import {
-  StyleSheet,
-  Text,
-  View,
-  TextInput,
-  Button,
-  FlatList,
-} from "react-native"
-import { useAgent } from "@aries-framework/react-hooks"
-import { agent } from "../../../config/agent"
+  BasicMessageRecord,
+  BasicMessageRole,
+  CredentialExchangeRecord,
+  CredentialState,
+  ProofExchangeRecord,
+  ProofState,
+} from "@aries-framework/core"
 import {
-  useBasicMessages,
+  useAgent,
   useBasicMessagesByConnectionId,
+  useConnectionById,
+  useCredentialsByConnectionId,
+  useProofsByConnectionId,
 } from "@aries-framework/react-hooks"
+import {
+  CredentialOfferCard,
+  PresentationDoneCard,
+  PresentationOfferCard,
+} from "@components/Card"
+import { CredentialReceivedCard } from "@components/Card/CredentialReceivedCard"
+import { Message } from "@components/MessageBubble/Message"
+import useHideBottomTabBar from "@hooks/useHideBottomTabBar"
 import { useIsFocused } from "@react-navigation/native"
-import { BasicMessageRecord, BasicMessageRole } from "@aries-framework/core"
-import Icon from "react-native-vector-icons/FontAwesome"
+import { getProofNameFromID } from "@utils/proof"
+import { getSchemaNameFromOfferID } from "@utils/schema"
 import * as SQLite from "expo-sqlite"
+import React, { useEffect, useLayoutEffect, useRef, useState } from "react"
+import { Button, FlatList, StyleSheet, TextInput, View } from "react-native"
+import Icon from "react-native-vector-icons/FontAwesome"
 
 const db = SQLite.openDatabase("db.db")
 
@@ -25,17 +36,53 @@ type CommunicationProps = {
   route: { params: { connection_id: string; connection_name: string } }
 }
 
+type ReceivedMessages =
+  | CredentialExchangeRecord
+  | BasicMessageRecord
+  | ProofExchangeRecord
+
 const Communication: React.FC<CommunicationProps> = ({ navigation, route }) => {
   const { connection_id, connection_name } = route.params
   const [message, setMessage] = useState("")
-  const [receivedMessages, setReceivedMessages] = useState<
-    BasicMessageRecord[]
-  >([])
-  const agentInstance = useAgent()
+  const [receivedMessages, setReceivedMessages] = useState<ReceivedMessages[]>(
+    []
+  )
   const isFocused = useIsFocused()
-  const flatListRef = useRef<FlatList<BasicMessageRecord>>(null)
+  const flatListRef = useRef<FlatList<ReceivedMessages>>(null)
   const [displayedDates, setDisplayedDates] = useState<string[]>([])
   const basicMessages = useBasicMessagesByConnectionId(connection_id)
+
+  const connection = useConnectionById(connection_id)
+  const credentialsOffer: CredentialExchangeRecord[] =
+    useCredentialsByConnectionId(connection_id)
+  const presentationOffer = useProofsByConnectionId(connection_id)
+  const agent = useAgent()
+  const [credentialMap, setCredentialMap] = useState(new Map())
+  const [proofMap, setProofMap] = useState(new Map())
+
+  useHideBottomTabBar()
+
+  const mapCredentials = async () => {
+    const newCredentialMap = new Map()
+
+    for (const e of credentialsOffer) {
+      const name = await getSchemaNameFromOfferID(agent.agent, e.id)
+      newCredentialMap.set(e.id, name)
+    }
+
+    setCredentialMap(newCredentialMap)
+  }
+
+  const mapProofs = async () => {
+    const newProofsMap = new Map()
+
+    for (const e of presentationOffer) {
+      const name = await getProofNameFromID(agent.agent, e.id)
+      newProofsMap.set(e.id, name)
+    }
+
+    setProofMap(newProofsMap)
+  }
 
   useLayoutEffect(() => {
     navigation.setOptions({
@@ -58,24 +105,31 @@ const Communication: React.FC<CommunicationProps> = ({ navigation, route }) => {
     })
   }, [navigation, connection_name, isFocused])
 
-  useLayoutEffect(() => {
-    navigation.setOptions({
-      title: connection_name,
-    })
-  }, [navigation, connection_name, isFocused])
+  useEffect(() => {
+    setReceivedMessages(() =>
+      [...basicMessages, ...credentialsOffer, ...presentationOffer].reverse()
+    )
+    console.log("Received messages:", receivedMessages)
+  }, [
+    basicMessages,
+    credentialsOffer,
+    presentationOffer,
+    isFocused,
+    connection_id,
+  ])
 
   useEffect(() => {
-    setReceivedMessages((prevMessages) => [...basicMessages].reverse())
-    console.log("Received messages:", receivedMessages)
-  }, [basicMessages, isFocused])
+    mapCredentials()
+    mapProofs()
+  }, [credentialsOffer, presentationOffer, connection_id])
 
   const isSentMessage = (role: BasicMessageRole) =>
     role === BasicMessageRole.Sender
 
   const handleSendMessage = async () => {
     try {
-      await agent?.basicMessages.sendMessage(connection_id, message)
-      console.log(agent?.config)
+      await agent.agent.basicMessages.sendMessage(connection_id, message)
+      console.log(agent.agent.config)
       setMessage("")
     } catch (error) {
       console.error("Error sending message:", error)
@@ -96,50 +150,66 @@ const Communication: React.FC<CommunicationProps> = ({ navigation, route }) => {
     item,
     index,
   }: {
-    item: BasicMessageRecord
+    item: ReceivedMessages
     index: number
   }) => {
     const currentDate = formatTime(item.sentTime)
-    const previousDate =
-      index > 0 ? formatTime(receivedMessages[index - 1].sentTime) : null
+    index > 0 ? formatTime(receivedMessages[index - 1].sentTime) : null
+
+    console.log(item)
 
     // Check if the date has already been displayed
     const isDateDisplayed = displayedDates.includes(currentDate)
 
-    return (
-      <View>
-        {!isDateDisplayed && (index === 0 || currentDate !== previousDate) && (
-          <Text style={styles.dateSeparator}></Text>
-        )}
+    if (item instanceof CredentialExchangeRecord) {
+      if (item.state === CredentialState.OfferReceived) {
+        return (
+          <CredentialOfferCard
+            key={index}
+            credentialExchangeRecord={item}
+            name={credentialMap.get(item.id)}
+            navigation={navigation}
+          />
+        )
+      } else if (item.state === CredentialState.Done) {
+        return (
+          <CredentialReceivedCard
+            key={item.id.toUpperCase()}
+            id={item.id}
+            name={credentialMap.get(item.id)}
+            navigation={navigation}
+          />
+        )
+      } else {
+        return <></>
+      }
+    }
 
-        <View
-          style={[
-            styles.messageContainer,
-            isSentMessage(item.role) && styles.sentMessageContainer,
-            !isSentMessage(item.role) && styles.receivedMessageContainer,
-          ]}
-        >
-          <Text
-            style={[
-              styles.messageText,
-              isSentMessage(item.role) && styles.sentMessageText,
-              !isSentMessage(item.role) && styles.receivedMessageText,
-            ]}
-          >
-            {item.content}
-          </Text>
-          <Text
-            style={
-              isSentMessage(item.role)
-                ? styles.senderTimeText
-                : styles.receiverTimeText
-            }
-          >
-            {formatTime(item.sentTime)}
-          </Text>
-        </View>
-      </View>
-    )
+    if (item instanceof ProofExchangeRecord) {
+      if (item.state === ProofState.RequestReceived) {
+        return (
+          <PresentationOfferCard
+            key={item.id}
+            proofExchangeRecord={item}
+            name={proofMap.get(item.id)}
+            navigation={navigation}
+          />
+        )
+      } else if (item.state === ProofState.Done) {
+        return (
+          <PresentationDoneCard
+            key={item.id}
+            id={item.id}
+            name={proofMap.get(item.id)}
+            navigation={navigation}
+            proofExchangeRecord={item}
+          />
+        )
+      } else {
+        return <></>
+      }
+    }
+    return <Message item={item} />
   }
 
   const plusButton = async () => {
@@ -211,7 +281,7 @@ const Communication: React.FC<CommunicationProps> = ({ navigation, route }) => {
     console.log("Combined data:", message)
 
     // Send the message after both transactions have completed
-    await agent?.basicMessages.sendMessage(connection_id, message)
+    await agent.agent.basicMessages.sendMessage(connection_id, message)
   }
 
   return (
@@ -220,7 +290,7 @@ const Communication: React.FC<CommunicationProps> = ({ navigation, route }) => {
         ref={flatListRef}
         style={styles.messageList}
         data={receivedMessages}
-        keyExtractor={(item) => item.sentTime}
+        keyExtractor={(item) => item.id}
         renderItem={renderItem}
         onContentSizeChange={() =>
           flatListRef.current?.scrollToEnd({ animated: true })
@@ -281,7 +351,7 @@ const styles = StyleSheet.create({
   inputContainer: {
     flexDirection: "row",
     alignItems: "center",
-    marginBottom: 120,
+    marginBottom: 20,
     paddingHorizontal: 10,
     paddingVertical: 5,
     backgroundColor: "#ffffff",
