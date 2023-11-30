@@ -88,20 +88,21 @@ const Communication: React.FC<CommunicationProps> = ({ navigation, route }) => {
     navigation.setOptions({
       title: connection_name,
       headerStyle: {
-        backgroundColor: "white",
-        borderBottomWidth: 1,
-        borderBottomColor: "#ccc",
+        backgroundColor: "#09182d",
+        borderBottomLeftRadius: 20,
+        borderBottomRightRadius: 20,
       },
       headerTintColor: "black",
       headerTitleStyle: {
         fontSize: 18,
-        color: "black",
+        color: "white",
         alignItems: "center",
         justifyContent: "center",
       },
       headerBackTitleStyle: {
         fontWeight: "bold",
       },
+      headerTintColor: "white",
     })
   }, [navigation, connection_name, isFocused])
 

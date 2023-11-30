@@ -2,28 +2,25 @@ import {
   useAgent,
   useConnectionById,
   useCredentialById,
-} from "@aries-framework/react-hooks";
-import { StackScreenProps } from "@react-navigation/stack";
-import React, { useEffect, useLayoutEffect, useState } from "react";
-import { Image, ScrollView, StyleSheet, Text, View } from "react-native";
-import { WalletStackParamList } from "../../navigation/WalletStack";
+} from "@aries-framework/react-hooks"
+import { StackScreenProps } from "@react-navigation/stack"
+import React, { useEffect, useLayoutEffect, useState } from "react"
+import { Image, ScrollView, StyleSheet, Text, View } from "react-native"
+import { WalletStackParamList } from "../../navigation/WalletStack"
 
-import {
-  getCredentialFormat,
-  getCredentialName,
-} from "../../utils/credentials";
-import { ContactStackParamList } from "../../navigation/ContactStack";
+import { getCredentialFormat, getCredentialName } from "../../utils/credentials"
+import { ContactStackParamList } from "../../navigation/ContactStack"
 
 type CredentialFormatData = {
-  name: string;
-  value: string;
-};
+  name: string
+  value: string
+}
 
 type Props =
   | StackScreenProps<WalletStackParamList, "Credential">
-  | StackScreenProps<ContactStackParamList, "Credential">;
+  | StackScreenProps<ContactStackParamList, "Credential">
 
-const credentialImage = require("../../assets/degree.png");
+const credentialImage = require("../../assets/degree.png")
 
 const tabBarStyle = {
   position: "absolute",
@@ -35,45 +32,50 @@ const tabBarStyle = {
   backgroundColor: "#fff",
   paddingBottom: 20,
   paddingTop: 20,
-};
+}
 
 const Credential = ({ navigation, route }: Props) => {
-  const { credential_offer_id, parentRoute } = route.params;
-  const credentialOffer = useCredentialById(credential_offer_id);
-  const agent = useAgent();
+  const { credential_offer_id, parentRoute } = route.params
+  const credentialOffer = useCredentialById(credential_offer_id)
+  const agent = useAgent()
   const connectionDetails = useConnectionById(
     credentialOffer?.connectionId ? credentialOffer.connectionId : ""
-  );
+  )
 
   const [credentialFormatData, setCredentialFormatData] = useState<
     CredentialFormatData[]
-  >([]);
+  >([])
 
-  const [credentialName, setCredentialName] = useState<string>("");
+  const [credentialName, setCredentialName] = useState<string>("")
 
   useLayoutEffect(() => {
+    //change header color to #09182d and text to white
     navigation.setOptions({
-      title: "",
-    });
-  });
-
+      headerStyle: {
+        backgroundColor: "#09182d",
+        borderBottomLeftRadius: 20,
+        borderBottomRightRadius: 20,
+      },
+      headerTintColor: "white",
+    })
+  })
   useEffect(() => {
     navigation.getParent()?.setOptions({
       tabBarStyle: {
         display: "none",
       },
-    });
-    updateNameAndFormat(credential_offer_id);
+    })
+    updateNameAndFormat(credential_offer_id)
 
     if (parentRoute === "Wallet") {
       return () =>
-        navigation.getParent()?.setOptions({ tabBarStyle: tabBarStyle });
+        navigation.getParent()?.setOptions({ tabBarStyle: tabBarStyle })
     }
-  }, [navigation]);
+  }, [navigation])
 
   async function updateNameAndFormat(id: string) {
-    setCredentialName(await getCredentialName(agent.agent, id));
-    setCredentialFormatData(await getCredentialFormat(agent.agent, id));
+    setCredentialName(await getCredentialName(agent.agent, id))
+    setCredentialFormatData(await getCredentialFormat(agent.agent, id))
   }
 
   return (
@@ -128,8 +130,8 @@ const Credential = ({ navigation, route }: Props) => {
         </View>
       </ScrollView>
     </View>
-  );
-};
+  )
+}
 
 const styles = StyleSheet.create({
   container: {
@@ -175,6 +177,6 @@ const styles = StyleSheet.create({
   credentialValue: {
     fontSize: 15,
   },
-});
+})
 
-export default Credential;
+export default Credential

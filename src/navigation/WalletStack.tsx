@@ -1,30 +1,37 @@
-import { createStackNavigator } from "@react-navigation/stack";
-import Credential from "@screens/Wallet/Credential";
-import SelfCredential from "@screens/Wallet/SelfCredential";
-import Wallet from "@screens/Wallet/Wallet";
-import React from "react";
+import {
+  createStackNavigator,
+  TransitionPresets,
+} from "@react-navigation/stack"
+import Credential from "@screens/Wallet/Credential"
+import SelfCredential from "@screens/Wallet/SelfCredential"
+import Wallet from "@screens/Wallet/Wallet"
+import React from "react"
 
-type WalletStackProps = {};
+type WalletStackProps = {}
 
 export type WalletStackParamList = {
-  Wallet: undefined;
+  Wallet: undefined
   Credential: {
-    credential_offer_id: string;
-    parentRoute: string;
-  };
-  SelfCredential: undefined;
-};
+    credential_offer_id: string
+    parentRoute: string
+  }
+  SelfCredential: undefined
+}
 
-const WalletStack = createStackNavigator<WalletStackParamList>();
+const WalletStack = createStackNavigator<WalletStackParamList>()
 
 const WalletScreenStack: React.FC = () => {
   return (
-    <WalletStack.Navigator>
+    <WalletStack.Navigator
+      screenOptions={{
+        ...TransitionPresets.ModalSlideFromBottomIOS,
+      }}
+    >
       <WalletStack.Screen name="Wallet" component={Wallet} />
       <WalletStack.Screen name="Credential" component={Credential} />
       <WalletStack.Screen name="SelfCredential" component={SelfCredential} />
     </WalletStack.Navigator>
-  );
-};
+  )
+}
 
-export default WalletScreenStack;
+export default WalletScreenStack

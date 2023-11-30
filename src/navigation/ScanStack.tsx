@@ -1,27 +1,34 @@
-import { OutOfBandInvitation } from "@aries-framework/core";
-import { createStackNavigator } from "@react-navigation/stack";
-import React from "react";
-import ConnectionRequest from "@screens/Connection/ConnectionRequest";
-import Scan from "@screens/Scan/Scan";
+import { OutOfBandInvitation } from "@aries-framework/core"
+import {
+  createStackNavigator,
+  TransitionPresets,
+} from "@react-navigation/stack"
+import React from "react"
+import ConnectionRequest from "@screens/Connection/ConnectionRequest"
+import Scan from "@screens/Scan/Scan"
 
-type ScanStackProps = {};
+type ScanStackProps = {}
 
 type ConnectionRequestScreenProps = {
-  inviteObj: OutOfBandInvitation;
-  url: string;
-};
+  inviteObj: OutOfBandInvitation
+  url: string
+}
 
 export type ScanStackParamList = {
-  Scan: undefined;
-  ConnectionRequest: ConnectionRequestScreenProps | undefined;
-  ContactStack: undefined;
-};
+  Scan: undefined
+  ConnectionRequest: ConnectionRequestScreenProps | undefined
+  ContactStack: undefined
+}
 
-const ScanStack = createStackNavigator<ScanStackParamList>();
+const ScanStack = createStackNavigator<ScanStackParamList>()
 
 const ScanScreenStack: React.FC = () => {
   return (
-    <ScanStack.Navigator>
+    <ScanStack.Navigator
+      screenOptions={{
+        ...TransitionPresets.ModalSlideFromBottomIOS,
+      }}
+    >
       <ScanStack.Screen
         name="Scan"
         component={Scan}
@@ -39,7 +46,7 @@ const ScanScreenStack: React.FC = () => {
         }
       />
     </ScanStack.Navigator>
-  );
-};
+  )
+}
 
-export default ScanScreenStack;
+export default ScanScreenStack

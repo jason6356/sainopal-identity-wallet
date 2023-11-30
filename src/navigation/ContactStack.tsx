@@ -1,4 +1,7 @@
-import { createStackNavigator } from "@react-navigation/stack"
+import {
+  createStackNavigator,
+  TransitionPresets,
+} from "@react-navigation/stack"
 import React from "react"
 import ConnectionDetails from "@screens/Connection/ConnectionDetails"
 import Contacts from "@screens/Connection/Contacts"
@@ -45,8 +48,20 @@ const ContactScreenStack: React.FC = () => {
         name="ConnectionDetails"
         component={ConnectionDetails}
       />
-      <ContactStack.Screen name="CredentialOffer" component={CredentialOffer} />
-      <ContactStack.Screen name="CredentialProof" component={CredentialProof} />
+      <ContactStack.Screen
+        name="CredentialOffer"
+        component={CredentialOffer}
+        options={{
+          ...TransitionPresets.ModalSlideFromBottomIOS,
+        }}
+      />
+      <ContactStack.Screen
+        name="CredentialProof"
+        component={CredentialProof}
+        options={{
+          ...TransitionPresets.ModalSlideFromBottomIOS,
+        }}
+      />
       <ContactStack.Screen name="Credential" component={Credential} />
       <ContactStack.Screen name="Proof" component={Proof} />
       <ContactStack.Screen name="Communication" component={Communication} />
