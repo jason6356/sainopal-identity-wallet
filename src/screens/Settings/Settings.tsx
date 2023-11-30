@@ -13,10 +13,13 @@ import {
 } from "react-native"
 
 import { SettingStackParamList } from "../../navigators/SettingStack"
+import { useAuth } from "../../../context/AuthProvider"
 
 type Props = StackScreenProps<SettingStackParamList, "Settings", "BackUpWallet">
 
 const Settings: React.FC<Props> = ({ navigation, route }: Props) => {
+  const { logout }: any = useAuth()
+
   const settingsData = [
     {
       id: 1,
@@ -41,7 +44,12 @@ const Settings: React.FC<Props> = ({ navigation, route }: Props) => {
     {
       id: 5,
       title: "Developer Testing",
-      icon: require("../../assets/developerIcon.gif"), //Only for testing Connection purpose
+      icon: require("../../assets/developerIcon.png"), //Only for testing Connection purpose
+    },
+    {
+      id: 5,
+      title: "Logout",
+      icon: require("../../assets/logout.png"),
     },
   ]
 
@@ -56,6 +64,8 @@ const Settings: React.FC<Props> = ({ navigation, route }: Props) => {
       navigation.push("RecoveryPhrase")
     } else if (title === "Developer Testing") {
       navigation.push("Testing")
+    } else if (title === "Logout") {
+      logout()
     }
   }
 
