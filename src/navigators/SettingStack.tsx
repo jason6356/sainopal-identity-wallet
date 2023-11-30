@@ -8,13 +8,11 @@ import RecoveryPhrase from "../screens/RecoverWallet/RecoveryPhrase"
 import RecoverWalletKey from "../screens/RecoverWallet/RecoverWalletKey"
 import AuthChangePassword from "../screens/ChangePassword/AuthChangePassword"
 import ChangeNewPassword from "../screens/ChangePassword/ChangeNewPassword"
-import AuthRecoveryPhrase from "../screens/ChangePassword/AuthRecoveryPhrase"
 import { DocumentPickerResponse } from "react-native-document-picker"
 
 export type SettingStackParamList = {
   Settings: undefined
   AuthChangePassword: undefined
-  AuthRecoveryPhrase: undefined
   Testing: undefined
   WalletManager: undefined
   RecoverWallet: undefined
@@ -36,10 +34,6 @@ const SettingStackScreen: React.FC = () => {
       <SettingStack.Screen
         name="ChangeNewPassword"
         component={ChangeNewPassword}
-      />
-      <SettingStack.Screen
-        name="AuthRecoveryPhrase"
-        component={AuthRecoveryPhrase}
       />
       <SettingStack.Screen name="WalletManager" component={WalletManager} />
       <SettingStack.Screen name="RecoverWallet" component={RecoverWallet} />

@@ -129,10 +129,6 @@ const AuthChangePassword = ({ navigation }: Props) => {
     setCode((prevCode) => prevCode.slice(0, -1))
   }
 
-  const handleForgotPin = () => {
-    navigation.navigate("AuthRecoveryPhrase")
-  }
-
   return (
     <View style={styles.container}>
       <Image style={styles.image} source={require("../../assets/login.png")} />
@@ -149,9 +145,6 @@ const AuthChangePassword = ({ navigation }: Props) => {
       >
         Enter PIN
       </Animated.Text>
-      <TouchableOpacity style={styles.forgotPin} onPress={handleForgotPin}>
-        <Text style={styles.forgotPinText}>Forgot Your PIN?</Text>
-      </TouchableOpacity>
       <Animated.View
         style={[
           styles.formContainer,
@@ -197,7 +190,6 @@ const AuthChangePassword = ({ navigation }: Props) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    justifyContent: "center",
     alignItems: "center",
     padding: 16,
     backgroundColor: "white",

@@ -8,6 +8,8 @@ import {
   ImageURISource,
   StyleSheet,
   Image,
+  Alert,
+  ActivityIndicator,
 } from "react-native"
 import { config, recoveryPhraseLocal } from "../../../config/index"
 import { WalletConfig } from "indy-sdk-react-native"
@@ -24,7 +26,13 @@ import { InitConfig } from "@aries-framework/core"
 
 type Props = StackScreenProps<WalletStackParamList, "SelfCredential">
 const WalletManager = ({ navigation }: Props) => {
+  const [loading, setLoading] = useState(false)
   let recoveryPhrase: string = ""
+  const [exportConfig, setExportConfig] = useState({
+    path: ``,
+    key: "",
+  })
+
   useLayoutEffect(() => {
     navigation.setOptions({
       title: "Backup Wallet",
@@ -42,15 +50,11 @@ const WalletManager = ({ navigation }: Props) => {
     fetchData()
   }, [])
 
-  const [exportConfig, setExportConfig] = useState({
-    path: `${RNFS.DownloadDirectoryPath}/exported_wallet${Date.now()}.json`,
-    key: "123456",
-  })
-
   let walletConfig: WalletConfig | undefined
   let walletCredentials: { key: string } | undefined
   const handleExport = async () => {
     try {
+      setLoading(true)
       console.log("sss : ", exportConfig)
       if (config?.walletConfig) {
         walletConfig = config.walletConfig
@@ -63,17 +67,29 @@ const WalletManager = ({ navigation }: Props) => {
         )
         await IndySdk.exportWallet(walletHandle, exportConfig)
         await IndySdk.closeWallet(walletHandle)
+
+        Alert.alert(
+          "Successfully",
+          `Exported wallet to your local dowload folder.`
+        )
         console.log("Exported Wallet Successfully")
       } else {
         console.log("CANNOT SIA")
       }
     } catch (error) {
       console.log(error)
+    } finally {
+      setLoading(false)
     }
   }
 
   return (
     <View style={[styles.container]}>
+      {loading && (
+        <View style={styles.loadingContainer}>
+          <ActivityIndicator size="large" color="#fff" />
+        </View>
+      )}
       <View style={[styles.containerImage]}>
         <Image
           source={require("../../assets/backupIcon.png")}
@@ -89,19 +105,11 @@ const WalletManager = ({ navigation }: Props) => {
           your data with your recovery phrase and your exported file.
         </Text>
       </View>
-      {/* Input fields and export button */}
-      {/* <Button
-        title="Create a new backup file"
-        onPress={handleExport}
-      /> */}
       <View style={[styles.containerBtn]}>
         <TouchableOpacity style={styles.button} onPress={handleExport}>
           <Text style={styles.buttonText}> Create new backup file </Text>
         </TouchableOpacity>
       </View>
-      {/* <Text>Import Wallet</Text> */}
-      {/* Input fields and import button */}
-      {/* <Button title="Import" onPress={handleImport} /> */}
     </View>
   )
 }
@@ -150,6 +158,12 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: "bold",
     color: "#aaafb8",
+  },
+  loadingContainer: {
+    ...StyleSheet.absoluteFillObject,
+    backgroundColor: "rgba(0, 0, 0, 0.7)",
+    justifyContent: "center",
+    alignItems: "center",
   },
 })
 

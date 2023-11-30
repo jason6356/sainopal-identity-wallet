@@ -14,6 +14,7 @@ import { RouteProp, NavigationProp } from "@react-navigation/native"
 import * as SQLite from "expo-sqlite"
 import { useAuth } from "../../../context/AuthProvider"
 import RecoveryPhraseTable from "../../../sqlite/recoveryPhrase"
+import { encode } from "base-64"
 
 type RootStackParamList = {
   RecoveryPhrases: undefined
@@ -37,7 +38,7 @@ const RecoveryPhrases: React.FC<{
   const { login }: any = useAuth()
 
   useEffect(() => {
-    RecoveryPhraseTable.getAllPhrasesArray((phrases: any) => {
+    RecoveryPhraseTable.getAllEncodedPhrasesArray((phrases: any) => {
       console.log("Retrieved Phrases Array:", phrases)
       setStoredRecoveryPhrase(phrases)
     })
@@ -64,7 +65,7 @@ const RecoveryPhrases: React.FC<{
 
   const handleConfirm = () => {
     if (wordCount === 12) {
-      const enteredWords = recoveryPhrase.trim().split(/\s+/)
+      const enteredWords = customEncode(recoveryPhrase).trim().split(/\s+/)
       const match = enteredWords.every(
         (word, index) => word === storedRecoveryPhrase[index]?.word
       )
@@ -86,6 +87,13 @@ const RecoveryPhrases: React.FC<{
     } catch (error) {
       console.error("Error reading from clipboard:", error)
     }
+  }
+
+  const customEncode = (text: string) => {
+    const words = text.trim().split(/\s+/)
+    const encodedWords = words.map((word) => encode(word))
+    const formattedText = encodedWords.join(" ")
+    return formattedText
   }
 
   return (

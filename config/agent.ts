@@ -32,6 +32,7 @@ import indySdk from "indy-sdk-react-native"
 import { genesis } from "./genesis"
 import * as SQLite from "expo-sqlite"
 import { useEffect, useState } from "react"
+import { encode } from "base-64"
 
 const poolConfig: IndySdkPoolConfig = {
   indyNamespace: "",
@@ -77,8 +78,7 @@ async function recoveryPhraseLocal(): Promise<string> {
         )
         const wordsString = wordsOnly.join(" ")
         console.log("Wallet Key(Recovery Phrase) :", wordsString)
-        recoveryPhrase = wordsString
-        resolve(recoveryPhrase)
+        resolve(wordsString)
       })
     })
   })
@@ -98,7 +98,6 @@ function getAgentConfig(
   }
   return config
 }
-
 
 function getAgent(config: InitConfig) {
   const indyProofFormat = new LegacyIndyProofFormatService()

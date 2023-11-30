@@ -99,12 +99,7 @@ const SignUp: React.FC<{
   return (
     <View style={styles.container}>
       <Image style={styles.image} source={require("../../assets/signUp.png")} />
-      <TouchableOpacity
-        style={styles.forgotPin}
-        onPress={() => navigation.navigate("Login")}
-      >
-        <Text style={styles.forgotPinText}>Back to Login</Text>
-      </TouchableOpacity>
+
       <Text style={styles.title}>
         {step === 1 ? "Enter New PIN" : "Confirm New PIN"}
       </Text>

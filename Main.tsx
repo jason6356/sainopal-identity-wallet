@@ -33,10 +33,6 @@ const Main: React.FC = () => {
         const agent = getAgent(config)
         await agent.initialize()
         await createLinkSecretIfRequired(agent)
-  // await agent.modules.pushNotificationsFcm.sendDeviceInfo(
-  //   'a-valid-connection-id',
-  //   { deviceToken: '123' }
-  // );
 
         setInitializedAgent(agent)
 
