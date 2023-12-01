@@ -12,7 +12,7 @@ import {
 } from "react-native"
 
 import { SettingStackParamList } from "../../navigators/SettingStack"
-import { useAuth } from "../../../context/AuthProvider"
+import { useAuth } from "../../context/AuthProvider"
 
 type Props = StackScreenProps<SettingStackParamList, "Settings", "BackUpWallet">
 

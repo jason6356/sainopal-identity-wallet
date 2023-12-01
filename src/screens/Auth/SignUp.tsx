@@ -2,10 +2,10 @@ import React, { useEffect, useState } from "react"
 import { View, Text, StyleSheet, Image, TouchableOpacity } from "react-native"
 import { useNavigation } from "@react-navigation/native"
 import SmoothPinCodeInput from "react-native-smooth-pincode-input"
-import NumberPad from "./components/NumberPad"
+import NumberPad from "../../components/NumberPad/NumberPad"
 import { RouteProp, NavigationProp } from "@react-navigation/native"
 import * as SQLite from "expo-sqlite"
-import UserTable from "../../../sqlite/userTable"
+import UserTable from "../../models/UserTable"
 
 type RootStackParamList = {
   SignUp: undefined

@@ -5,7 +5,7 @@ import DocumentPicker, {
 } from "react-native-document-picker"
 import RNFS from "react-native-fs"
 import IndySdk, { WalletConfig } from "indy-sdk-react-native"
-import { config, recoveryPhraseLocal } from "../../../config/agent"
+import { config, recoveryPhraseLocal } from "../../../agentStuff/agent"
 
 import { StackScreenProps } from "@react-navigation/stack"
 import { ConsoleLogger, InitConfig, LogLevel } from "@aries-framework/core"

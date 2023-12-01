@@ -1,15 +1,15 @@
 import { createStackNavigator } from "@react-navigation/stack"
 // import AuthRecoveryPhrase from "../screens/ChangePassword/"
+import WalletManager from "@screens/Backupwallet/WalletManager"
+import AuthChangePassword from "@screens/ChangePassword/AuthChangePassword"
+import ChangeNewPassword from "@screens/ChangePassword/ChangeNewPassword"
+import Home from "@screens/Home/Home"
+import RecoverWallet from "@screens/RecoverWallet/RecoverWallet"
+import RecoverWalletKey from "@screens/RecoverWallet/RecoverWalletKey"
+import RecoveryPhrase from "@screens/RecoverWallet/RecoveryPhrase"
+import Settings from "@screens/Settings/Settings"
 import React from "react"
 import { DocumentPickerResponse } from "react-native-document-picker"
-import WalletManager from "../screens/Backupwallet/WalletManager"
-import AuthChangePassword from "../screens/ChangePassword/AuthChangePassword"
-import ChangeNewPassword from "../screens/ChangePassword/ChangeNewPassword"
-import Home from "../screens/Home/Home"
-import RecoverWallet from "../screens/RecoverWallet/RecoverWallet"
-import RecoverWalletKey from "../screens/RecoverWallet/RecoverWalletKey"
-import RecoveryPhrase from "../screens/RecoverWallet/RecoveryPhrase"
-import Settings from "../screens/Settings/Settings"
 
 export type SettingStackParamList = {
   Settings: undefined

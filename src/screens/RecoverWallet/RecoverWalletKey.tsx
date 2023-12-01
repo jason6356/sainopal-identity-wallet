@@ -1,38 +1,25 @@
+import { ConsoleLogger, InitConfig, LogLevel } from "@aries-framework/core"
+import { useAgent } from "@aries-framework/react-hooks"
+import { SettingStackParamList } from "@navigation/SettingStack"
+import { StackScreenProps } from "@react-navigation/stack"
+import { encode } from "base-64"
+import * as SQLite from "expo-sqlite"
+import IndySdk, { WalletConfig } from "indy-sdk-react-native"
 import React, { useEffect, useLayoutEffect, useState } from "react"
 import {
-  View,
-  Text,
-  StyleSheet,
-  Image,
-  TouchableOpacity,
-  TextInput,
-  Clipboard,
   ActivityIndicator,
+  Alert,
+  Clipboard,
+  StyleSheet,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  View,
 } from "react-native"
-import { useNavigation } from "@react-navigation/native"
-import { RouteProp, NavigationProp } from "@react-navigation/native"
-import * as SQLite from "expo-sqlite"
-import { SettingStackParamList } from "../../navigators/SettingStack"
-import { StackScreenProps } from "@react-navigation/stack"
-import { Alert } from "react-native"
-import { ConsoleLogger, InitConfig, LogLevel } from "@aries-framework/core"
 import { DocumentPickerResponse } from "react-native-document-picker"
 import RNFS from "react-native-fs"
-import IndySdk, { WalletConfig } from "indy-sdk-react-native"
-import {
-  getAgent,
-  config,
-  agent,
-  recoveryPhraseLocal,
-  walletLocal,
-  getAgentConfig,
-  createLinkSecretIfRequired,
-} from "../../../config/index"
-import { useAgent } from "@aries-framework/react-hooks"
-import { useAuth } from "../../../context/AuthProvider"
-import { encode, decode } from "base-64"
-import RecoveryPhrases from "../Auth/RecoveryPhrase"
-import RecoveryPhraseTable from "../../../sqlite/recoveryPhrase"
+import { useAuth } from "@context/AuthProvider"
+import RecoveryPhraseTable from "../../models/RecoveryPhraseTable"
 
 type Props = StackScreenProps<SettingStackParamList, "RecoverWalletKey">
 
@@ -78,7 +65,11 @@ const RecoverWalletKey = ({ navigation, route }: Props) => {
         logger: new ConsoleLogger(LogLevel.trace),
       }
 
-      const walletConfig: WalletConfig = configNew.walletConfig || {}
+      const walletConfig: WalletConfig = configNew.walletConfig || {
+        id: "",
+        storage_type: undefined,
+        storage_config: undefined,
+      }
       const walletCredentials = { key: configNew.walletConfig?.key || "" }
 
       const existingWalletPath = `${RNFS.DocumentDirectoryPath}/.indy_client/wallet/${walletName}`
@@ -175,13 +166,17 @@ const RecoverWalletKey = ({ navigation, route }: Props) => {
               console.log("User table updated successfully")
               resolve()
             },
-            (_, error) => {
+            (transaction, error) => {
               console.error("Error updating user table:", error)
               reject()
+              return false
             }
           )
         },
-        null,
+        (error) => {
+          console.error("Error updating user table:", error)
+          reject()
+        },
         () => {
           console.log("Transaction completed")
         }

@@ -3867,6 +3867,11 @@
   dependencies:
     tslib "^2.4.0"
 
+"@types/base-64@^1.0.2":
+  version "1.0.2"
+  resolved "https://registry.npmjs.org/@types/base-64/-/base-64-1.0.2.tgz#f7bc80d242306f20c57f076d79d1efe2d31032ca"
+  integrity sha512-uPgKMmM9fmn7I+Zi6YBqctOye4SlJsHKcisjHIMWpb2YKZRc36GpKyNuQ03JcT+oNXg1m7Uv4wU94EVltn8/cw==
+
 "@types/hammerjs@^2.0.36":
   version "2.0.41"
   resolved "https://registry.npmjs.org/@types/hammerjs/-/hammerjs-2.0.41.tgz"
@@ -3940,7 +3945,7 @@
 
 "@types/react-native-base64@^0.2.2":
   version "0.2.2"
-  resolved "https://registry.npmjs.org/@types/react-native-base64/-/react-native-base64-0.2.2.tgz"
+  resolved "https://registry.npmjs.org/@types/react-native-base64/-/react-native-base64-0.2.2.tgz#d4e1d537e6d547d23d96a1e64627acc13587ae6b"
   integrity sha512-obr+/L9Jaxdr+xCVS/IQcYgreg5xtnui4Wqw/G1acBUtW2CnqVJj6lK6F/5F3+5d2oZEo5xDDLqy8GVn2HbEmw==
 
 "@types/react-native-vector-icons@^6.4.10", "@types/react-native-vector-icons@^6.4.6":

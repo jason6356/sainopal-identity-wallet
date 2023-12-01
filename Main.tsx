@@ -11,8 +11,8 @@ import {
   getAgentConfig,
   recoveryPhraseLocal,
   walletLocal,
-} from "./config"
-import { useAuth } from "./context/AuthProvider"
+} from "./agentStuff"
+import { useAuth } from "@context/AuthProvider"
 
 const Main: React.FC = () => {
   const [initializedAgent, setInitializedAgent] = useState<Agent<any> | null>(

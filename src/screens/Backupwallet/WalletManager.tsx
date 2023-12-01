@@ -1,3 +1,6 @@
+import { config, recoveryPhraseLocal } from "@agentStuff/index"
+import useHideBottomTabBar from "@hooks/useHideBottomTabBar"
+import { SettingStackParamList } from "@navigation/SettingStack"
 import { StackScreenProps } from "@react-navigation/stack"
 import IndySdk, { WalletConfig } from "indy-sdk-react-native"
 import React, { useEffect, useLayoutEffect, useState } from "react"
@@ -11,11 +14,8 @@ import {
 } from "react-native"
 import RNFS from "react-native-fs"
 import { TouchableOpacity } from "react-native-gesture-handler"
-import { config, recoveryPhraseLocal } from "../../../config/index"
-import { WalletStackParamList } from "@navigation/WalletStack"
-import useHideBottomTabBar from "@hooks/useHideBottomTabBar"
 
-type Props = StackScreenProps<WalletStackParamList, "SelfCredential">
+type Props = StackScreenProps<SettingStackParamList, "WalletManager">
 const WalletManager = ({ navigation }: Props) => {
   useHideBottomTabBar()
 

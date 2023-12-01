@@ -1,3 +1,6 @@
+import useHideBottomTabBar from "@hooks/useHideBottomTabBar"
+import RecoveryPhraseTable from "../../models/RecoveryPhraseTable"
+import { SettingStackParamList } from "@navigation/SettingStack"
 import { StackScreenProps } from "@react-navigation/stack"
 import * as SQLite from "expo-sqlite"
 import React, { useEffect, useLayoutEffect, useRef, useState } from "react"
@@ -10,9 +13,6 @@ import {
   View,
 } from "react-native"
 import Toast from "react-native-toast-message"
-import RecoveryPhraseTable from "../../../sqlite/recoveryPhrase"
-import { SettingStackParamList } from "@navigation/SettingStack"
-import useHideBottomTabBar from "@hooks/useHideBottomTabBar"
 type Props = StackScreenProps<SettingStackParamList, "RecoveryPhrase">
 const db = SQLite.openDatabase("db.db")
 

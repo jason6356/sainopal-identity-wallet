@@ -2,10 +2,10 @@ import { StackScreenProps } from "@react-navigation/stack"
 import React, { useEffect, useState } from "react"
 import { Image, StyleSheet, Text, View } from "react-native"
 import SmoothPinCodeInput from "react-native-smooth-pincode-input"
-import { useAuth } from "../../../context/AuthProvider"
-import UserTable from "../../../sqlite/userTable"
+import { useAuth } from "../../context/AuthProvider"
+import UserTable from "../../models/UserTable"
 import { SettingStackParamList } from "../../navigators/SettingStack"
-import NumberPad from "../Auth/components/NumberPad"
+import NumberPad from "../../components/NumberPad/NumberPad"
 
 type Props = StackScreenProps<SettingStackParamList, "ChangeNewPassword">
 

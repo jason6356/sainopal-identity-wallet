@@ -6,8 +6,8 @@ import * as LocalAuthentication from "expo-local-authentication"
 import React, { useEffect, useLayoutEffect, useState } from "react"
 import { Animated, Image, StyleSheet, View } from "react-native"
 import SmoothPinCodeInput from "react-native-smooth-pincode-input"
-import UserTable from "../../../sqlite/userTable"
-import NumberPad from "../Auth/components/NumberPad"
+import UserTable from "../../models/UserTable"
+import NumberPad from "../../components/NumberPad/NumberPad"
 
 type Props = StackScreenProps<SettingStackParamList, "AuthChangePassword">
 

@@ -4,6 +4,7 @@
     "strict": true,
     "baseUrl": ".",
     "paths": {
+      "@agentStuff/*": ["agentStuff/*"],
       "@components/*": ["src/components/*"],
       "@constants/*": ["src/constants/*"],
       "@hooks/*": ["src/hooks/*"],
@@ -11,8 +12,10 @@
       "@screens/*": ["src/screens/*"],
       "@services/*": ["src/services/*"],
       "@types/*": ["src/types/*"],
-      "@utils/*": ["src/utils/*"]
+      "@utils/*": ["src/utils/*"],
+      "@context/*": ["src/context/*"],
+      "@models/*": ["src/models/*"]
     },
-    "jsx": "react"
+    "jsx": "react-native"
   }
 }

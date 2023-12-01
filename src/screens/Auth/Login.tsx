@@ -1,35 +1,32 @@
-import React, { useEffect, useState } from "react"
+import NumberPad from "@components/NumberPad/NumberPad"
+import { useAuth } from "@context/AuthProvider"
 import {
-  View,
-  Text,
-  StyleSheet,
-  Image,
-  TouchableOpacity,
-  Alert,
-} from "react-native"
-import SmoothPinCodeInput from "react-native-smooth-pincode-input"
-import NumberPad from "./components/NumberPad"
-import {
-  RouteProp,
   NavigationProp,
+  RouteProp,
   useFocusEffect,
 } from "@react-navigation/native"
-import { Animated } from "react-native"
-import { useAuth } from "../../../context/AuthProvider"
-import UserTable from "../../../sqlite/userTable"
-import RecoveryPhraseTable from "../../../sqlite/recoveryPhrase"
 import * as LocalAuthentication from "expo-local-authentication"
-import LoginFailedTable from "../../../sqlite/loginFailed"
+import React, { useEffect, useState } from "react"
+import {
+  Alert,
+  Animated,
+  Image,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
+} from "react-native"
+import SmoothPinCodeInput from "react-native-smooth-pincode-input"
+import LoginFailedTable from "../../models/LoginFailedTable"
+import RecoveryPhraseTable from "../../models/RecoveryPhraseTable"
+import UserTable from "../../models/UserTable"
+import { LoginNavParamList } from "@navigation/LoginNav"
 
-type RootStackParamList = {
-  RecoveryPhrases: undefined
-  Login: undefined
-  SignUp: undefined
-}
 
-type LoginScreenNavigationProp = NavigationProp<RootStackParamList, "Login">
+type LoginScreenNavigationProp = NavigationProp<LoginNavParamList, "Login">
 
-type LoginScreenRouteProp = RouteProp<RootStackParamList, "Login">
+type LoginScreenRouteProp = RouteProp<LoginNavParamList, "Login">
+
 
 const Login: React.FC<{
   navigation: LoginScreenNavigationProp
@@ -46,6 +43,7 @@ const Login: React.FC<{
   const [loginFail, setLoginFailed] = useState<number>(0)
   const [pinLabelText, setPinLabelText] = useState<string>("Enter PIN")
   const [pinDisabled, setPinDisabled] = useState<boolean>(false)
+
   useFocusEffect(
     React.useCallback(() => {
       handleFailedLogin()

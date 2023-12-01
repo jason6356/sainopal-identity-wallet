@@ -1,7 +1,7 @@
 import React from "react"
 import { StyleSheet } from "react-native"
 import Main from "./Main"
-import { AuthProvider } from "./context/AuthProvider"
+import { AuthProvider } from "./src/context/AuthProvider"
 import { LogBox } from "react-native"
 
 LogBox.ignoreAllLogs()

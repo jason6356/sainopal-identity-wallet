@@ -34,7 +34,7 @@ const NumberPad: React.FC<NumberPadProps> = ({ onKeyPress, onDelete }) => {
         <TouchableOpacity style={styles.iconKey} onPress={onDelete}>
           <Image
             style={styles.icon}
-            source={require("../../../assets/delete.png")}
+            source={require("../../assets/delete.png")}
           />
         </TouchableOpacity>
       </View>

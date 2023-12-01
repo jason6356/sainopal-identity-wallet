@@ -1,10 +1,17 @@
 // LoginNav.tsx
-import { createNativeStackNavigator } from "@react-navigation/native-stack";
-import React from "react";
-import Login from "../screens/Auth/Login";
-import RecoveryPhrases from "../screens/Auth/RecoveryPhrase";
-import SignUp from "../screens/Auth/SignUp";
-const Stack = createNativeStackNavigator();
+import { createNativeStackNavigator } from "@react-navigation/native-stack"
+import React from "react"
+import Login from "@screens/Auth/Login"
+import RecoveryPhrases from "@screens/Auth/RecoveryPhrase"
+import SignUp from "@screens/Auth/SignUp"
+
+export type LoginNavParamList = {
+  RecoveryPhrases: undefined
+  Login: undefined
+  SignUp: undefined
+}
+
+const Stack = createNativeStackNavigator<LoginNavParamList>()
 
 const LoginNav = () => {
   return (
@@ -24,7 +31,7 @@ const LoginNav = () => {
         component={RecoveryPhrases}
       ></Stack.Screen>
     </Stack.Navigator>
-  );
-};
+  )
+}
 
-export default LoginNav;
+export default LoginNav

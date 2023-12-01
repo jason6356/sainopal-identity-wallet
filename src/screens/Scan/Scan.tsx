@@ -4,16 +4,13 @@ import { StackScreenProps } from "@react-navigation/stack"
 import { BarCodeScanner, BarCodeScannerResult } from "expo-barcode-scanner"
 import React, { useEffect, useState } from "react"
 import {
-  Button,
   StyleSheet,
   Text,
-  View,
   TouchableHighlight,
-  Dimensions,
   TouchableOpacity,
+  View,
 } from "react-native"
-import { SafeAreaView } from "react-native-safe-area-context"
-import { ScanStackParamList } from "../../navigation/ScanStack"
+import { ScanStackParamList } from "@navigation/ScanStack"
 
 type Props = StackScreenProps<ScanStackParamList, "Scan">
 
