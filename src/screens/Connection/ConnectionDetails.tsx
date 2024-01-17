@@ -2,70 +2,68 @@ import {
   CredentialExchangeRecord,
   CredentialState,
   ProofState,
-} from "@aries-framework/core";
+} from "@aries-framework/core"
 import {
   useAgent,
   useConnectionById,
   useCredentialsByConnectionId,
   useProofsByConnectionId,
-} from "@aries-framework/react-hooks";
-import { CredentialOfferCard } from "@components/Card/CredentialOfferCard";
-import { CredentialReceivedCard } from "@components/Card/CredentialReceivedCard";
-import { PresentationDoneCard } from "@components/Card/PresentationDoneCard";
-import { PresentationOfferCard } from "@components/Card/PresentationOfferCard";
-import useHideBottomTabBar from "@hooks/useHideBottomTabBar";
-import { ContactStackParamList } from "@navigation/ContactStack";
-import { StackScreenProps } from "@react-navigation/stack";
-import React, { useEffect, useState } from "react";
-import { ScrollView, StyleSheet, View } from "react-native";
-import {
-  getProofNameFromID,
-  getSchemaNameFromOfferID,
-} from "../../utils/index";
+} from "@aries-framework/react-hooks"
+import { CredentialOfferCard } from "@components/Card/CredentialOfferCard"
+import { CredentialReceivedCard } from "@components/Card/CredentialReceivedCard"
+import { PresentationDoneCard } from "@components/Card/PresentationDoneCard"
+import { PresentationOfferCard } from "@components/Card/PresentationOfferCard"
+import useHideBottomTabBar from "@hooks/useHideBottomTabBar"
+import { ContactStackParamList } from "@navigation/ContactStack"
+import { StackScreenProps } from "@react-navigation/stack"
+import React, { useEffect, useState } from "react"
+import { ScrollView, StyleSheet, View } from "react-native"
+import { getProofNameFromID, getSchemaNameFromOfferID } from "../../utils/index"
 
-type Props = StackScreenProps<ContactStackParamList, "ConnectionDetails">;
+type Props = StackScreenProps<ContactStackParamList, "ConnectionDetails">
 
 const ConnectionDetails = ({ navigation, route }: Props) => {
-  const { connection_id } = route.params;
-  const connection = useConnectionById(connection_id);
+  const { connection_id } = route.params
+  const connection = useConnectionById(connection_id)
   const credentialsOffer: CredentialExchangeRecord[] =
-    useCredentialsByConnectionId(connection_id);
-  const presentationOffer = useProofsByConnectionId(connection_id);
-  const agent = useAgent();
-  const [credentialMap, setCredentialMap] = useState(new Map());
-  const [proofMap, setProofMap] = useState(new Map());
-  const hidden = useHideBottomTabBar();
+    useCredentialsByConnectionId(connection_id)
+  const presentationOffer = useProofsByConnectionId(connection_id)
+  const agent = useAgent()
+  const [credentialMap, setCredentialMap] = useState(new Map())
+  const [proofMap, setProofMap] = useState(new Map())
+  const hidden = useHideBottomTabBar()
 
   const mapCredentials = async () => {
-    const newCredentialMap = new Map();
+    const newCredentialMap = new Map()
 
     for (const e of credentialsOffer) {
-      const name = await getSchemaNameFromOfferID(agent.agent, e.id);
-      newCredentialMap.set(e.id, name);
+      const name = await getSchemaNameFromOfferID(agent.agent, e.id)
+      newCredentialMap.set(e.id, name)
     }
 
-    setCredentialMap(newCredentialMap);
-  };
+    setCredentialMap(newCredentialMap)
+  }
 
   const mapProofs = async () => {
-    const newProofsMap = new Map();
+    const newProofsMap = new Map()
 
     for (const e of presentationOffer) {
-      const name = await getProofNameFromID(agent.agent, e.id);
-      newProofsMap.set(e.id, name);
+      const name = await getProofNameFromID(agent.agent, e.id)
+      newProofsMap.set(e.id, name)
     }
 
-    setProofMap(newProofsMap);
-  };
+    setProofMap(newProofsMap)
+  }
 
   useEffect(() => {
-    mapCredentials();
-    mapProofs();
+    mapCredentials()
+    mapProofs()
     navigation.setOptions({
       title: connection?.theirLabel,
-    });
-    presentationOffer.forEach((e) => console.log(e.state));
-  }, [credentialsOffer, presentationOffer, connection_id]);
+    })
+    console.log("Connection ID: ", connection_id)
+    //presentationOffer.forEach((e) => console.log(e.state))
+  }, [credentialsOffer, presentationOffer, connection_id])
 
   return (
     <View style={styles.container}>
@@ -80,7 +78,7 @@ const ConnectionDetails = ({ navigation, route }: Props) => {
                 name={credentialMap.get(e.id)}
                 navigation={navigation}
               />
-            );
+            )
           })}
         {credentialsOffer
           .filter((e) => e.state === CredentialState.Done)
@@ -92,7 +90,7 @@ const ConnectionDetails = ({ navigation, route }: Props) => {
                 name={credentialMap.get(e.id)}
                 navigation={navigation}
               />
-            );
+            )
           })}
         {presentationOffer
           .filter((e) => e.state !== ProofState.Done)
@@ -117,13 +115,13 @@ const ConnectionDetails = ({ navigation, route }: Props) => {
           ))}
       </ScrollView>
     </View>
-  );
-};
+  )
+}
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
     padding: 15,
   },
-});
-export default ConnectionDetails;
+})
+export default ConnectionDetails

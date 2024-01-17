@@ -37,12 +37,13 @@ import _ledger from "./ledger.json"
 
 const poolConfig: IndySdkPoolConfig = {
   indyNamespace: "",
-  id: "YourSovrinLocal", // <----<<< as shown here
+  id: "i2hub-von-network", // <----<<< as shown here
   genesisTransactions: genesis,
   isProduction: false,
 }
 
-const ledgers = _ledger
+const ledgers: any = _ledger
+ledgers.push(poolConfig)
 
 const db = SQLite.openDatabase("db.db")
 
@@ -175,4 +176,5 @@ export {
   getAgentConfig,
   recoveryPhraseLocal,
   walletLocal,
+  ledgers,
 }

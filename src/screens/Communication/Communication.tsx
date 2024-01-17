@@ -110,7 +110,7 @@ const Communication: React.FC<CommunicationProps> = ({ navigation, route }) => {
     setReceivedMessages(() =>
       [...basicMessages, ...credentialsOffer, ...presentationOffer].reverse()
     )
-    console.log("Received messages:", receivedMessages)
+    //console.log("Received messages:", receivedMessages)
   }, [
     basicMessages,
     credentialsOffer,
@@ -157,7 +157,7 @@ const Communication: React.FC<CommunicationProps> = ({ navigation, route }) => {
     const currentDate = formatTime(item.sentTime)
     index > 0 ? formatTime(receivedMessages[index - 1].sentTime) : null
 
-    console.log(item)
+    //console.log(item)
 
     // Check if the date has already been displayed
     const isDateDisplayed = displayedDates.includes(currentDate)

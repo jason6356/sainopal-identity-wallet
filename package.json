@@ -62,6 +62,7 @@
     "react-native-safe-area-context": "4.6.3",
     "react-native-screens": "~3.22.0",
     "react-native-smooth-pincode-input": "^1.0.9",
+    "react-native-tcp-socket": "^6.0.6",
     "react-native-toast-message": "^2.1.7",
     "scss": "^0.2.4",
     "styled-components": "^6.0.7"
