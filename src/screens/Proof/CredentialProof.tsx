@@ -2,20 +2,21 @@ import {
   useAgent,
   useConnectionById,
   useProofById,
-} from "@aries-framework/react-hooks";
-import { StackScreenProps } from "@react-navigation/stack";
-import React, { useEffect, useState } from "react";
+} from "@aries-framework/react-hooks"
+import { ContactCard } from "@components/Card/ContactCard"
+import { ContactStackParamList } from "@navigation/ContactStack"
+import { StackScreenProps } from "@react-navigation/stack"
+import React, { useEffect, useState } from "react"
 import {
-  StyleSheet,
-  Text,
-  View,
-  Image,
-  TouchableHighlight,
   ActivityIndicator,
   Alert,
-} from "react-native";
-import { ContactCard } from "@components/Card/ContactCard";
-import { ContactStackParamList } from "@navigation/ContactStack";
+  Image,
+  StyleSheet,
+  Text,
+  TouchableHighlight,
+  View,
+} from "react-native"
+import { ScrollView } from "react-native-gesture-handler"
 import {
   MappedAttributes,
   RequestedAttributes,
@@ -24,98 +25,96 @@ import {
   getAvailableCredentialsForProof,
   getPredicateFromFormatData,
   getProofFormatData,
-  getRequestAttributesFromFormatData,
   mapRequestAttributes,
-} from "../../utils/proof";
-import { ScrollView } from "react-native-gesture-handler";
+} from "../../utils/proof"
 
-type Props = StackScreenProps<ContactStackParamList, "CredentialProof">;
+type Props = StackScreenProps<ContactStackParamList, "CredentialProof">
 
-const credentialImage = require("../../assets/degree.png");
+const credentialImage = require("../../assets/degree.png")
 
 const CredentialProof: React.FC<Props> = ({ navigation, route }: Props) => {
-  const agent = useAgent();
-  const { presentation_id, connection_id } = route.params;
-  const proof = useProofById(presentation_id);
-  const connectionInvitation = useConnectionById(connection_id);
-  const [proofFormatData, setProofFormatData] = useState<any>([]);
+  const agent = useAgent()
+  const { presentation_id, connection_id } = route.params
+  const proof = useProofById(presentation_id)
+  const connectionInvitation = useConnectionById(connection_id)
+  const [proofFormatData, setProofFormatData] = useState<any>([])
   const [requestedAttributes, setRequestedAttributes] = useState<
     RequestedAttributes[]
-  >([]);
+  >([])
   const [mappedAttributes, setMappedAttributes] = useState<MappedAttributes[]>(
     []
-  );
-  const [predicate, setPredicate] = useState<RequestedPredicate[]>([]);
+  )
+  const [predicate, setPredicate] = useState<RequestedPredicate[]>([])
 
-  const [loading, setIsLoading] = useState(false);
+  const [loading, setIsLoading] = useState(false)
 
   useEffect(() => {
-    retrieveProofFormatData();
-  }, [proof]);
+    retrieveProofFormatData()
+  }, [proof])
 
   async function retrieveProofFormatData() {
-    const data = await getProofFormatData(agent.agent, presentation_id);
-    const predicate = getPredicateFromFormatData(data);
-    const attributesNeeded = getAttributesRequested(data);
+    const data = await getProofFormatData(agent.agent, presentation_id)
+    const predicate = getPredicateFromFormatData(data)
+    const attributesNeeded = getAttributesRequested(data)
 
     if (predicate.length > 0) {
-      console.log("Predicate Type Credentials?");
-      console.log(JSON.stringify(predicate));
-      setPredicate(predicate);
+      console.log("Predicate Type Credentials?")
+      console.log(JSON.stringify(predicate))
+      setPredicate(predicate)
     }
 
     if (attributesNeeded.length > 0) {
-      console.log("Interesting");
-      console.log(JSON.stringify(attributesNeeded));
+      console.log("Interesting")
+      console.log(JSON.stringify(attributesNeeded))
       const availableCredentials = await getAvailableCredentialsForProof(
         agent.agent,
         presentation_id
-      );
+      )
       const mappedAttributes = mapRequestAttributes(
         availableCredentials.proofFormats.indy.attributes,
         attributesNeeded
-      );
-      setRequestedAttributes(attributesNeeded);
-      setMappedAttributes(mappedAttributes);
+      )
+      setRequestedAttributes(attributesNeeded)
+      setMappedAttributes(mappedAttributes)
     }
 
-    setProofFormatData(data);
+    setProofFormatData(data)
   }
 
   async function acceptRequest(id: any) {
-    setIsLoading(true);
+    setIsLoading(true)
     agent.agent.proofs
       .acceptRequest({
         proofRecordId: presentation_id,
       })
       .then((e) => {
-        Alert.alert("Proof Sent!");
+        Alert.alert("Proof Sent!")
       })
       .catch((e) => {
-        Alert.alert("Error", e.message);
+        Alert.alert("Error", e.message)
       })
       .finally(() => {
-        setIsLoading(false);
-        navigation.goBack();
-      });
+        setIsLoading(false)
+        navigation.goBack()
+      })
   }
 
   async function declineRequest() {
-    setIsLoading(true);
+    setIsLoading(true)
     agent.agent.proofs
       .declineRequest({
         proofRecordId: presentation_id,
       })
       .then((e) => {
-        Alert.alert("Proof Declined!");
+        Alert.alert("Proof Declined!")
       })
       .catch((e) => {
-        Alert.alert("Error", e.message);
+        Alert.alert("Error", e.message)
       })
       .finally(() => {
-        setIsLoading(false);
-        navigation.goBack();
-      });
+        setIsLoading(false)
+        navigation.goBack()
+      })
   }
 
   async function selectCredential(id: any, format: any) {
@@ -123,9 +122,9 @@ const CredentialProof: React.FC<Props> = ({ navigation, route }: Props) => {
       await agent.agent.proofs.selectCredentialsForRequest({
         proofRecordId: id,
         proofFormats: [format[0]],
-      });
+      })
     } catch (error) {
-      console.error(error);
+      console.error(error)
     }
   }
 
@@ -237,8 +236,8 @@ const CredentialProof: React.FC<Props> = ({ navigation, route }: Props) => {
         </View>
       </View>
     </ScrollView>
-  );
-};
+  )
+}
 
 const styles = StyleSheet.create({
   container: {
@@ -387,5 +386,5 @@ const styles = StyleSheet.create({
     color: "#333333",
     marginBottom: 5,
   },
-});
-export default CredentialProof;
+})
+export default CredentialProof
