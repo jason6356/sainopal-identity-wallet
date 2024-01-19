@@ -11,7 +11,9 @@
       "resizeMode": "contain",
       "backgroundColor": "#09182d"
     },
-    "assetBundlePatterns": ["**/*"],
+    "assetBundlePatterns": [
+      "**/*"
+    ],
     "ios": {
       "supportsTablet": true,
       "bitcode": false,
@@ -19,7 +21,8 @@
         "NSCameraUsageDescription": "Allow $(PRODUCT_NAME) to access camera.",
         "NSMicrophoneUsageDescription": "Allow $(PRODUCT_NAME) to access your microphone",
         "NSFaceIDUsageDescription": "Allow $(PRODUCT_NAME) to use Face ID"
-      }
+      },
+      "bundleIdentifier": "com.sainoforce.sainopal"
     },
     "android": {
       "adaptiveIcon": {
@@ -44,7 +47,9 @@
           }
         }
       ],
-      ["@animo-id/indy-sdk-expo-plugin"],
+      [
+        "@animo-id/indy-sdk-expo-plugin"
+      ],
       [
         "expo-barcode-scanner",
         {
@@ -62,6 +67,12 @@
       "eas": {
         "projectId": "76907cf3-1bc3-4038-b701-592fdb1c9e0f"
       }
+    },
+    "runtimeVersion": {
+      "policy": "appVersion"
+    },
+    "updates": {
+      "url": "https://u.expo.dev/76907cf3-1bc3-4038-b701-592fdb1c9e0f"
     }
   }
 }
