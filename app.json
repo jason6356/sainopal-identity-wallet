@@ -36,6 +36,14 @@
       "favicon": "./assets/favicon.png"
     },
     "plugins": [
+      [
+        "expo-build-properties",
+        {
+          "android": {
+            "useCleartextTraffic": true
+          }
+        }
+      ],
       ["@animo-id/indy-sdk-expo-plugin"],
       [
         "expo-barcode-scanner",
