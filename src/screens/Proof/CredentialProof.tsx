@@ -27,6 +27,7 @@ import {
   getProofFormatData,
   mapRequestAttributes,
 } from "../../utils/proof"
+import useHideBottomTabBar from "@hooks/useHideBottomTabBar"
 
 type Props = StackScreenProps<ContactStackParamList, "CredentialProof">
 
@@ -47,6 +48,8 @@ const CredentialProof: React.FC<Props> = ({ navigation, route }: Props) => {
   const [predicate, setPredicate] = useState<RequestedPredicate[]>([])
 
   const [loading, setIsLoading] = useState(false)
+
+  useHideBottomTabBar()
 
   useEffect(() => {
     retrieveProofFormatData()

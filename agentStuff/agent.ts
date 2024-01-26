@@ -8,6 +8,7 @@ import {
   V1ProofProtocol,
 } from "@aries-framework/anoncreds"
 import { AnonCredsRsModule } from "@aries-framework/anoncreds-rs"
+import { AskarModule } from "@aries-framework/askar"
 import type { InitConfig } from "@aries-framework/core"
 import {
   Agent,
@@ -22,20 +23,29 @@ import {
   V2ProofProtocol,
   WsOutboundTransport,
 } from "@aries-framework/core"
+import { ariesAskar } from "@hyperledger/aries-askar-react-native"
 import {
-  IndySdkAnonCredsRegistry,
-  IndySdkIndyDidResolver,
-  IndySdkModule,
-  IndySdkPoolConfig,
-} from "@aries-framework/indy-sdk"
+  IndyVdrAnonCredsRegistry,
+  IndyVdrIndyDidResolver,
+  IndyVdrModule,
+  IndyVdrPoolConfig,
+  IndyVdrSovDidResolver,
+} from "@aries-framework/indy-vdr"
+import { indyVdr } from "@hyperledger/indy-vdr-react-native"
+// import {
+//   IndySdkAnonCredsRegistry,
+//   IndySdkIndyDidResolver,
+//   IndySdkModule,
+//   IndySdkPoolConfig,
+// } from "@aries-framework/indy-sdk"
 import { agentDependencies } from "@aries-framework/react-native"
 import { anoncreds } from "@hyperledger/anoncreds-react-native"
 import * as SQLite from "expo-sqlite"
-import indySdk from "indy-sdk-react-native"
+//import indySdk from "indy-sdk-react-native"
 import { genesis } from "./genesis"
 import _ledger from "./ledger.json"
 
-const poolConfig: IndySdkPoolConfig = {
+const poolConfig = {
   indyNamespace: "",
   id: "i2hub-von-network", // <----<<< as shown here
   genesisTransactions: genesis,
@@ -110,19 +120,26 @@ function getAgent(config: InitConfig) {
     config,
     dependencies: agentDependencies,
     modules: {
+      askar: new AskarModule({
+        ariesAskar,
+      }),
       mediationRecipient: new MediationRecipientModule({
         mediatorInvitationUrl,
       }),
-      indySdk: new IndySdkModule({
-        indySdk,
+      indyVdr: new IndyVdrModule({
+        indyVdr,
         networks: ledgers,
       }),
+      // indySdk: new IndySdkModule({
+      //   indySdk,
+      //   networks: ledgers,
+      // }),
       anoncredsRs: new AnonCredsRsModule({ anoncreds }),
       anoncreds: new AnonCredsModule({
-        registries: [new IndySdkAnonCredsRegistry()],
+        registries: [new IndyVdrAnonCredsRegistry()],
       }),
       dids: new DidsModule({
-        resolvers: [new IndySdkIndyDidResolver()],
+        resolvers: [new IndyVdrSovDidResolver(), new IndyVdrIndyDidResolver()],
       }),
       credentials: new CredentialsModule({
         credentialProtocols: [
@@ -174,7 +191,7 @@ export {
   createLinkSecretIfRequired,
   getAgent,
   getAgentConfig,
+  ledgers,
   recoveryPhraseLocal,
   walletLocal,
-  ledgers,
 }

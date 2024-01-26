@@ -2,7 +2,9 @@ import { config, recoveryPhraseLocal } from "@agentStuff/index"
 import useHideBottomTabBar from "@hooks/useHideBottomTabBar"
 import { SettingStackParamList } from "@navigation/SettingStack"
 import { StackScreenProps } from "@react-navigation/stack"
-import IndySdk, { WalletConfig } from "indy-sdk-react-native"
+import { useAgent } from "@aries-framework/react-hooks"
+//import IndySdk, { WalletConfig } from "indy-sdk-react-native"
+import { WalletConfig } from "@aries-framework/core"
 import React, { useEffect, useLayoutEffect, useState } from "react"
 import {
   ActivityIndicator,
@@ -18,6 +20,7 @@ import { TouchableOpacity } from "react-native-gesture-handler"
 type Props = StackScreenProps<SettingStackParamList, "WalletManager">
 const WalletManager = ({ navigation }: Props) => {
   useHideBottomTabBar()
+  const agent = useAgent()
 
   const [loading, setLoading] = useState(false)
   let recoveryPhrase: string = ""
@@ -60,12 +63,12 @@ const WalletManager = ({ navigation }: Props) => {
         walletCredentials = { key: config.walletConfig.key }
       }
       if (walletConfig && walletCredentials) {
-        const walletHandle = await IndySdk.openWallet(
-          walletConfig,
-          walletCredentials
-        )
-        await IndySdk.exportWallet(walletHandle, exportConfig)
-        await IndySdk.closeWallet(walletHandle)
+        // const walletHandle = await agent.agent.wallet.open(
+        //   walletConfig
+        //   //walletCredentials
+        // )
+        await agent.agent.wallet.export(exportConfig)
+        await agent.agent.wallet.close()
 
         Alert.alert(
           "Successfully",

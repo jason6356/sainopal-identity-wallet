@@ -2,7 +2,8 @@
   "build": {
     "preview": {
       "android": {
-        "buildType": "apk"
+        "buildType": "apk",
+        "autoIncrement": true
       }
     },
     "preview2": {
@@ -19,4 +20,3 @@
     "production": {}
   }
 }
-

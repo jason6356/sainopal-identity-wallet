@@ -10,6 +10,7 @@ import Credential from "@screens/Wallet/Credential"
 import CredentialOffer from "@screens/Offer/CredentialOffer"
 import Proof from "@screens/Proof/Proof"
 import Communication from "@screens/Communication/Communication"
+import useAgentEventListenerHook from "@hooks/useAgentEventListenerHook"
 
 export type ContactStackParamList = {
   Contacts: undefined
@@ -17,12 +18,12 @@ export type ContactStackParamList = {
     connection_id: string
   }
   CredentialOffer: {
-    credential_offer_id: string
-    connection_id: string
+    credential_offer_id: string | undefined
+    connection_id: string | undefined
   }
   CredentialProof: {
     presentation_id: string
-    connection_id: string
+    connection_id: string | undefined
   }
   Credential: {
     credential_offer_id: string
@@ -41,6 +42,8 @@ export type ContactStackParamList = {
 const ContactStack = createStackNavigator<ContactStackParamList>()
 
 const ContactScreenStack: React.FC = () => {
+  useAgentEventListenerHook()
+
   return (
     <ContactStack.Navigator>
       <ContactStack.Screen name="Contacts" component={Contacts} />

@@ -6,6 +6,7 @@ import {
 import React from "react"
 import ConnectionRequest from "@screens/Connection/ConnectionRequest"
 import Scan from "@screens/Scan/Scan"
+import useAgentEventListenerHook from "@hooks/useAgentEventListenerHook"
 
 type ScanStackProps = {}
 
@@ -23,6 +24,7 @@ export type ScanStackParamList = {
 const ScanStack = createStackNavigator<ScanStackParamList>()
 
 const ScanScreenStack: React.FC = () => {
+  useAgentEventListenerHook()
   return (
     <ScanStack.Navigator
       screenOptions={{

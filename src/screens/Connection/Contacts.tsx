@@ -1,8 +1,16 @@
-import { ConnectionRecord } from "@aries-framework/core"
-import { useConnections } from "@aries-framework/react-hooks"
+import {
+  ConnectionRecord,
+  CredentialEventTypes,
+  CredentialState,
+  CredentialStateChangedEvent,
+  ProofEventTypes,
+  ProofState,
+  ProofStateChangedEvent,
+} from "@aries-framework/core"
+import { useConnections, useAgent } from "@aries-framework/react-hooks"
 import { MaterialIcons } from "@expo/vector-icons"
 import { StackScreenProps } from "@react-navigation/stack"
-import React, { useEffect, useLayoutEffect, useState } from "react"
+import React, { useEffect, useState } from "react"
 import {
   FlatList,
   Image,
@@ -14,6 +22,7 @@ import {
   View,
 } from "react-native"
 import { ContactStackParamList } from "../../navigation/ContactStack"
+import useDecoratedHeader from "@hooks/useDecoratedHeader"
 type Props = StackScreenProps<
   ContactStackParamList,
   "Contacts",
@@ -28,12 +37,13 @@ const Contacts = ({ navigation, route }: Props) => {
     ConnectionRecord[]
   >([])
   const connections = useConnections()
+  const agent = useAgent()
 
   useEffect(() => {
     setFilteredConnections(connections.records)
-    console.log(connections.records)
-    //console.log(connections.records);
   }, [connections.records])
+
+  useDecoratedHeader()
 
   const searchFilterFunction = (text: string) => {
     if (text === "") {
@@ -47,18 +57,6 @@ const Contacts = ({ navigation, route }: Props) => {
     }
     setSearch(text)
   }
-
-  useLayoutEffect(() => {
-    //change header color to #09182d and text to white
-    navigation.setOptions({
-      headerStyle: {
-        backgroundColor: "#09182d",
-        borderBottomLeftRadius: 20,
-        borderBottomRightRadius: 20,
-      },
-      headerTintColor: "white",
-    })
-  })
 
   const clearSearch = () => {
     setFilteredConnections(connections.records)

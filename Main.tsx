@@ -13,6 +13,7 @@ import {
   walletLocal,
 } from "./agentStuff"
 import { useAuth } from "@context/AuthProvider"
+import { AgentEventsProvider } from "@context/AgentEventsProvider"
 
 const Main: React.FC = () => {
   const [initializedAgent, setInitializedAgent] = useState<Agent<any> | null>(
@@ -31,6 +32,7 @@ const Main: React.FC = () => {
         const recoveryPhrase = await recoveryPhraseLocal()
         const config = getAgentConfig(id, recoveryPhrase)
         const agent = getAgent(config)
+        console.log("Sup")
         await agent.initialize()
         await createLinkSecretIfRequired(agent)
 
@@ -84,7 +86,9 @@ const Main: React.FC = () => {
       ) : (
         initializedAgent && (
           <AgentProvider agent={initializedAgent}>
-            <BottomNavigation />
+            <NavigationContainer>
+              <BottomNavigation />
+            </NavigationContainer>
           </AgentProvider>
         )
       )}

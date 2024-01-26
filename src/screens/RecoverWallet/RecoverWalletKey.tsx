@@ -4,7 +4,8 @@ import { SettingStackParamList } from "@navigation/SettingStack"
 import { StackScreenProps } from "@react-navigation/stack"
 import { encode } from "base-64"
 import * as SQLite from "expo-sqlite"
-import IndySdk, { WalletConfig } from "indy-sdk-react-native"
+//import IndySdk, { WalletConfig } from "indy-sdk-react-native"
+import { WalletConfig } from "@aries-framework/core"
 import React, { useEffect, useLayoutEffect, useState } from "react"
 import {
   ActivityIndicator,
@@ -67,9 +68,9 @@ const RecoverWalletKey = ({ navigation, route }: Props) => {
 
       const walletConfig: WalletConfig = configNew.walletConfig || {
         id: "",
-        storage_type: undefined,
-        storage_config: undefined,
+        key: "",
       }
+
       const walletCredentials = { key: configNew.walletConfig?.key || "" }
 
       const existingWalletPath = `${RNFS.DocumentDirectoryPath}/.indy_client/wallet/${walletName}`
@@ -84,7 +85,7 @@ const RecoverWalletKey = ({ navigation, route }: Props) => {
 
       console.log(customEncode(recoveryPhrase))
 
-      await IndySdk.importWallet(walletConfig, walletCredentials, {
+      await agent.agent.wallet.import(walletConfig, {
         path: localFilePath,
         key: customEncode(recoveryPhrase),
       })

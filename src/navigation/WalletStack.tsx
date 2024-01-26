@@ -1,3 +1,4 @@
+import useAgentEventListenerHook from "@hooks/useAgentEventListenerHook"
 import {
   createStackNavigator,
   TransitionPresets,
@@ -21,6 +22,8 @@ export type WalletStackParamList = {
 const WalletStack = createStackNavigator<WalletStackParamList>()
 
 const WalletScreenStack: React.FC = () => {
+  useAgentEventListenerHook()
+
   return (
     <WalletStack.Navigator
       screenOptions={{

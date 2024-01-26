@@ -1,3 +1,4 @@
+import useAgentEventListenerHook from "@hooks/useAgentEventListenerHook"
 import { createStackNavigator } from "@react-navigation/stack"
 // import AuthRecoveryPhrase from "../screens/ChangePassword/"
 import WalletManager from "@screens/Backupwallet/WalletManager"
@@ -26,6 +27,8 @@ export type SettingStackParamList = {
 const SettingStack = createStackNavigator<SettingStackParamList>()
 
 const SettingStackScreen: React.FC = () => {
+  useAgentEventListenerHook()
+
   return (
     <SettingStack.Navigator>
       <SettingStack.Screen name="Settings" component={Settings} />

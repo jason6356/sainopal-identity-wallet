@@ -1,17 +1,23 @@
 import React, { useLayoutEffect, useState } from "react"
-import { View, Text, StyleSheet, TouchableOpacity, Alert } from "react-native"
+import { Alert, StyleSheet, Text, TouchableOpacity, View } from "react-native"
 import DocumentPicker, {
   DocumentPickerResponse,
 } from "react-native-document-picker"
 import RNFS from "react-native-fs"
-import IndySdk, { WalletConfig } from "indy-sdk-react-native"
-import { config, recoveryPhraseLocal } from "../../../agentStuff/agent"
+//import IndySdk, { WalletConfig } from "indy-sdk-react-native"
+import { recoveryPhraseLocal } from "../../../agentStuff/agent"
 
+import {
+  ConsoleLogger,
+  InitConfig,
+  LogLevel,
+  WalletConfig,
+} from "@aries-framework/core"
 import { StackScreenProps } from "@react-navigation/stack"
-import { ConsoleLogger, InitConfig, LogLevel } from "@aries-framework/core"
 
-import { SettingStackParamList } from "../../navigators/SettingStack"
+import { useAgent } from "@aries-framework/react-hooks"
 import useHideBottomTabBar from "@hooks/useHideBottomTabBar"
+import { SettingStackParamList } from "@navigation/SettingStack"
 
 type Props = StackScreenProps<SettingStackParamList, "RecoverWallet">
 
@@ -30,6 +36,7 @@ const RecoverWallet = ({ navigation }: Props) => {
   }, [navigation])
 
   const [importedFileName, setImportedFileName] = useState<string | null>(null)
+  const agent = useAgent()
 
   const pickDocument = async () => {
     try {
@@ -78,7 +85,10 @@ const RecoverWallet = ({ navigation }: Props) => {
         logger: new ConsoleLogger(LogLevel.trace),
       }
 
-      const walletConfig: WalletConfig = configNew.walletConfig || {}
+      const walletConfig: WalletConfig = configNew.walletConfig || {
+        id: "",
+        key: "",
+      }
       const walletCredentials = { key: configNew.walletConfig?.key || "" }
 
       // Check if the wallet already exists
@@ -99,9 +109,9 @@ const RecoverWallet = ({ navigation }: Props) => {
       //   key: "123456",
       // })
 
-      await IndySdk.importWallet(walletConfig, walletCredentials, {
+      await agent.agent.wallet.import(walletConfig, {
         path: localFilePath,
-        key: recovertWallet,
+        key: "123456",
       })
 
       console.log("Imported Wallet Successfully")
